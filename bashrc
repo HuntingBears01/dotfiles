@@ -90,7 +90,6 @@ case "$TERM" in
 esac
 
 # Enable color support of ls and also add handy aliases
-# Doesn't run under OS X
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
@@ -101,11 +100,20 @@ fi
 
 # OS X specific section
 if [ $(uname -s) = "Darwin" ]; then
-    alias ls='ls -G'
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-    export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
+    # Use GNU coreutils if installed
+    if [ -x /usr/local/bin/gdircolors ]; then
+        test -r ~/.dircolors && eval "$(gdircolors -b ~/.dircolors)" || eval "$(gdircolors -b)"
+        alias ls='gls --color=auto'
+        alias grep='grep --color=auto'
+        alias fgrep='fgrep --color=auto'
+        alias egrep='egrep --color=auto'
+    else
+        alias ls='ls -G'
+        alias grep='grep --color=auto'
+        alias fgrep='fgrep --color=auto'
+        alias egrep='egrep --color=auto'
+        export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
+    fi
 fi
 
 # `up` is a convenient way to navigate back up a file tree, and is a general-use
