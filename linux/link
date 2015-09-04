@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# Link dotfiles using RCM and load new config
+echo -e "\nLinking dotfiles to your home directory ..."
+rcup -v -d ~/.dotfiles -x "*:*osx*" -x "*:*linux*" -x "*:*README*"
+source ~/.bashrc
+
+# Setup Vim
+echo -e "\nSetting up Vim ..."
+if [ ! -d ~/.vim/bundle/base16-vim ]; then
+    git clone https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim
+fi
+if [ ! -d ~/.vim/bundle/Vundle.vim ]; then
+    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+fi
+vim +PluginInstall +qall
+
+echo -e "\nDone."

@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+if [ $(uname -s) = "Darwin" ]; then
+
+    # Install Xcode command line tools
+    if !(xcode-select -p > /dev/null); then
+        echo -e "\nInstalling Xcode Command Line Tools ..."
+        xcode-select --install
+    fi
+
+    # Install Homebrew
+    if !(which brew > /dev/null); then
+        echo -e "\nInstalling Homebrew ..."
+        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    fi
+
+    echo -e "\nUpdating Homebrew ..."
+    brew update
+
+    # Install RCM for managing dotfiles
+    if !(brew list | grep rcm > /dev/null); then
+        echo -e "\nInstalling RCM ..."
+        brew tap thoughtbot/formulae
+        brew install rcm
+    fi
+
+    # Install Homebrew Cask
+    if !(brew list | grep brew-cask > /dev/null); then
+        echo -e "\nInstalling Homebrew Cask ..."
+        brew install caskroom/cask/brew-cask
+    fi
+
+    brew_cask_install() {
+        for app; do
+            local app_name="$(echo $app | sed 's/-/ /')"
+            if (ls /Applications/ | grep -i "$app_name" > /dev/null) || (brew cask list | grep $app > /dev/null); then
+                echo "Already installed: $app_name"
+            else
+                echo "Installing: $app"
+                brew cask install --appdir="/Applications" $app || true
+            fi
+        done
+    }
+
+    brew_install() {
+        for app; do
+            if !(brew list | grep $app > /dev/null); then
+                echo "Installing: $app"
+                brew install $app || true
+            fi
+        done
+    }
+    echo -e "\nInstalling Homebrew Applications ..."
+    brew_cask_install vim
+
+    echo -e "\nInstalling Homebrew Cask Applications ..."
+    brew_cask_install 1password a-better-finder-rename airfoil alfred appcleaner \
+        bartender bettertouchtool bittorrent-sync burn calibre catch chronosync \
+        coconutbattery doxie dropbox evernote fantastical fastscripts firefox \
+        flux forklift github-desktop google-chrome google-earth gpgtools \
+        handbrake ibrowse imageoptim istat-menus iterm2 ivolume jing kid3 kindle \
+        knockknock mactracker macvim malwarebytes-anti-malware musicbrainz-picard \
+        logitech-myharmony netspot omnidisksweeper sequel-pro skitch spotify \
+        superduper taskpaper textwrangler the-unarchiver things torbrowser \
+        transmission tunnelbear vlc
+
+    echo -e "\nBrew Cleanup ..."
+    brew cleanup
+
+else
+    echo -e "\nThis script runs under OS X only."
+fi

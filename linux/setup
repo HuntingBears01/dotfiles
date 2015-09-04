@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+if [ $(uname -s) != "Darwin" ]; then
+
+    # Get script directory
+    SOURCE="${BASH_SOURCE[0]}"
+    while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+        DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+        SOURCE="$(readlink "$SOURCE")"
+        [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, resolve it
+    done
+    DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+    if [ $( cat /etc/*release | grep -ci "debian" ) -ge 1 ]; then
+        DISTRO="Debian"
+    elif [ $( cat /etc/*release | grep -ci "red hat" ) -ge 1 ]; then
+        DISTRO="Red Hat"
+    elif [ $( cat /etc/*release | grep -ci "centos" ) -ge 1 ]; then
+        DISTRO="CentOS"
+    else
+        DISTRO="Other"
+    fi
+
+    case $DISTRO in
+        "Debian")
+            # Install dependancies
+            sudo apt-get update && sudo apt-get install -y git vim wget
+
+            # Install RCM
+            wget https://thoughtbot.github.io/rcm/debs/rcm_1.2.3-1_all.deb
+            sha=$(sha256sum rcm_1.2.3-1_all.deb | cut -f1 -d' ')
+            [ "$sha" = "fb8ec2611cd4d519965b66fcf950bd93d7593773659f83a8612053217daa38b4" ] && \
+                sudo dpkg -i rcm_1.2.3-1_all.deb
+
+            # Link dotfiles to home dir & setup Vim
+            source $DIR/link
+            ;;
+        "Red Hat")
+            # Install dependancies
+            yum install git vim wget
+
+            # Install RCM
+            cd /etc/yum.repos.d/
+            wget http://download.opensuse.org/repositories/utilities/CentOS_6/utilities.repo
+            yum install rcm
+
+            # Link dotfiles to home dir & setup Vim
+            source $DIR/link
+            ;;
+        "CentOS")
+            # Install dependancies
+            yum install git vim wget
+
+            # Install RCM
+            cd /etc/yum.repos.d/
+            wget http://download.opensuse.org/repositories/utilities/CentOS_6/utilities.repo
+            yum install rcm
+
+            # Link dotfiles to home dir & setup Vim
+            source $DIR/link
+            ;;
+        "Other")
+            echo -e "\nUnknown Distro - Manual install required"
+            echo -e "\nUse your package manager to install git, vim & wget"
+            echo -e "Install RCM (see https://github.com/thoughtbot/rcm for installation guide)\n"
+            echo -e "\nRun ~/.dotfiles/linux/link to complete installation"
+            ;;
+    esac
+else
+    echo "This script runs under Linux only."
+fi
