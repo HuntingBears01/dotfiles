@@ -41,7 +41,7 @@ if [ $(uname -s) != "Darwin" ]; then
 
             # Install RCM
             cd /etc/yum.repos.d/
-            wget http://download.opensuse.org/repositories/utilities/CentOS_6/utilities.repo
+            wget http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo
             yum install rcm
 
             # Link dotfiles to home dir & setup Vim
