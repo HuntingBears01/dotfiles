@@ -62,7 +62,7 @@ if [ $(uname -s) = "Darwin" ]; then
         knockknock mactracker macvim malwarebytes-anti-malware musicbrainz-picard \
         logitech-myharmony netspot omnidisksweeper sequel-pro skitch spotify \
         superduper taskpaper textwrangler the-unarchiver things torbrowser \
-        transmission tunnelbear vlc
+        transmission tunnelbear vlc max diskmaker-x
 
     echo -e "\nBrew Cleanup ..."
     brew cleanup
