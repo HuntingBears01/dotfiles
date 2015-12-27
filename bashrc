@@ -18,7 +18,7 @@ HISTFILESIZE=2000
 shopt -s checkwinsize
 
 # Add `~/bin` to the `$PATH`
-export PATH="$HOME/bin:$PATH";
+export PATH="$HOME/bin:/usr/local/sbin:$PATH";
 
 # Base16 Shell
 BASE16_SHELL="$HOME/.config/base16-shell/base16-atelierdune.dark.sh"
