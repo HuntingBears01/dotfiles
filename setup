@@ -56,6 +56,7 @@ setup_common() {
     fi
     git config --global core.editor "$(which vim)"
     git config --global core.autocrlf input
+    git config --global push.default current
     git config --global alias.unstage 'reset HEAD --'
     git config --global alias.last 'log -1 HEAD'
     git config --global alias.co checkout
