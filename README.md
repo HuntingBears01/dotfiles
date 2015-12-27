@@ -26,28 +26,7 @@ curl -#L https://github.com/huntingbears01/dotfiles/tarball/master \
 ## Setup
 
 Run the setup script
-
-#### OS X
-
 ```
-cd && .dotfiles/osx/setup
-```
-
-#### Linux
-
-```
-cd && .dotfiles/linux/setup
-```
-
-### Local Git Config
-
-Create a .gitconfig.local file in your **home** directory to personalise your Git install
-
-Example:
-
-```
-[user]
-    name = Your Name
-    email = youremail@example.com
+cd && .dotfiles/setup
 ```
 
