@@ -68,7 +68,7 @@ setup_common() {
 
     e_begin "Vim configuration"
     if [ ! -d ~/.vim/bundle/base16-vim ]; then
-        git clone https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim > /dev/nul
+        git clone https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim > /dev/null
     fi
     if [ ! -d ~/.vim/bundle/Vundle.vim ]; then
         git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim > /dev/null
@@ -90,7 +90,7 @@ case $DISTRO in
             sudo scutil --set ComputerName "$name"
             sudo scutil --set HostName "$name"
             sudo scutil --set LocalHostName "$name"
-            sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSNam
+            sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
             e_end
         fi
 
