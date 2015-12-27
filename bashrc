@@ -146,6 +146,7 @@ if [ $(uname -s) = "Darwin" ]; then
     command -v md5sum > /dev/null || alias md5sum="md5"
     # OS X has no `sha1sum`, so use `shasum` as a fallback
     command -v sha1sum > /dev/null || alias sha1sum="shasum"
+    alias updatey='brew update && brew upgrade --cleanup'
 else
     # Linux only section
     alias updatey='sudo apt-get update && sudo apt-get -y upgrade'
