@@ -54,6 +54,7 @@ setup_common() {
     if test ! -z "$gitEmail"; then
         git config --global user.email "$gitEmail"
     fi
+    git config --global color.ui auto
     git config --global core.editor "$(which vim)"
     git config --global core.autocrlf input
     git config --global push.default current
