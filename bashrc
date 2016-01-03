@@ -146,10 +146,16 @@ if [ $(uname -s) = "Darwin" ]; then
     command -v md5sum > /dev/null || alias md5sum="md5"
     # OS X has no `sha1sum`, so use `shasum` as a fallback
     command -v sha1sum > /dev/null || alias sha1sum="shasum"
-    alias updatey='brew update && brew upgrade --cleanup'
+    if [ ${UID} -ne "0" ]; then
+        alias updatey='brew update && brew upgrade --cleanup'
+        alias svi='sudo vi'
+    fi
 else
     # Linux only section
-    alias updatey='sudo apt-get update && sudo apt-get -y upgrade'
+    if [ ${UID} -ne "0" ]; then
+        alias updatey='sudo apt-get update && sudo apt-get -y upgrade'
+        alias svi='sudo vi'
+    fi
 fi
 
 # enable programmable completion features (you don't need to enable
