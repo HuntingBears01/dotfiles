@@ -68,7 +68,7 @@ fi
 
 if [ "$color_prompt" = yes ]; then
     # Highlight the user name when logged in as root.
-    if [[ "${USER}" == "root" ]]; then
+    if [[ "${UID}" -eq "0" ]]; then
         userStyle="${red}";
     else
         userStyle="${green}";
