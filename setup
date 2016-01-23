@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 e_begin() {
-    echo -e "\n \033[1;33m➜\033[0m  $@ ..."
+    echo -e "\n \033[1;33m➜\033[0m  $* ..."
 }
 
 e_success() {
-    echo -e " \033[1;32m✔\033[0m  $@\n"
+    echo -e " \033[1;32m✔\033[0m  $*\n"
 }
 
 e_error() {
-    echo -e " \033[1;31m✖\033[0m  $@\n"
+    echo -e " \033[1;31m✖\033[0m  $*\n"
 }
 
 e_end() {
@@ -24,33 +24,56 @@ e_end() {
 clear
 echo -e "Dotfiles Setup Script\n=====================\n"
 
-if [ $(uname -s) = "Darwin" ]; then
+if [ "$( uname -s )" = "Darwin" ]; then
     DISTRO="OS X"
-elif [ $( cat /etc/*release | grep -ci "debian" ) -ge 1 ]; then
+elif [ "$( cat /etc/*release | grep -ci "debian" )" -ge 1 ]; then
     DISTRO="Debian"
-elif [ $( cat /etc/*release | grep -ci "red hat" ) -ge 1 ]; then
+elif [ "$( cat /etc/*release | grep -ci "red hat" )" -ge 1 ]; then
     DISTRO="Red Hat"
-elif [ $( cat /etc/*release | grep -ci "centos" ) -ge 1 ]; then
-    DISTRO="CentOS"
+elif [ "$( cat /etc/*release | grep -ci "centos" )" -ge 1 ]; then
+    DISTRO="Red Hat"
 else
     DISTRO="Other"
 fi
+
+apt_install() {
+    for app; do
+        if ! (dpkg --list | grep "$app" > /dev/null); then
+            echo "Installing: $app"
+            apt-get install "$app" || true
+        fi
+    done
+}
+
+brew_install() {
+    for app; do
+        if ! (brew list | grep "$app" > /dev/null); then
+            echo "Installing: $app"
+            brew install "$app" || true
+        fi
+    done
+}
+
+yum_install() {
+    for app; do
+        if ! (rpm -qa | grep "$app" > /dev/null); then
+            echo "Installing: $app"
+            yum install "$app" || true
+        fi
+    done
+}
 
 setup_common() {
     e_begin "Linking dotfiles to your home directory"
     rcup -d ~/.dotfiles -x "*:*setup*" -x "*:*README*"
     e_end
 
-    e_begin "Loading new config"
-    source ~/.bashrc
-    e_end
-
     e_begin "Git configuration"
-    read -p "    Name: " gitName
+    read -rp "    Name: " gitName
     if test ! -z "$gitName"; then
         git config --global user.name "$gitName"
     fi
-    read -p "    Email: " gitEmail
+    read -rp "    Email: " gitEmail
     if test ! -z "$gitEmail"; then
         git config --global user.email "$gitEmail"
     fi
@@ -77,124 +100,115 @@ setup_common() {
     vim +PluginInstall +qall
     e_end
 
+    e_begin "Loading new config"
+    source ~/.bashrc
+    e_end
+
     echo -e "\nScript complete"
 }
 
-case $DISTRO in
-    "OS X")
-        # Set hostname
-        e_begin "Configuring Hostname"
-        read -p "    Hostname: " name
-        if test -z $name; then
-            e_success "Hostname unchanged"
-        else
-            sudo scutil --set ComputerName "$name"
-            sudo scutil --set HostName "$name"
-            sudo scutil --set LocalHostName "$name"
-            sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
-            e_end
-        fi
+setup_debian() {
+    e_begin "Installing dependencies"
+    sudo apt-get update > /dev/null && sudo apt-get install -y git vim wget > /dev/null
+    e_end
 
-        # Install dependancies
-        e_begin "Installing Xcode Command Line Tools"
-        if !(xcode-select -p > /dev/null); then
-            xcode-select --install
-            e_end
-        else
-            e_success "Already installed"
-        fi
-
-        e_begin "Installing Homebrew"
-        if !(which brew > /dev/null); then
-            ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-            e_end
-        else
-            e_success "Already installed"
-            e_begin "Updating Homebrew"
-            brew update > /dev/null
-            brew upgrade > /dev/null
-            e_end
-        fi
-
-        e_begin "Installing RCM"
-        if !(brew list | grep rcm > /dev/null); then
-            brew tap thoughtbot/formulae
-            brew install rcm
-            e_end
-        else
-            e_success "Already installed"
-        fi
-
-        brew_install() {
-            for app; do
-                if !(brew list | grep $app > /dev/null); then
-                    echo "Installing: $app"
-                    brew install $app || true
-                fi
-            done
-        }
-        e_begin "Installing Homebrew applications"
-        brew_install vim coreutils > /dev/null
+    e_begin "Installing RCM"
+    if [ "$( which lsrc )" ]; then
+        e_success "Already installed"
+    else
+        wget https://thoughtbot.github.io/rcm/debs/rcm_1.3.0-1_all.deb > /dev/null
+        sha=$(sha256sum rcm_1.3.0-1_all.deb | cut -f1 -d' ') > /dev/null
+        [ "$sha" = "2e95bbc23da4a0b995ec4757e0920197f4c92357214a65fedaf24274cda6806d" ] > /dev/null && sudo dpkg -i rcm_1.3.0-1_all.deb > /dev/null
         e_end
+    fi
 
-        e_begin "Brew cleanup"
-        brew cleanup > /dev/null
+    e_begin "Installing applications"
+    apt_install shellcheck > /dev/null
+    e_end
+
+    setup_common
+}
+
+setup_rhel() {
+    e_begin "Installing dependencies"
+    yum install git vim wget > /dev/null
+    e_end
+
+    e_begin "Installing RCM"
+    if [ "$( which lsrc )" ]; then
+        e_success "Already installed"
+    else
+        cd /etc/yum.repos.d/ || exit > /dev/null
+        wget http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo > /dev/null
+        yum install rcm > /dev/null
         e_end
+    fi
 
-        setup_common
-        ;;
-    "Debian")
-        e_begin "Installing dependencies"
-        sudo apt-get update > /dev/null && sudo apt-get install -y git vim wget > /dev/null
+    e_begin "Installing applications"
+    yum_install shellcheck > /dev/null
+    e_end
+
+    setup_common
+}
+
+setup_osx() {
+    # Set hostname
+    e_begin "Configuring Hostname"
+    read -rp "    Hostname: " name
+    if test -z "$name"; then
+        e_success "Hostname unchanged"
+    else
+        sudo scutil --set ComputerName "$name"
+        sudo scutil --set HostName "$name"
+        sudo scutil --set LocalHostName "$name"
+        sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
         e_end
+    fi
 
-        e_begin "Installing RCM"
-        if [ $(which lsrc) ]; then
-            e_success "Already installed"
-        else
-            wget https://thoughtbot.github.io/rcm/debs/rcm_1.3.0-1_all.deb > /dev/null
-            sha=$(sha256sum rcm_1.3.0-1_all.deb | cut -f1 -d' ') > /dev/null
-            [ "$sha" = "2e95bbc23da4a0b995ec4757e0920197f4c92357214a65fedaf24274cda6806d" ] > /dev/null && sudo dpkg -i rcm_1.3.0-1_all.deb > /dev/null
-            e_end
-        fi
-
-        setup_common
-        ;;
-    "Red Hat")
-        e_begin "Installing dependencies"
-        yum install git vim wget > /dev/null
+    # Install dependancies
+    e_begin "Installing Xcode Command Line Tools"
+    if ! (xcode-select -p > /dev/null); then
+        xcode-select --install
         e_end
+    else
+        e_success "Already installed"
+    fi
 
-        e_begin "Installing RCM"
-        if [ $(which lsrc) ]; then
-            e_success "Already installed"
-        else
-            cd /etc/yum.repos.d/ > /dev/null
-            wget http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo > /dev/null
-            yum install rcm > /dev/null
-            e_end
-        fi
-
-        setup_common
-        ;;
-    "CentOS")
-        e_begin "Installing dependencies"
-        yum install git vim wget > /dev/null
+    e_begin "Installing Homebrew"
+    if ! (which brew > /dev/null); then
+        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         e_end
+    else
+        e_success "Already installed"
+        e_begin "Updating Homebrew"
+        brew update > /dev/null
+        brew upgrade > /dev/null
+        e_end
+    fi
 
-        e_begin "Installing RCM"
-        if [ $(which lsrc) ]; then
-            e_success "Already installed"
-        else
-            cd /etc/yum.repos.d/ > /dev/null
-            wget http://download.opensuse.org/repositories/utilities/CentOS_6/utilities.repo > /dev/null
-            yum install rcm > /dev/null
-            e_end
-        fi
+    e_begin "Installing RCM"
+    if ! (brew list | grep rcm > /dev/null); then
+        brew tap thoughtbot/formulae
+        brew install rcm
+        e_end
+    else
+        e_success "Already installed"
+    fi
 
-        setup_common
-        ;;
-    "Other")
-        e_error "Unknown Distro - Manual install required"
-        ;;
+    e_begin "Installing applications"
+    brew_install vim coreutils shellcheck > /dev/null
+    e_end
+
+    e_begin "Brew cleanup"
+    brew cleanup > /dev/null
+    e_end
+
+    setup_common
+}
+
+case "$DISTRO" in
+    "OS X") setup_osx;;
+    "Debian") setup_debian;;
+    "Red Hat") setup_rhel;;
+    "Other") e_error "Unknown Distro - Manual install required";;
 esac
