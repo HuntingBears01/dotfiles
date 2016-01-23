@@ -39,8 +39,10 @@ fi
 apt_install() {
     for app; do
         if ! (dpkg --list | grep "$app" > /dev/null); then
-            echo "Installing: $app"
-            apt-get install "$app" || true
+            echo "    Installing: $app"
+            sudo apt-get install "$app" || true
+        else
+            echo "    $app already installed"
         fi
     done
 }
@@ -48,8 +50,10 @@ apt_install() {
 brew_install() {
     for app; do
         if ! (brew list | grep "$app" > /dev/null); then
-            echo "Installing: $app"
+            echo "    Installing: $app"
             brew install "$app" || true
+        else
+            echo "    $app already installed"
         fi
     done
 }
@@ -57,8 +61,10 @@ brew_install() {
 yum_install() {
     for app; do
         if ! (rpm -qa | grep "$app" > /dev/null); then
-            echo "Installing: $app"
+            echo "    Installing: $app"
             yum install "$app" || true
+        else
+            echo "    $app already installed"
         fi
     done
 }
@@ -109,7 +115,8 @@ setup_common() {
 
 setup_debian() {
     e_begin "Installing dependencies"
-    sudo apt-get update > /dev/null && sudo apt-get install -y git vim wget > /dev/null
+    sudo apt-get update > /dev/null
+    apt_install git wget
     e_end
 
     e_begin "Installing RCM"
@@ -123,7 +130,7 @@ setup_debian() {
     fi
 
     e_begin "Installing applications"
-    apt_install shellcheck > /dev/null
+    apt_install vim shellcheck
     e_end
 
     setup_common
@@ -131,7 +138,7 @@ setup_debian() {
 
 setup_rhel() {
     e_begin "Installing dependencies"
-    yum install git vim wget > /dev/null
+    yum_install git wget
     e_end
 
     e_begin "Installing RCM"
@@ -145,7 +152,7 @@ setup_rhel() {
     fi
 
     e_begin "Installing applications"
-    yum_install shellcheck > /dev/null
+    yum_install vim shellcheck
     e_end
 
     setup_common
@@ -196,7 +203,7 @@ setup_osx() {
     fi
 
     e_begin "Installing applications"
-    brew_install vim coreutils shellcheck > /dev/null
+    brew_install vim coreutils shellcheck
     e_end
 
     e_begin "Brew cleanup"
