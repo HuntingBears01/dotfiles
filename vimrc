@@ -16,11 +16,7 @@ Plugin 'bling/vim-airline'
 Plugin 'terryma/vim-expand-region'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-unimpaired'
 Plugin 'scrooloose/nerdcommenter'
-Plugin 'rstacruz/sparkup'
-Plugin 'mattn/emmet-vim'
-Plugin 'godlygeek/tabular'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -58,25 +54,25 @@ set shiftround
 " ============
 " Set leader key
 let mapleader = ","
-" F2 - Toggle paste mode
+" Toggle paste mode
 set pastetoggle=<F2>
-" F3 - Toggle line numbering
-nmap <F3> :set invnumber<CR>
-" F4 - Toggle NERDTree
-nmap <F4> :NERDTreeToggle<CR>
-" F5 - Remove trailing spaces
-nmap <F5> :call Preserve("%s/\\s\\+$//e")<CR>
-" F6 - Fix indentation for entire document
-nmap <F6> :call Preserve("normal gg=G")<CR>
-" F7 - Toggle show hidden characters
-nmap <F7> :set list!<CR>
-" F8 - Toggle wordwrap
-nmap <F8> :set wrap! linebreak! nolist<CR>
-" F9 - Toggle spellcheck
-nmap <F9> :set spell!<CR>
-" F10 - Clear search highlighting
-nmap <F10> :nohlsearch<CR>
-" v/CTRL v - Select/deselect character/word/paragraph
+" Toggle line numbering
+nmap <Leader>l :set invnumber<CR>
+" Toggle NERDTree
+nmap <Leader>n :NERDTreeToggle<CR>
+" Remove trailing spaces
+nmap <Leader>t :call Preserve("%s/\\s\\+$//e")<CR>
+" Fix indentation for entire document
+nmap <Leader>i :call Preserve("normal gg=G")<CR>
+" Toggle show hidden characters
+nmap <Leader>x :set list!<CR>
+" Toggle wordwrap
+nmap <Leader>w :set wrap! linebreak! nolist<CR>
+" Toggle spellcheck
+nmap <Leader>s :set spell!<CR>
+" Clear search highlighting
+nmap <Leader>h :nohlsearch<CR>
+" Select/deselect character/word/paragraph
 vmap v <Plug>(expand_region_expand)
 vmap <C-v> <Plug>(expand_region_shrink)
 " CTRL h/j/k/l - Switch to window left/below/above/right
@@ -92,13 +88,6 @@ vmap j gj
 vmap k gk
 nmap j gj
 nmap k gk
-" Tabular shortcuts
-if exists(":Tabularize")
-    nmap <Leader>a= :Tabularize /=<CR>
-    vmap <Leader>a= :Tabularize /=<CR>
-    nmap <Leader>a: :Tabularize /:\zs<CR>
-    vmap <Leader>a: :Tabularize /:\zs<CR>
-endif
 
 set backspace=2                         " Backspace deletes like most programs in insert mode
 set laststatus=2                        " Always display the status line
