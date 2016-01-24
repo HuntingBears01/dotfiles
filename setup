@@ -1,80 +1,86 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-e_begin() {
-    echo -e "\n \033[1;33m➜\033[0m  $* ..."
+clear
+printf "Dotfiles Setup Script\n=====================\n"
+
+if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
+    DISTRO="OS X"
+elif ([ "$( cat /etc/*release | grep -ci "debian" )" -ge 1 ]) > /dev/null 2>&1; then
+    DISTRO="Debian"
+elif ([ "$( cat /etc/*release | grep -ci "red hat" )" -ge 1 ]) > /dev/null 2>&1; then
+    DISTRO="Red Hat"
+elif ([ "$( cat /etc/*release | grep -ci "centos" )" -ge 1 ]) > /dev/null 2>&1; then
+    DISTRO="Red Hat"
+else
+    error "Unknown Distro - Manual install required\n"
+    exit
+fi
+
+printf "\n%s install\n" "$DISTRO"
+
+begin() {
+    printf " \033[0;33m➜\033[0m  %s\n" "$*"
 }
 
-e_success() {
-    echo -e " \033[1;32m✔\033[0m  $*\n"
+success() {
+    printf " \033[0;32m✔\033[0m  %s\n" "$*"
 }
 
-e_error() {
-    echo -e " \033[1;31m✖\033[0m  $*\n"
+error() {
+    printf " \033[0;31m✖\033[0m  %s\n" "$*"
 }
 
-e_end() {
+end() {
     status=$?
     if test $status -eq 0; then
-        e_success "Complete"
+        success "Complete"
     else
-        e_error "Error"
+        error "Error"
     fi
 }
 
-clear
-echo -e "Dotfiles Setup Script\n=====================\n"
-
-if [ "$( uname -s )" = "Darwin" ]; then
-    DISTRO="OS X"
-elif [ "$( cat /etc/*release | grep -ci "debian" )" -ge 1 ]; then
-    DISTRO="Debian"
-elif [ "$( cat /etc/*release | grep -ci "red hat" )" -ge 1 ]; then
-    DISTRO="Red Hat"
-elif [ "$( cat /etc/*release | grep -ci "centos" )" -ge 1 ]; then
-    DISTRO="Red Hat"
-else
-    DISTRO="Other"
-fi
-
 apt_install() {
     for app; do
-        if ! (dpkg --list | grep "$app" > /dev/null); then
-            echo "    Installing: $app"
-            sudo apt-get install "$app" || true
+        printf "\n"
+        begin "Installing $app"
+        if ! (dpkg --list | grep "$app" > /dev/null 2>&1); then
+            sudo apt-get install "$app" > /dev/null 2>&1 || false
+            end
         else
-            echo "    $app already installed"
+            success "Already installed"
         fi
     done
 }
 
 brew_install() {
     for app; do
-        if ! (brew list | grep "$app" > /dev/null); then
-            echo "    Installing: $app"
-            brew install "$app" || true
+        printf "\n"
+        begin "Installing $app"
+        if ! (brew list | grep "$app" > /dev/null 2>&1); then
+            brew install "$app" > /dev/null 2>&1 || false
+            end
         else
-            echo "    $app already installed"
+            success "Already installed"
         fi
     done
 }
 
 yum_install() {
     for app; do
-        if ! (rpm -qa | grep "$app" > /dev/null); then
-            echo "    Installing: $app"
-            yum install "$app" || true
+        printf "\n"
+        begin "Installing $app"
+        if ! (rpm -qa | grep "$app" > /dev/null 2>&1); then
+            yum install "$app" > /dev/null 2>&1 || false
+            end
         else
-            echo "    $app already installed"
+            success "Already installed"
         fi
     done
 }
 
-setup_common() {
-    e_begin "Linking dotfiles to your home directory"
-    rcup -d ~/.dotfiles -x "*:*setup*" -x "*:*README*"
-    e_end
-
-    e_begin "Git configuration"
+git_setup() {
+    printf "\n"
+    begin "Git configuration"
     read -rp "    Name: " gitName
     if test ! -z "$gitName"; then
         git config --global user.name "$gitName"
@@ -94,128 +100,151 @@ setup_common() {
     git config --global alias.ci commit
     git config --global alias.s status
     git config --global alias.logp 'log --pretty=oneline --graph'
-    e_end
+    end
+}
 
-    e_begin "Vim configuration"
+setup_common() {
+    printf "\n"
+    begin "Linking dotfiles to your home directory"
+    rcup -d ~/.dotfiles -x "*:*setup*" -x "*:*README*"
+    end
+
+    git_setup
+
+    printf "\n"
+    begin "Vim configuration"
     if [ ! -d ~/.vim/bundle/base16-vim ]; then
-        git clone https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim > /dev/null
+        git clone https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim > /dev/null 2>&1
     fi
     if [ ! -d ~/.vim/bundle/Vundle.vim ]; then
-        git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim > /dev/null
+        git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim > /dev/null 2>&1
     fi
     vim +PluginInstall +qall
-    e_end
+    end
 
-    e_begin "Loading new config"
+    printf "\n"
+    begin "Loading new config"
     source ~/.bashrc
-    e_end
+    end
 
-    echo -e "\nScript complete"
+    printf "\n\n\n"
+    success "Script complete"
+    printf "\n\n"
 }
 
 setup_debian() {
-    e_begin "Installing dependencies"
-    sudo apt-get update > /dev/null
-    apt_install git wget
-    e_end
+    printf "\n"
+    begin "Updating package list"
+    sudo apt-get update > /dev/null 2>&1
+    end
 
-    e_begin "Installing RCM"
+    printf "\n"
+    apt_install git wget
+
+    printf "\n"
+    begin "Installing RCM"
     if [ "$( which lsrc )" ]; then
-        e_success "Already installed"
+        success "Already installed"
     else
-        wget https://thoughtbot.github.io/rcm/debs/rcm_1.3.0-1_all.deb > /dev/null
-        sha=$(sha256sum rcm_1.3.0-1_all.deb | cut -f1 -d' ') > /dev/null
-        [ "$sha" = "2e95bbc23da4a0b995ec4757e0920197f4c92357214a65fedaf24274cda6806d" ] > /dev/null && sudo dpkg -i rcm_1.3.0-1_all.deb > /dev/null
-        e_end
+        wget https://thoughtbot.github.io/rcm/debs/rcm_1.3.0-1_all.deb > /dev/null 2>&1
+        sha=$(sha256sum rcm_1.3.0-1_all.deb | cut -f1 -d' ') > /dev/null 2>&1
+        ([ "$sha" = "2e95bbc23da4a0b995ec4757e0920197f4c92357214a65fedaf24274cda6806d" ] && sudo dpkg -i rcm_1.3.0-1_all.deb) > /dev/null 2>&1
+        end
     fi
 
-    e_begin "Installing applications"
     apt_install vim shellcheck
-    e_end
 
     setup_common
 }
 
 setup_rhel() {
-    e_begin "Installing dependencies"
+    printf "\n"
     yum_install git wget
-    e_end
 
-    e_begin "Installing RCM"
+    printf "\n"
+    begin "Installing RCM"
     if [ "$( which lsrc )" ]; then
-        e_success "Already installed"
+        success "Already installed"
     else
-        cd /etc/yum.repos.d/ || exit > /dev/null
-        wget http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo > /dev/null
-        yum install rcm > /dev/null
-        e_end
+        cd /etc/yum.repos.d/ || error "Unable to find /etc/yum.repos.d/" && exit
+        wget http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo > /dev/null 2>&1
+        yum install rcm > /dev/null 2>&1
+        end
     fi
 
-    e_begin "Installing applications"
     yum_install vim shellcheck
-    e_end
 
     setup_common
 }
 
 setup_osx() {
-    # Set hostname
-    e_begin "Configuring Hostname"
+    printf "\n"
+    begin "Configuring Hostname"
     read -rp "    Hostname: " name
     if test -z "$name"; then
-        e_success "Hostname unchanged"
+        success "Hostname unchanged"
     else
         sudo scutil --set ComputerName "$name"
         sudo scutil --set HostName "$name"
         sudo scutil --set LocalHostName "$name"
         sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
-        e_end
+        end
     fi
 
-    # Install dependancies
-    e_begin "Installing Xcode Command Line Tools"
-    if ! (xcode-select -p > /dev/null); then
+    printf "\n"
+    begin "Installing Xcode Command Line Tools"
+    if ! (xcode-select -p > /dev/null 2>&1); then
         xcode-select --install
-        e_end
+        end
     else
-        e_success "Already installed"
+        success "Already installed"
     fi
 
-    e_begin "Installing Homebrew"
-    if ! (which brew > /dev/null); then
-        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        e_end
+    printf "\n"
+    begin "Installing Homebrew"
+    if ! (which brew > /dev/null 2>&1); then
+        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" > /dev/null 2>&1
+        end
     else
-        e_success "Already installed"
-        e_begin "Updating Homebrew"
-        brew update > /dev/null
-        brew upgrade > /dev/null
-        e_end
+        success "Already installed"
+        printf "\n"
+        begin "Updating Homebrew"
+        brew update > /dev/null 2>&1
+        brew upgrade > /dev/null 2>&1
+        end
     fi
 
-    e_begin "Installing RCM"
-    if ! (brew list | grep rcm > /dev/null); then
-        brew tap thoughtbot/formulae
-        brew install rcm
-        e_end
+    printf "\n"
+    begin "Installing RCM"
+    if ! (brew list | grep rcm > /dev/null 2>&1); then
+        brew tap thoughtbot/formulae > /dev/null 2>&1
+        brew install rcm > /dev/null 2>&1
+        end
     else
-        e_success "Already installed"
+        success "Already installed"
     fi
 
-    e_begin "Installing applications"
     brew_install vim coreutils shellcheck
-    e_end
 
-    e_begin "Brew cleanup"
-    brew cleanup > /dev/null
-    e_end
+    printf "\n"
+    begin "Brew cleanup"
+    brew cleanup > /dev/null 2>&1
+    end
 
     setup_common
 }
 
 case "$DISTRO" in
-    "OS X") setup_osx;;
-    "Debian") setup_debian;;
-    "Red Hat") setup_rhel;;
-    "Other") e_error "Unknown Distro - Manual install required";;
+    "OS X")
+        setup_osx
+        ;;
+    "Debian")
+        setup_debian
+        ;;
+    "Red Hat")
+        setup_rhel
+        ;;
+    *)
+        error "Unknown Distro - Manual install required"
+        ;;
 esac
