@@ -106,7 +106,7 @@ git_setup() {
 setup_common() {
     printf "\n"
     begin "Linking dotfiles to your home directory"
-    rcup -d ~/.dotfiles -x "*:*setup*" -x "*:*README*"
+    rcup -d ~/.dotfiles -x "*:*setup*" -x "*:*README*" -x "*:*docs*"
     end
 
     git_setup

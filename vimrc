@@ -1,4 +1,4 @@
-" -------------------- Vundle begin --------------------
+" Vundle begin {{{1
 
 set nocompatible              " be iMproved, required
 filetype off                  " required
@@ -9,7 +9,7 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
-" Plugin list
+" Plugin begin
 Plugin 'chriskempson/base16-vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'bling/vim-airline'
@@ -17,78 +17,83 @@ Plugin 'terryma/vim-expand-region'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'tpope/vim-surround'
 Plugin 'scrooloose/nerdcommenter'
+Plugin 'nelstrom/vim-markdown-folding'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
 
-" -------------------- Vundle end --------------------
-
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
+" Syntax highlighting {{{1
 if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
     syntax on
-    set hlsearch
+    set hlsearch " Highlight search pattern
 endif
 
-" Color scheme
+" Color scheme {{{1
 let base16colorspace=256
 colorscheme base16-atelierdune
 set background=dark
 set encoding=utf-8
 
-" Vim-airline config
+" Vim-airline config {{{1
 if !exists('g:airline_symbols')
     let g:airline_symbols = {}
 endif
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
 
-" Tab config
+" Tab config {{{1
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set expandtab
 set shiftround
 
-" Key mappings
-" ============
-" Set leader key
+" Key mappings {{{1
 let mapleader = ","
 " Toggle paste mode
 set pastetoggle=<F2>
 " Toggle line numbering
-nmap <Leader>l :set invnumber<CR>
+nnoremap <Leader>l :set invnumber<CR>
 " Toggle NERDTree
-nmap <Leader>n :NERDTreeToggle<CR>
+nnoremap <Leader>n :NERDTreeToggle<CR>
 " Remove trailing spaces
-nmap <Leader>t :call Preserve("%s/\\s\\+$//e")<CR>
+nnoremap <Leader>t :call Preserve("%s/\\s\\+$//e")<CR>
 " Fix indentation for entire document
-nmap <Leader>i :call Preserve("normal gg=G")<CR>
+nnoremap <Leader>i :call Preserve("normal gg=G")<CR>
 " Toggle show hidden characters
-nmap <Leader>x :set list!<CR>
+nnoremap <Leader>h :set list!<CR>
 " Toggle wordwrap
-nmap <Leader>w :set wrap! linebreak! nolist<CR>
+nnoremap <Leader>w :set wrap! linebreak! nolist<CR>
 " Toggle spellcheck
-nmap <Leader>s :set spell!<CR>
+nnoremap <Leader>s :set spell!<CR>
 " Clear search highlighting
-nmap <Leader>h :nohlsearch<CR>
+nnoremap <Leader>c :nohlsearch<CR>
+" Edit vimrc
+nnoremap <leader>ev :split $MYVIMRC<cr>
+" Reload vimrc
+nnoremap <leader>rv :source $MYVIMRC<cr>
+
+" Vim-expand-region config {{{1
 " Select/deselect character/word/paragraph
-vmap v <Plug>(expand_region_expand)
-vmap <C-v> <Plug>(expand_region_shrink)
+vnoremap v <Plug>(expand_region_expand)
+vnoremap <C-v> <Plug>(expand_region_shrink)
+
+" Vim tweaks {{{1
 " CTRL h/j/k/l - Switch to window left/below/above/right
-map <C-h> <C-w>h
-map <C-j> <C-w>j
-map <C-k> <C-w>k
-map <C-l> <C-w>l
-" Auto cetre on matched string
+noremap <C-h> <C-w>h
+noremap <C-j> <C-w>j
+noremap <C-k> <C-w>k
+noremap <C-l> <C-w>l
+" Auto centre on matched string
 noremap n nzz
 noremap N Nzz
 " Navigate through wrapped lines
-vmap j gj
-vmap k gk
-nmap j gj
-nmap k gk
+vnoremap j gj
+vnoremap k gk
+nnoremap j gj
+nnoremap k gk
 
+" General settings {{{1
 set backspace=2                         " Backspace deletes like most programs in insert mode
 set laststatus=2                        " Always display the status line
 set showcmd                             " Show (partial) command in status line
@@ -110,15 +115,39 @@ set hidden                              " Hide buffers instead of prompting to s
 set scrolloff=8                         " Keep 8 lines above or below the cursor when scrolling
 set sidescroll=1
 set sidescrolloff=15                    " Keep 15 columns next to the cursor when scrolling horizontally
+" Open new split panes to right and bottom, which feels more natural
+set splitbelow
+set splitright
 
-if has("autocmd")
+" Folding settings {{{1
+augroup folding
+    autocmd!
+    " Set syntax folding as default
+    autocmd FileType * setlocal foldmethod=syntax
+    " Set marker folding for vim files
+    autocmd FileType vim setlocal foldmethod=marker
+    " Set expr folding for markdown files
+    autocmd FileType markdown setlocal foldmethod=expr
+augroup END
+set nofoldenable
+set foldnestmax=2
+let sh_fold_enabled=1
+let javaScript_fold=1
+let php_folding=1
+let xml_syntax_folding=1
+noremap <Space> za
+vnoremap <Space> za
+
+" NERDTree config {{{1
+augroup nerdtree
+    autocmd!
     " Automatically close if NERDTree is last window
     autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
-endif
+augroup end
 
+" Save cursor position & Git commit config {{{1
 augroup vimrcEx
     autocmd!
-
     " When editing a file, always jump to the last known cursor position.
     " Don't do it for commit messages, when the position is invalid, or when
     " inside an event handler (happens when dropping a file on gvim).
@@ -126,16 +155,12 @@ augroup vimrcEx
                 \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
                 \   exe "normal g`\"" |
                 \ endif
-
     " Automatically wrap at 72 characters and spell check git commit messages
     autocmd FileType gitcommit setlocal textwidth=72
     autocmd FileType gitcommit setlocal spell
 augroup END
 
-" Open new split panes to right and bottom, which feels more natural
-set splitbelow
-set splitright
-
+" Indentation script {{{1
 function! Preserve(command)
     " Preparation: save last search, and cursor position.
     let _s=@/
