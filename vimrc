@@ -18,6 +18,7 @@ Plugin 'sheerun/vim-polyglot'
 Plugin 'tpope/vim-surround'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'nelstrom/vim-markdown-folding'
+Plugin 'tpope/vim-repeat'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -47,6 +48,7 @@ set softtabstop=4
 set shiftwidth=4
 set expandtab
 set shiftround
+set smarttab
 
 " Key mappings {{{1
 let mapleader = ","
