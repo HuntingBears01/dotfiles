@@ -1,44 +1,22 @@
-#!/bin/bash
-
-clear
-printf "Dotfiles Setup Script\n=====================\n"
-
-if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
-    DISTRO="OS X"
-elif ([ "$( cat /etc/*release | grep -ci "debian" )" -ge 1 ]) > /dev/null 2>&1; then
-    DISTRO="Debian"
-elif ([ "$( cat /etc/*release | grep -ci "red hat" )" -ge 1 ]) > /dev/null 2>&1; then
-    DISTRO="Red Hat"
-elif ([ "$( cat /etc/*release | grep -ci "centos" )" -ge 1 ]) > /dev/null 2>&1; then
-    DISTRO="Red Hat"
-else
-    error "Unknown Distro - Manual install required\n"
-    exit
-fi
-
-printf "\n%s install\n" "$DISTRO"
+#!/usr/bin/env bash
 
 begin() {
     printf " \033[0;33m➜\033[0m  %s\n" "$*"
 }
-
 success() {
     printf " \033[0;32m✔\033[0m  %s\n" "$*"
 }
-
 error() {
     printf " \033[0;31m✖\033[0m  %s\n" "$*"
 }
-
 end() {
     status=$?
-    if test $status -eq 0; then
+    if [ $status -eq 0 ]; then
         success "Complete"
     else
         error "Error"
     fi
 }
-
 apt_install() {
     for app; do
         printf "\n"
@@ -51,7 +29,6 @@ apt_install() {
         fi
     done
 }
-
 brew_install() {
     for app; do
         printf "\n"
@@ -64,7 +41,6 @@ brew_install() {
         fi
     done
 }
-
 yum_install() {
     for app; do
         printf "\n"
@@ -77,16 +53,15 @@ yum_install() {
         fi
     done
 }
-
 git_setup() {
     printf "\n"
     begin "Git configuration"
     read -rp "    Name: " gitName
-    if test ! -z "$gitName"; then
+    if [ ! -z "$gitName" ]; then
         git config --global user.name "$gitName"
     fi
     read -rp "    Email: " gitEmail
-    if test ! -z "$gitEmail"; then
+    if [ ! -z "$gitEmail" ]; then
         git config --global user.email "$gitEmail"
     fi
     git config --global color.ui auto
@@ -102,7 +77,6 @@ git_setup() {
     git config --global alias.logp 'log --pretty=oneline --graph'
     end
 }
-
 setup_common() {
     printf "\n"
     begin "Linking dotfiles to your home directory"
@@ -131,8 +105,8 @@ setup_common() {
     success "Script complete"
     printf "\n\n"
 }
-
 setup_debian() {
+    sudo -v
     printf "\n"
     begin "Updating package list"
     sudo apt-get update > /dev/null 2>&1
@@ -152,11 +126,10 @@ setup_debian() {
         end
     fi
 
-    apt_install vim shellcheck
+    apt_install vim shellcheck python3 python3-pip at
 
     setup_common
 }
-
 setup_rhel() {
     printf "\n"
     yum_install git wget
@@ -176,12 +149,12 @@ setup_rhel() {
 
     setup_common
 }
-
 setup_osx() {
+    sudo -v
     printf "\n"
     begin "Configuring Hostname"
     read -rp "    Hostname: " name
-    if test -z "$name"; then
+    if [ -z "$name" ]; then
         success "Hostname unchanged"
     else
         sudo scutil --set ComputerName "$name"
@@ -189,15 +162,6 @@ setup_osx() {
         sudo scutil --set LocalHostName "$name"
         sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
         end
-    fi
-
-    printf "\n"
-    begin "Installing Xcode Command Line Tools"
-    if ! (xcode-select -p > /dev/null 2>&1); then
-        xcode-select --install
-        end
-    else
-        success "Already installed"
     fi
 
     printf "\n"
@@ -224,7 +188,7 @@ setup_osx() {
         success "Already installed"
     fi
 
-    brew_install vim coreutils shellcheck
+    brew_install vim coreutils shellcheck python3
 
     printf "\n"
     begin "Brew cleanup"
@@ -234,17 +198,19 @@ setup_osx() {
     setup_common
 }
 
-case "$DISTRO" in
-    "OS X")
-        setup_osx
-        ;;
-    "Debian")
-        setup_debian
-        ;;
-    "Red Hat")
-        setup_rhel
-        ;;
-    *)
-        error "Unknown Distro - Manual install required"
-        ;;
-esac
+clear
+printf "Dotfiles Setup Script\n=====================\n\n"
+
+if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
+    xcode-select --install > /dev/null 2>&1
+    setup_osx
+elif ([ "$( cat /etc/*release | grep -ci "debian" )" -ge 1 ]) > /dev/null 2>&1; then
+    setup_debian
+elif ([ "$( cat /etc/*release | grep -ci "red hat" )" -ge 1 ]) > /dev/null 2>&1; then
+    setup_rhel
+elif ([ "$( cat /etc/*release | grep -ci "centos" )" -ge 1 ]) > /dev/null 2>&1; then
+    setup_rhel
+else
+    error "Unknown Distro - Manual install required\n"
+    exit
+fi
