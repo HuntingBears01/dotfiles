@@ -17,6 +17,15 @@ HISTFILESIZE=2000
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
 
+# Case-insensitive globbing (used in pathname expansion)
+shopt -s nocaseglob
+
+# Autocorrect typos in path names when using `cd`
+shopt -s cdspell
+
+# Add tab completion for SSH hostnames based on ~/.ssh/config, ignoring wildcards
+[ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh;
+
 # Add `~/bin` to the `$PATH`
 export PATH="$HOME/bin:/usr/local/sbin:$PATH";
 
@@ -114,6 +123,10 @@ if [ $(uname -s) = "Darwin" ]; then
         alias egrep='egrep --color=auto'
         export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
     fi
+    # OS X has no `md5sum`, so use `md5` as a fallback
+    command -v md5sum > /dev/null || alias md5sum="md5"
+    # OS X has no `sha1sum`, so use `shasum` as a fallback
+    command -v sha1sum > /dev/null || alias sha1sum="shasum"
 fi
 
 # `up` is a convenient way to navigate back up a file tree, and is a general-use
@@ -133,6 +146,20 @@ while [ ${TIMES} -gt 0 ]; do
 done
 }
 
+function updatey() {
+if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
+    alias updatey='brew update && brew upgrade --cleanup'
+elif ([ "$( cat /etc/*release | grep -ci "debian" )" -ge 1 ]) > /dev/null 2>&1; then
+    alias updatey='sudo apt-get update && sudo apt-get -y upgrade'
+elif ([ "$( cat /etc/*release | grep -ci "red hat" )" -ge 1 ]) > /dev/null 2>&1; then
+    alias updatey='yum update'
+elif ([ "$( cat /etc/*release | grep -ci "centos" )" -ge 1 ]) > /dev/null 2>&1; then
+    alias updatey='yum update'
+else
+    exit
+fi
+}
+
 # Alias definitions.
 alias la='ls -a'
 alias ll='ls -lh'
@@ -140,22 +167,9 @@ alias lla='ls -lha'
 alias cl='clear'
 alias reload='cd && . ./.bashrc' # Reload .bashrc
 alias g='git'
-
-if [ $(uname -s) = "Darwin" ]; then
-    # OS X has no `md5sum`, so use `md5` as a fallback
-    command -v md5sum > /dev/null || alias md5sum="md5"
-    # OS X has no `sha1sum`, so use `shasum` as a fallback
-    command -v sha1sum > /dev/null || alias sha1sum="shasum"
-    if [ ${UID} -ne "0" ]; then
-        alias updatey='brew update && brew upgrade --cleanup'
-        alias svi='sudo vi'
-    fi
-else
-    # Linux only section
-    if [ ${UID} -ne "0" ]; then
-        alias updatey='sudo apt-get update && sudo apt-get -y upgrade'
-        alias svi='sudo vi'
-    fi
+# Non root users only
+if [ ${UID} -ne "0" ]; then
+    alias svi='sudo vi'
 fi
 
 # enable programmable completion features (you don't need to enable
