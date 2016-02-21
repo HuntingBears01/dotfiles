@@ -22,7 +22,7 @@ apt_install() {
         printf "\n"
         begin "Installing $app"
         if ! (dpkg --list | grep "$app" > /dev/null 2>&1); then
-            sudo apt-get install "$app" > /dev/null 2>&1 || false
+            sudo apt-get -y install "$app" > /dev/null 2>&1 || false
             end
         else
             success "Already installed"
