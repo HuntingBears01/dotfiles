@@ -30,7 +30,7 @@ Shortcut    | Description
 ,n          | NERDTree toggle
 ,rv         | Reload vimrc
 ,s          | Spellcheck toggle
-,t          | Trailing space removal
+,t          | Trailing whitespace removal
 ,w          | Wordwrap toggle
 
 ## Visual Mode
