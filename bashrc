@@ -148,13 +148,13 @@ done
 
 function updatey() {
 if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
-    alias updatey='brew update && brew upgrade --cleanup'
+    brew update && brew upgrade --cleanup
 elif ([ "$( cat /etc/*release | grep -ci "debian" )" -ge 1 ]) > /dev/null 2>&1; then
-    alias updatey='sudo apt-get update && sudo apt-get -y upgrade'
+    sudo apt-get update && sudo apt-get -y upgrade
 elif ([ "$( cat /etc/*release | grep -ci "red hat" )" -ge 1 ]) > /dev/null 2>&1; then
-    alias updatey='yum update'
+    yum update
 elif ([ "$( cat /etc/*release | grep -ci "centos" )" -ge 1 ]) > /dev/null 2>&1; then
-    alias updatey='yum update'
+    yum update
 else
     exit
 fi
