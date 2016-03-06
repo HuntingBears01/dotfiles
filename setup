@@ -188,11 +188,19 @@ setup_osx() {
         success "Already installed"
     fi
 
-    brew_install vim coreutils shellcheck python3
+    brew_install vim coreutils shellcheck python3 bash
 
     printf "\n"
     begin "Brew cleanup"
     brew cleanup > /dev/null 2>&1
+    end
+
+    printf "\n"
+    begin "Set GNU Bash as default"
+    # Add the new shell to the list of allowed shells
+    sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
+    # Change to the new shell
+    sudo chsh -s /usr/local/bin/bash "$USER" > /dev/null 2>&1
     end
 
     setup_common
