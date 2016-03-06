@@ -197,9 +197,11 @@ setup_osx() {
 
     printf "\n"
     begin "Set GNU Bash as default"
-    # Add the new shell to the list of allowed shells
-    sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
-    # Change to the new shell
+    # Add the GNU shell to the list of allowed shells
+    if ([ "$( cat /etc/shells | grep '/usr/local/bin/bash' )" -ge 1 ]) > /dev/null 2>&1; then
+        sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
+    fi
+    # Change to the GNU shell
     sudo chsh -s /usr/local/bin/bash "$USER" > /dev/null 2>&1
     end
 
