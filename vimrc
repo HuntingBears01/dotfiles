@@ -12,7 +12,8 @@ Plugin 'VundleVim/Vundle.vim'
 " Plugin begin
 Plugin 'chriskempson/base16-vim'
 Plugin 'scrooloose/nerdtree'
-Plugin 'bling/vim-airline'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 Plugin 'terryma/vim-expand-region'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'tpope/vim-surround'
@@ -41,6 +42,7 @@ if !exists('g:airline_symbols')
 endif
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
+let g:airline_theme='base16'
 
 " Tab config {{{1
 set tabstop=4
