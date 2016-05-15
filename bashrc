@@ -168,9 +168,7 @@ fi
 alias la='ls -a'
 alias ll='ls -lh'
 alias lla='ls -lha'
-alias cl='clear'
 alias reload='cd && . ./.bashrc' # Reload .bashrc
-alias g='git'
 # Non root users only
 if [ ${UID} -ne "0" ]; then
     alias svi='sudo vi'

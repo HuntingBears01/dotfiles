@@ -119,8 +119,7 @@ set hidden                              " Hide buffers instead of prompting to s
 set scrolloff=8                         " Keep 8 lines above or below the cursor when scrolling
 set sidescroll=1
 set sidescrolloff=15                    " Keep 15 columns next to the cursor when scrolling horizontally
-set textwidth=79                        " Set text width to 79
-set colorcolumn=+1                      " Highlight column 80
+set colorcolumn=80                      " Highlight column 80
 " Open new split panes to right and bottom, which feels more natural
 set splitbelow
 set splitright
