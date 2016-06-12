@@ -21,7 +21,7 @@ apt_install() {
     for app; do
         printf "\n"
         begin "Installing $app"
-        if ! (dpkg --list | grep "$app" > /dev/null 2>&1); then
+        if ! (dpkg --list | grep -w "$app" > /dev/null 2>&1); then
             sudo apt-get -y install "$app" > /dev/null 2>&1 || false
             end
         else
@@ -33,7 +33,7 @@ brew_install() {
     for app; do
         printf "\n"
         begin "Installing $app"
-        if ! (brew list | grep "$app" > /dev/null 2>&1); then
+        if ! (brew list | grep -w "$app" > /dev/null 2>&1); then
             brew install "$app" > /dev/null 2>&1 || false
             end
         else
@@ -45,7 +45,7 @@ yum_install() {
     for app; do
         printf "\n"
         begin "Installing $app"
-        if ! (rpm -qa | grep "$app" > /dev/null 2>&1); then
+        if ! (rpm -qa | grep -w "$app" > /dev/null 2>&1); then
             yum install "$app" > /dev/null 2>&1 || false
             end
         else
