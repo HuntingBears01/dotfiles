@@ -116,7 +116,7 @@ setup_debian() {
     sudo apt-get -y install vim > /dev/null 2>&1
     end
 
-    apt_install git wget shellcheck python3 python3-pip at mtr-tiny htop
+    apt_install git wget shellcheck python3 python3-pip at mtr-tiny htop curl
 
     printf "\n"
     begin "Installing RCM"
@@ -189,7 +189,7 @@ setup_osx() {
         success "Already installed"
     fi
 
-    brew_install vim coreutils shellcheck python3 bash mtr htop
+    brew_install vim coreutils shellcheck python3 bash mtr htop curl
 
     printf "\n"
     begin "Brew cleanup"
