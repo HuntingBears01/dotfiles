@@ -123,9 +123,11 @@ setup_debian() {
     if [ "$( which lsrc )" ]; then
         success "Already installed"
     else
-        wget https://thoughtbot.github.io/rcm/debs/rcm_1.3.0-1_all.deb > /dev/null 2>&1
-        sha=$(sha256sum rcm_1.3.0-1_all.deb | cut -f1 -d' ') > /dev/null 2>&1
-        [ "$sha" = "2e95bbc23da4a0b995ec4757e0920197f4c92357214a65fedaf24274cda6806d" ] && sudo dpkg -i rcm_1.3.0-1_all.deb > /dev/null 2>&1
+        rcmdeb=rcm_1.3.0-1_all.deb
+        wget https://thoughtbot.github.io/rcm/debs/$rcmdeb > /dev/null 2>&1
+        sha=$(sha256sum $rcmdeb | cut -f1 -d' ') > /dev/null 2>&1
+        [ "$sha" = "2e95bbc23da4a0b995ec4757e0920197f4c92357214a65fedaf24274cda6806d" ] && sudo dpkg -i $rcmdeb > /dev/null 2>&1
+        rm $rcmdeb
         end
     fi
 
