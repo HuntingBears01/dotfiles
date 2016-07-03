@@ -11,7 +11,6 @@ Plugin 'VundleVim/Vundle.vim'
 
 " Plugin begin
 Plugin 'chriskempson/base16-vim'
-Plugin 'scrooloose/nerdtree'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'terryma/vim-expand-region'
@@ -58,8 +57,6 @@ let mapleader = ","
 set pastetoggle=<F2>
 " Toggle line numbering
 nnoremap <Leader>l :set invnumber<CR>
-" Toggle NERDTree
-nnoremap <Leader>n :NERDTreeToggle<CR>
 " Remove trailing spaces
 nnoremap <Leader>t :call Preserve("%s/\\s\\+$//e")<CR>
 " Fix indentation for entire document
