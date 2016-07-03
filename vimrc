@@ -31,7 +31,7 @@ endif
 
 " Color scheme {{{1
 let base16colorspace=256
-colorscheme base16-atelierdune
+colorscheme base16-atelier-dune
 set background=dark
 set encoding=utf-8
 
@@ -139,13 +139,6 @@ let php_folding=1
 let xml_syntax_folding=1
 noremap <Space> za
 vnoremap <Space> za
-
-" NERDTree config {{{1
-augroup nerdtree
-    autocmd!
-    " Automatically close if NERDTree is last window
-    autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
-augroup end
 
 " Save cursor position & Git commit config {{{1
 augroup vimrcEx
