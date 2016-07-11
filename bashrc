@@ -149,16 +149,21 @@ done
 function updatey() {
 if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
     brew update && brew upgrade --cleanup
+    vim +PluginClean! +PluginUpdate +qall
 elif ([ "$( cat /etc/*release | grep -ci "debian" )" -ge 1 ]) > /dev/null 2>&1; then
     if [ ${UID} -ne "0" ]; then
         sudo apt-get update && sudo apt-get -y upgrade
+        vim +PluginClean! +PluginUpdate +qall
     else
         apt-get update && apt-get -y upgrade
+        vim +PluginClean! +PluginUpdate +qall
     fi
 elif ([ "$( cat /etc/*release | grep -ci "red hat" )" -ge 1 ]) > /dev/null 2>&1; then
     yum update
+    vim +PluginClean! +PluginUpdate +qall
 elif ([ "$( cat /etc/*release | grep -ci "centos" )" -ge 1 ]) > /dev/null 2>&1; then
     yum update
+    vim +PluginClean! +PluginUpdate +qall
 else
     exit
 fi
