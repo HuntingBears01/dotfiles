@@ -1,0 +1,9 @@
+git
+wget
+shellcheck
+python3
+python3-pip
+at
+mtr-tiny
+htop
+curl
