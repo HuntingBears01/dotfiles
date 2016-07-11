@@ -46,7 +46,7 @@ cask_install() {
         printf "\n"
         begin "Installing $app"
         if ! (brew cask list | grep -w "$app" > /dev/null 2>&1); then
-            brew install "$app" > /dev/null 2>&1 || false
+            brew cask install "$app" > /dev/null 2>&1 || false
             end
         else
             success "Already installed"
