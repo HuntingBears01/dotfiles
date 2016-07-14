@@ -129,6 +129,10 @@ if [ $(uname -s) = "Darwin" ]; then
     command -v sha1sum > /dev/null || alias sha1sum="shasum"
 fi
 
+begin() {
+    printf "\n \033[0;33m➜\033[0m  %s\n\n" "$*"
+}
+
 # `up` is a convenient way to navigate back up a file tree, and is a general-use
 # replacement for `cd ..`.
 # if no arguments are passed, up is simply an alias for `cd ..`.
@@ -148,22 +152,25 @@ done
 
 function updatey() {
 if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
+    begin "Updating brew"
     brew update && brew upgrade --cleanup
-    vim +PluginClean! +PluginUpdate +qall
 elif ([ "$( cat /etc/*release | grep -ciwE "debian|ubuntu" )" -ge 1 ]) > /dev/null 2>&1; then
     if [ ${UID} -ne "0" ]; then
         sudo apt-get update && sudo apt-get -y upgrade
-        vim +PluginClean! +PluginUpdate +qall
     else
         apt-get update && apt-get -y upgrade
-        vim +PluginClean! +PluginUpdate +qall
     fi
 elif ([ "$( cat /etc/*release | grep -ciwE "red hat|centos" )" -ge 1 ]) > /dev/null 2>&1; then
     yum update
-    vim +PluginClean! +PluginUpdate +qall
 else
     exit
 fi
+# Update dotfiles
+begin "Updating dotfiles"
+git -C ~/.dotfiles pull
+# Update Vim & Vim plugins
+begin "Updating Vim"
+vim +PluginClean! +PluginUpdate +qall
 }
 
 # Alias definitions.
