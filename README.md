@@ -27,6 +27,11 @@ curl -#L https://github.com/huntingbears01/dotfiles/tarball/master \
 
 Run the setup script
 ```
-cd .dotfiles && ./setup
+~/.dotfiles/setup
+```
+
+Apply the new configuration
+```
+source ~/.bashrc
 ```
 

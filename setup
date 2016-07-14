@@ -108,11 +108,6 @@ setup_common() {
     vim +PluginInstall +qall
     end
 
-    printf "\n"
-    begin "Loading new config"
-    source ~/.bashrc
-    end
-
     printf "\n\n\n"
     success "Script complete"
     printf "\n\n"
@@ -128,7 +123,7 @@ setup_debian() {
     sudo apt-get -y install vim > /dev/null 2>&1
     end
 
-    apt_install $(cat debian.lst)
+    apt_install $( cat "$DIR"/debian.lst )
 
     printf "\n"
     begin "Installing RCM"
@@ -160,7 +155,7 @@ setup_rhel() {
         end
     fi
 
-    yum_install $(cat rhel.lst)
+    yum_install $( cat "$DIR"/rhel.lst )
 
     setup_common
 }
@@ -203,8 +198,8 @@ setup_macos() {
         success "Already installed"
     fi
 
-    brew_install $(cat brew.lst)
-    cask_install $(cat cask.lst)
+    brew_install $( cat "$DIR"/brew.lst )
+    cask_install $( cat "$DIR"/cask.lst )
 
     printf "\n"
     begin "Brew cleanup"
@@ -214,7 +209,7 @@ setup_macos() {
     printf "\n"
     begin "Set GNU Bash as default"
     # Add the GNU shell to the list of allowed shells
-    if ([ "$( cat /etc/shells | grep '/usr/local/bin/bash' )" -ge 1 ]) > /dev/null 2>&1; then
+    if ([ "$( grep -f '/etc/shells' '/usr/local/bin/bash' )" -ge 1 ]) > /dev/null 2>&1; then
         sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
     fi
     # Change to the GNU shell
@@ -227,13 +222,20 @@ setup_macos() {
 clear
 printf "Dotfiles Setup Script\n=====================\n\n"
 
+# Get script directory
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, resolve it
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
 if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
     setup_macos
-elif ([ "$( cat /etc/*release | grep -ci "debian" )" -ge 1 ]) > /dev/null 2>&1; then
+elif ([ "$( cat /etc/*release | grep -ciwE "debian|ubuntu" )" -ge 1 ]) > /dev/null 2>&1; then
     setup_debian
-elif ([ "$( cat /etc/*release | grep -ci "red hat" )" -ge 1 ]) > /dev/null 2>&1; then
-    setup_rhel
-elif ([ "$( cat /etc/*release | grep -ci "centos" )" -ge 1 ]) > /dev/null 2>&1; then
+elif ([ "$( cat /etc/*release | grep -ciwE "red hat|centos" )" -ge 1 ]) > /dev/null 2>&1; then
     setup_rhel
 else
     error "Unknown Distro - Manual install required\n"
