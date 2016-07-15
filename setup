@@ -58,7 +58,7 @@ yum_install() {
         printf "\n"
         begin "Installing $app"
         if ! (rpm -qa | grep -w "$app" > /dev/null 2>&1); then
-            yum install "$app" > /dev/null 2>&1 || false
+            sudo yum install -y "$app" > /dev/null 2>&1 || false
             end
         else
             success "Already installed"
@@ -146,12 +146,12 @@ setup_rhel() {
 
     printf "\n"
     begin "Installing RCM"
-    if [ "$( which lsrc )" ]; then
+    if (rpm -qa | grep -w rcm > /dev/null 2>&1); then
         success "Already installed"
     else
-        cd /etc/yum.repos.d/ || error "Unable to find /etc/yum.repos.d/" && exit
-        wget http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo > /dev/null 2>&1
-        yum install rcm > /dev/null 2>&1
+        cd /etc/yum.repos.d/ || exit
+        sudo wget http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo > /dev/null 2>&1
+        sudo yum -y install rcm > /dev/null 2>&1
         end
     fi
 

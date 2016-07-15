@@ -167,7 +167,10 @@ else
 fi
 # Update dotfiles
 begin "Updating dotfiles"
-git -C ~/.dotfiles pull
+cur_dir=$( pwd )
+cd ~/.dotfiles || exit
+git pull
+cd "${cur_dir}" || exit
 # Update Vim & Vim plugins
 begin "Updating Vim"
 vim +PluginClean! +PluginUpdate +qall
