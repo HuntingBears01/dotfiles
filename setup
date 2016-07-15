@@ -137,6 +137,7 @@ setup_debian() {
     setup_common
 }
 setup_rhel() {
+    sudo -v
     printf "\n"
     yum_install wget
 
@@ -160,7 +161,7 @@ setup_rhel() {
         wget http://pkgs.repoforge.org/rpmforge-release/$reporpm > /dev/null 2>&1
         sudo rpm --import http://dag.wiee.rs/packages/RPM-GPG-KEY.dag.txt > /dev/null 2>&1
         rpm -K $reporpm > /dev/null 2>&1 && sudo rpm -i $reporpm > /dev/null 2>&1
-        rm $reporpm
+        rm $reporpm > /dev/null 2>&1
         end
     fi
 
