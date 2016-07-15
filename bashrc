@@ -161,7 +161,7 @@ elif ([ "$( cat /etc/*release | grep -ciwE "debian|ubuntu" )" -ge 1 ]) > /dev/nu
         apt-get update && apt-get -y upgrade
     fi
 elif ([ "$( cat /etc/*release | grep -ciwE "red hat|centos" )" -ge 1 ]) > /dev/null 2>&1; then
-    yum update
+    sudo yum update
 else
     exit
 fi
@@ -181,6 +181,7 @@ alias la='ls -a'
 alias ll='ls -lh'
 alias lla='ls -lha'
 alias reload='cd && . ./.bashrc' # Reload .bashrc
+alias vi='vim'
 # Non root users only
 if [ ${UID} -ne "0" ]; then
     alias svi='sudo vi'

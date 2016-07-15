@@ -1,3 +1,6 @@
-vim
-shellcheck
+vim-enhanced
 mtr
+git
+wget
+at
+curl
