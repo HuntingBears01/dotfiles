@@ -151,6 +151,7 @@ setup_rhel() {
         end
     fi
 
+    printf "\n"
     begin "Installing RepoForge"
     if (rpm -qa | grep rpmforge > /dev/null 2>&1);then
         success "Already installed"
