@@ -152,12 +152,16 @@ setup_rhel() {
     fi
 
     begin "Installing RepoForge"
+    if (rpm -qa | grep rpmforge > /dev/null 2>&1);then
+        success "Already installed"
+    else
         reporpm=rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm
         wget http://pkgs.repoforge.org/rpmforge-release/$reporpm > /dev/null 2>&1
-        sudo rpm --import http://dag.wiee.rs/packages/RPM-GPG-KEY.dag.txt
-        rpm -K $reporpm && sudo rpm -i $reporpm
+        sudo rpm --import http://dag.wiee.rs/packages/RPM-GPG-KEY.dag.txt > /dev/null 2>&1
+        rpm -K $reporpm > /dev/null 2>&1 && sudo rpm -i $reporpm > /dev/null 2>&1
         rm $reporpm
-    end
+        end
+    fi
 
     setup_common
 }
