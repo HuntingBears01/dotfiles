@@ -138,6 +138,9 @@ setup_debian() {
 }
 setup_rhel() {
     printf "\n"
+    yum_install wget
+
+    printf "\n"
     begin "Installing RCM"
     if (rpm -qa | grep -w rcm > /dev/null 2>&1); then
         success "Already installed"
@@ -161,7 +164,6 @@ setup_rhel() {
         end
     fi
 
-    printf "\n"
     yum_install $( cat "$DIR"/rhel.lst )
 
     setup_common
