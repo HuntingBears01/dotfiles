@@ -119,10 +119,6 @@ setup_debian() {
     end
 
     printf "\n"
-    begin "Installing Vim"
-    sudo apt-get -y install vim > /dev/null 2>&1
-    end
-
     apt_install $( cat "$DIR"/debian.lst )
 
     printf "\n"
@@ -142,7 +138,7 @@ setup_debian() {
 }
 setup_rhel() {
     printf "\n"
-    yum_install git wget
+    yum_install $( cat "$DIR"/rhel.lst )
 
     printf "\n"
     begin "Installing RCM"
@@ -154,8 +150,6 @@ setup_rhel() {
         sudo yum -y install rcm > /dev/null 2>&1
         end
     fi
-
-    yum_install $( cat "$DIR"/rhel.lst )
 
     setup_common
 }
