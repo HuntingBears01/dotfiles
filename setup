@@ -158,10 +158,10 @@ setup_rhel() {
         success "Already installed"
     else
         reporpm=rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm
-        wget -q http://apt.sw.be/redhat/el7/en/x86_64/rpmforge/RPMS/$reporpm
+        sudo wget -q http://apt.sw.be/redhat/el7/en/x86_64/rpmforge/RPMS/$reporpm
         sudo rpm --import http://dag.wiee.rs/packages/RPM-GPG-KEY.dag.txt > /dev/null 2>&1
-        rpm -K $reporpm > /dev/null 2>&1 && sudo rpm -i $reporpm > /dev/null 2>&1
-        rm $reporpm > /dev/null 2>&1
+        sudo rpm -K $reporpm > /dev/null 2>&1 && sudo rpm -i $reporpm > /dev/null 2>&1
+        sudo rm $reporpm > /dev/null 2>&1
         end
     fi
 
