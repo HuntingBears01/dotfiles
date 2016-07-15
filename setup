@@ -151,6 +151,14 @@ setup_rhel() {
         end
     fi
 
+    begin "Installing RepoForge"
+        reporpm=rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm
+        wget http://pkgs.repoforge.org/rpmforge-release/$reporpm > /dev/null 2>&1
+        sudo rpm --import http://dag.wiee.rs/packages/RPM-GPG-KEY.dag.txt
+        rpm -K $reporpm && sudo rpm -i $reporpm
+        rm $reporpm
+    end
+
     setup_common
 }
 setup_macos() {
