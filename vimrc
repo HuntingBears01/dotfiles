@@ -167,3 +167,28 @@ function! Preserve(command)
     let @/=_s
     call cursor(l, c)
 endfunction
+
+" Minimalist-TabComplete-Plugin {{{1
+inoremap <expr> <Tab> TabComplete()
+function! TabComplete()
+    if getline('.')[col('.') - 2] =~ '\K' || pumvisible()
+        return "\<C-P>"
+    else
+        return "\<Tab>"
+    endif
+endfunction
+
+" Minimalist-AutoCompletePop-Plugin {{{1
+set completeopt=menu,menuone,noinsert
+inoremap <expr> <CR> pumvisible() ? "\<C-Y>" : "\<CR>"
+autocmd InsertCharPre * call AutoComplete()
+function! AutoComplete()
+    if v:char =~ '\K'
+        \ && getline('.')[col('.') - 4] !~ '\K'
+        \ && getline('.')[col('.') - 3] =~ '\K'
+        \ && getline('.')[col('.') - 2] =~ '\K' " last char
+        \ && getline('.')[col('.') - 1] !~ '\K'
+
+        call feedkeys("\<C-P>", 'n')
+    end
+endfunction
