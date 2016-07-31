@@ -26,9 +26,6 @@ shopt -s cdspell
 # Add tab completion for SSH hostnames based on ~/.ssh/config, ignoring wildcards
 [ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh;
 
-# Add `~/bin` to the `$PATH`
-export PATH="$HOME/bin:/usr/local/sbin:$PATH";
-
 # Base16 Shell
 BASE16_SHELL="$HOME/.config/base16-shell/base16-atelierdune.dark.sh"
 [[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
@@ -182,6 +179,7 @@ alias ll='ls -lh'
 alias lla='ls -lha'
 alias reload='cd && . ./.bashrc' # Reload .bashrc
 alias vi='vim'
+alias cls='clear;tput cup $LINES 0'
 # Non root users only
 if [ ${UID} -ne "0" ]; then
     alias svi='sudo vi'
@@ -193,3 +191,6 @@ fi
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
+
+# Place prompt at bottom of screen
+tput cup $LINES 0
