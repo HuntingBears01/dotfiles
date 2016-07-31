@@ -177,18 +177,3 @@ function! TabComplete()
         return "\<Tab>"
     endif
 endfunction
-
-" Minimalist-AutoCompletePop-Plugin {{{1
-set completeopt=menu,menuone,noinsert
-inoremap <expr> <CR> pumvisible() ? "\<C-Y>" : "\<CR>"
-autocmd InsertCharPre * call AutoComplete()
-function! AutoComplete()
-    if v:char =~ '\K'
-        \ && getline('.')[col('.') - 4] !~ '\K'
-        \ && getline('.')[col('.') - 3] =~ '\K'
-        \ && getline('.')[col('.') - 2] =~ '\K' " last char
-        \ && getline('.')[col('.') - 1] !~ '\K'
-
-        call feedkeys("\<C-P>", 'n')
-    end
-endfunction
