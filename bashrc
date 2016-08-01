@@ -182,7 +182,7 @@ alias vi='vim'
 alias cls='clear;tput cup $LINES 0'
 # Non root users only
 if [ ${UID} -ne "0" ]; then
-    alias svi='sudo vi'
+    alias svi='sudo vim'
 fi
 
 # enable programmable completion features (you don't need to enable
