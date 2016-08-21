@@ -31,10 +31,10 @@ yum_install() {
 git_setup() {
     printf "\n"
     read -rp "Enter Git Name: " gitName
-    if [ ! -z "$gitName" ]; then
+    if ! [ -z "$gitName" ]; then
         git config --global user.name "$gitName"
         read -rp "    Enter Git Email: " gitEmail
-        if [ ! -z "$gitEmail" ]; then
+        if ! [ -z "$gitEmail" ]; then
             git config --global user.email "$gitEmail"
         fi
     fi
@@ -60,12 +60,12 @@ setup_common() {
     git_setup
 
     start_spinner "Vim configuration"
-    if [ ! -d ~/.vim/bundle/base16-vim ]; then
+    if ! [ -d ~/.vim/bundle/base16-vim ]; then
         { echo -e "\nVim base16 install\n";
             git clone https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim;
         } >> "$LOG" 2>&1
     fi
-    if [ ! -d ~/.vim/bundle/Vundle.vim ]; then
+    if ! [ -d ~/.vim/bundle/Vundle.vim ]; then
         { echo -e "\nVim vundle install\n";
             git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim;
         } >> "$LOG" 2>&1
@@ -93,7 +93,7 @@ setup_debian() {
         stop_spinner $?
 
         start_spinner "Installing RCM..."
-        if [ ! "$( which lsrc )" ]; then
+        if ! [ "$( which lsrc )" ]; then
             rcmdeb=rcm_1.3.0-1_all.deb
             wget https://thoughtbot.github.io/rcm/debs/$rcmdeb >> "$LOG" 2>&1
             sha=$(sha256sum $rcmdeb | cut -f1 -d' ') > /dev/null 2>&1
