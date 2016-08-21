@@ -135,42 +135,46 @@ begin() {
 # if no arguments are passed, up is simply an alias for `cd ..`.
 # with any integer argument n, `cd ..` will be performed n times
 function up() {
-# number of times to move up in the directory tree
-TIMES=$1
+    # number of times to move up in the directory tree
+    TIMES=$1
 
-if [ -z ${TIMES} ]; then
-    TIMES=1
-fi
-while [ ${TIMES} -gt 0 ]; do
-    cd ..
-    TIMES=$((${TIMES} - 1))
-done
+    if [ -z ${TIMES} ]; then
+        TIMES=1
+    fi
+    while [ ${TIMES} -gt 0 ]; do
+        cd ..
+        TIMES=$((${TIMES} - 1))
+    done
 }
 
 function updatey() {
-if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
-    begin "Updating brew"
-    brew update && brew upgrade --cleanup
-elif ([ "$( cat /etc/*release | grep -ciwE "debian|ubuntu" )" -ge 1 ]) > /dev/null 2>&1; then
-    if [ ${UID} -ne "0" ]; then
-        sudo apt-get update && sudo apt-get -y upgrade
+    if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
+        begin "Updating brew"
+        brew update && brew upgrade --cleanup
+    elif ([ "$( cat /etc/*release | grep -ciwE "debian|ubuntu" )" -ge 1 ]) > /dev/null 2>&1; then
+        if [ ${UID} -ne "0" ]; then
+            sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get autoclean
+        else
+            apt-get update && apt-get -y upgrade && apt-get autoclean
+        fi
+    elif ([ "$( cat /etc/*release | grep -ciwE "red hat|centos" )" -ge 1 ]) > /dev/null 2>&1; then
+        if [ ${UID} -ne "0" ]; then
+            sudo yum update -y
+        else
+            yum update -y
+        fi
     else
-        apt-get update && apt-get -y upgrade
+        exit
     fi
-elif ([ "$( cat /etc/*release | grep -ciwE "red hat|centos" )" -ge 1 ]) > /dev/null 2>&1; then
-    sudo yum update
-else
-    exit
-fi
-# Update dotfiles
-begin "Updating dotfiles"
-cur_dir=$( pwd )
-cd ~/.dotfiles || exit
-git pull
-cd "${cur_dir}" || exit
-# Update Vim & Vim plugins
-begin "Updating Vim"
-vim +PluginClean! +PluginUpdate +qall
+    # Update dotfiles
+    begin "Updating dotfiles"
+    cur_dir=$( pwd )
+    cd ~/.dotfiles || exit
+    git pull
+    cd "${cur_dir}" || exit
+    # Update Vim & Vim plugins
+    begin "Updating Vim"
+    vim +PluginClean! +PluginUpdate +qall
 }
 
 # Alias definitions.
