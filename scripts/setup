@@ -124,20 +124,12 @@ setup_rhel() {
                 sudo wget -q http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo;
                 sudo yum -qy install rcm;
             } >> "$LOG" 2>&1
-            stop_spinner $?
         fi
+        stop_spinner $?
 
-        start_spinner "Installing RepoForge..."
-        if ! (rpm -qa | grep rpmforge > /dev/null 2>&1);then
-            { echo -e "\nRepoForge install\n";
-                reporpm=rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm;
-                sudo wget -q http://apt.sw.be/redhat/el7/en/x86_64/rpmforge/RPMS/$reporpm;
-                sudo rpm --import http://dag.wiee.rs/packages/RPM-GPG-KEY.dag.txt;
-                sudo rpm -K $reporpm > /dev/null 2>&1 && sudo rpm -i $reporpm;
-                sudo rm $reporpm;
-            } >> "$LOG" 2>&1
-            stop_spinner $?
-        fi
+        start_spinner "Installing epel..."
+        yum_install epel-release
+        stop spinner $?
 
         start_spinner "Installing packages..."
         echo -e "\nPackage install\n" >> "$LOG"
