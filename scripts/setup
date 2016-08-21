@@ -92,13 +92,15 @@ setup_debian() {
         apt_install $( cat "$DIR/debian.lst" )
         stop_spinner $?
 
-        start_spinner "Installing RCM"
+        start_spinner "Installing RCM..."
         if [ ! "$( which lsrc )" ]; then
             rcmdeb=rcm_1.3.0-1_all.deb
             wget https://thoughtbot.github.io/rcm/debs/$rcmdeb >> "$LOG" 2>&1
             sha=$(sha256sum $rcmdeb | cut -f1 -d' ') > /dev/null 2>&1
             [ "$sha" = "2e95bbc23da4a0b995ec4757e0920197f4c92357214a65fedaf24274cda6806d" ] && sudo dpkg -i $rcmdeb >> "$LOG" 2>&1
             rm $rcmdeb
+        else
+            echo -e "\nRCM already installed\n" >> "$LOG"
         fi
         stop_spinner $?
 
