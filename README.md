@@ -15,13 +15,6 @@ Or SSH
 ```
 cd && git clone git@github.com:HuntingBears01/dotfiles.git .dotfiles
 ```
-#### Git-free
-
-```
-cd && mkdir .dotfiles && cd .dotfiles
-curl -#L https://github.com/huntingbears01/dotfiles/tarball/master \
-| tar -xzv --strip-components 1
-```
 
 ## Setup
 
