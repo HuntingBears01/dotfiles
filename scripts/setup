@@ -129,7 +129,7 @@ setup_rhel() {
 
         start_spinner "Installing epel..."
         yum_install epel-release
-        stop spinner $?
+        stop_spinner $?
 
         start_spinner "Installing packages..."
         echo -e "\nPackage install\n" >> "$LOG"
