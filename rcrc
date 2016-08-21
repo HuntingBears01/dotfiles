@@ -1,2 +1,2 @@
 DOTFILES_DIRS=".dotfiles"
-EXCLUDES="*:*osx* *:*linux*"
+EXCLUDES="*:*scripts* *:*README* *:*docs*"

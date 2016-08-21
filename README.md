@@ -27,7 +27,7 @@ curl -#L https://github.com/huntingbears01/dotfiles/tarball/master \
 
 Run the setup script
 ```
-~/.dotfiles/setup
+~/.dotfiles/scripts/setup
 ```
 
 Apply the new configuration
