@@ -179,7 +179,7 @@ alias ll='ls -lh'
 alias lla='ls -lha'
 alias reload='cd && . ./.bashrc' # Reload .bashrc
 alias vi='vim'
-alias cls='clear;tput cup $LINES 0'
+alias cls='clear'
 # Non root users only
 if [ ${UID} -ne "0" ]; then
     alias svi='sudo vim'
@@ -191,6 +191,3 @@ fi
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
-
-# Place prompt at bottom of screen
-tput cup $LINES 0
