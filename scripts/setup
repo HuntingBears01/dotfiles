@@ -76,130 +76,142 @@ setup_common() {
     printf "\n\n Setup complete. \n Log saved at %s.\n\n" "$LOG"
 }
 setup_debian() {
-    sudo -v
+    if [ $(id -u) -eq 0 ]; then
+        setup_common
+    else
+        sudo -v
 
-    start_spinner "Updating package list..."
-    { echo -e "\nUpdate package list\n";
-        sudo apt-get update;
-    } >> "$LOG" 2>&1
-    stop_spinner $?
+        start_spinner "Updating package list..."
+        { echo -e "\nUpdate package list\n";
+            sudo apt-get update;
+        } >> "$LOG" 2>&1
+        stop_spinner $?
 
-    start_spinner "Installing packages..."
-    echo -e "\nPackage install\n" >> "$LOG" 2>&1
-    apt_install $( cat "$DIR/debian.lst" )
-    stop_spinner $?
+        start_spinner "Installing packages..."
+        echo -e "\nPackage install\n" >> "$LOG" 2>&1
+        apt_install $( cat "$DIR/debian.lst" )
+        stop_spinner $?
 
-    start_spinner "Installing RCM"
-    if [ ! "$( which lsrc )" ]; then
-        rcmdeb=rcm_1.3.0-1_all.deb
-        wget https://thoughtbot.github.io/rcm/debs/$rcmdeb >> "$LOG" 2>&1
-        sha=$(sha256sum $rcmdeb | cut -f1 -d' ') > /dev/null 2>&1
-        [ "$sha" = "2e95bbc23da4a0b995ec4757e0920197f4c92357214a65fedaf24274cda6806d" ] && sudo dpkg -i $rcmdeb >> "$LOG" 2>&1
-        rm $rcmdeb
+        start_spinner "Installing RCM"
+        if [ ! "$( which lsrc )" ]; then
+            rcmdeb=rcm_1.3.0-1_all.deb
+            wget https://thoughtbot.github.io/rcm/debs/$rcmdeb >> "$LOG" 2>&1
+            sha=$(sha256sum $rcmdeb | cut -f1 -d' ') > /dev/null 2>&1
+            [ "$sha" = "2e95bbc23da4a0b995ec4757e0920197f4c92357214a65fedaf24274cda6806d" ] && sudo dpkg -i $rcmdeb >> "$LOG" 2>&1
+            rm $rcmdeb
+        fi
+        stop_spinner $?
+
+        setup_common
     fi
-    stop_spinner $?
-
-    setup_common
 }
 setup_rhel() {
-    sudo -v
+    if [ $(id -u) -eq 0 ]; then
+        setup_common
+    else
+        sudo -v
 
-    start_spinner "Installing wget..."
-    yum_install wget
-    stop_spinner $?
-
-    start_spinner "Installing RCM..."
-    if ! (rpm -qa | grep -w rcm > /dev/null 2>&1); then
-        { echo -e "\nRCM install\n";
-            cd /etc/yum.repos.d/ || exit;
-            sudo wget -q http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo;
-            sudo yum -qy install rcm;
-        } >> "$LOG" 2>&1
+        start_spinner "Installing wget..."
+        yum_install wget
         stop_spinner $?
-    fi
 
-    start_spinner "Installing RepoForge..."
-    if ! (rpm -qa | grep rpmforge > /dev/null 2>&1);then
-        { echo -e "\nRepoForge install\n";
-            reporpm=rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm;
-            sudo wget -q http://apt.sw.be/redhat/el7/en/x86_64/rpmforge/RPMS/$reporpm;
-            sudo rpm --import http://dag.wiee.rs/packages/RPM-GPG-KEY.dag.txt;
-            sudo rpm -K $reporpm > /dev/null 2>&1 && sudo rpm -i $reporpm;
-            sudo rm $reporpm;
-        } >> "$LOG" 2>&1
+        start_spinner "Installing RCM..."
+        if ! (rpm -qa | grep -w rcm > /dev/null 2>&1); then
+            { echo -e "\nRCM install\n";
+                cd /etc/yum.repos.d/ || exit;
+                sudo wget -q http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo;
+                sudo yum -qy install rcm;
+            } >> "$LOG" 2>&1
+            stop_spinner $?
+        fi
+
+        start_spinner "Installing RepoForge..."
+        if ! (rpm -qa | grep rpmforge > /dev/null 2>&1);then
+            { echo -e "\nRepoForge install\n";
+                reporpm=rpmforge-release-0.5.3-1.el7.rf.x86_64.rpm;
+                sudo wget -q http://apt.sw.be/redhat/el7/en/x86_64/rpmforge/RPMS/$reporpm;
+                sudo rpm --import http://dag.wiee.rs/packages/RPM-GPG-KEY.dag.txt;
+                sudo rpm -K $reporpm > /dev/null 2>&1 && sudo rpm -i $reporpm;
+                sudo rm $reporpm;
+            } >> "$LOG" 2>&1
+            stop_spinner $?
+        fi
+
+        start_spinner "Installing packages..."
+        echo -e "\nPackage install\n" >> "$LOG"
+        yum_install $( cat "$DIR/rhel.lst" )
         stop_spinner $?
+
+        setup_common
     fi
-
-    start_spinner "Installing packages..."
-    echo -e "\nPackage install\n" >> "$LOG"
-    yum_install $( cat "$DIR/rhel.lst" )
-    stop_spinner $?
-
-    setup_common
 }
 setup_macos() {
-    sudo -v
-    printf "\n"
-    read -rp "Enter Hostname: " name
-    if [ ! -z "$name" ]; then
-        start_spinner "Updating hostname..."
-        sudo scutil --set ComputerName "$name"
-        sudo scutil --set HostName "$name"
-        sudo scutil --set LocalHostName "$name"
-        sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
+    if [ $(id -u) -eq 0 ]; then
+        setup_common
+    else
+        sudo -v
+        printf "\n"
+        read -rp "Enter Hostname: " name
+        if [ ! -z "$name" ]; then
+            start_spinner "Updating hostname..."
+            sudo scutil --set ComputerName "$name"
+            sudo scutil --set HostName "$name"
+            sudo scutil --set LocalHostName "$name"
+            sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
+            stop_spinner $?
+        fi
+
+        start_spinner "Installing/updating Homebrew..."
+        if ! (which brew > /dev/null 2>&1); then
+            { echo -e "\nHomebrew install\n";
+                ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
+            } >> "$LOG" 2>&1
+        else
+            { echo -e "\nHomebrew update\n";
+                brew update;
+                brew upgrade;
+            } >> "$LOG" 2>&1
+        fi
         stop_spinner $?
+
+        start_spinner "Installing RCM..."
+        if ! (brew list | grep rcm > /dev/null 2>&1); then
+            { echo -e "\nRCM install\n";
+                brew tap thoughtbot/formulae;
+                brew install rcm;
+            } >> "$LOG" 2>&1
+        else
+            echo -e "\nRCM already installed\n" >> "$LOG"
+        fi
+        stop_spinner $?
+
+        start_spinner "Installing Homebrew apps..."
+        echo -e "\nHomebrew app installation\n" >> "$LOG"
+        brew_install $( cat "$DIR/brew.lst" )
+        stop_spinner $?
+
+        start_spinner "Installing Homebrew Cask apps..."
+        echo -e "\nHomebrew Cask app installation\n" >> "$LOG"
+        cask_install $( cat "$DIR/cask.lst" )
+        stop_spinner $?
+
+        start_spinner "Homebrew cleanup..."
+        echo -e "\nHomebrew cleanup\n" >> "$LOG"
+        brew cleanup >> "$LOG" 2>&1
+        stop_spinner $?
+
+        start_spinner "Set GNU Bash as default..."
+        echo -e "\nGNU Bash setup\n" >> "$LOG"
+        # Add the GNU shell to the list of allowed shells
+        if ([ "$( grep -f '/etc/shells' '/usr/local/bin/bash' )" -ge 1 ]) > /dev/null 2>&1; then
+            sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
+        fi
+        # Change to the GNU shell
+        sudo chsh -s /usr/local/bin/bash "$USER" >> "$LOG" 2>&1
+        stop_spinner $?
+
+        setup_common
     fi
-
-    start_spinner "Installing/updating Homebrew..."
-    if ! (which brew > /dev/null 2>&1); then
-        { echo -e "\nHomebrew install\n";
-            ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
-        } >> "$LOG" 2>&1
-    else
-        { echo -e "\nHomebrew update\n";
-            brew update;
-            brew upgrade;
-        } >> "$LOG" 2>&1
-    fi
-    stop_spinner $?
-
-    start_spinner "Installing RCM..."
-    if ! (brew list | grep rcm > /dev/null 2>&1); then
-        { echo -e "\nRCM install\n";
-            brew tap thoughtbot/formulae;
-            brew install rcm;
-        } >> "$LOG" 2>&1
-    else
-        echo -e "\nRCM already installed\n" >> "$LOG"
-    fi
-    stop_spinner $?
-
-    start_spinner "Installing Homebrew apps..."
-    echo -e "\nHomebrew app installation\n" >> "$LOG"
-    brew_install $( cat "$DIR/brew.lst" )
-    stop_spinner $?
-
-    start_spinner "Installing Homebrew Cask apps..."
-    echo -e "\nHomebrew Cask app installation\n" >> "$LOG"
-    cask_install $( cat "$DIR/cask.lst" )
-    stop_spinner $?
-
-    start_spinner "Homebrew cleanup..."
-    echo -e "\nHomebrew cleanup\n" >> "$LOG"
-    brew cleanup >> "$LOG" 2>&1
-    stop_spinner $?
-
-    start_spinner "Set GNU Bash as default..."
-    echo -e "\nGNU Bash setup\n" >> "$LOG"
-    # Add the GNU shell to the list of allowed shells
-    if ([ "$( grep -f '/etc/shells' '/usr/local/bin/bash' )" -ge 1 ]) > /dev/null 2>&1; then
-        sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
-    fi
-    # Change to the GNU shell
-    sudo chsh -s /usr/local/bin/bash "$USER" >> "$LOG" 2>&1
-    stop_spinner $?
-
-    setup_common
 }
 
 clear
