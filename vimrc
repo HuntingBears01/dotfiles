@@ -44,9 +44,9 @@ let g:airline_right_sep = ''
 let g:airline_theme='base16'
 
 " Tab config {{{1
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
 set expandtab
 set shiftround
 set smarttab
