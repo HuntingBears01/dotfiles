@@ -1,29 +1,5 @@
 #!/usr/bin/env bash
 
-apt_install() {
-  for app; do
-    echo -e "\n-- $app --\n" >> "$LOG"
-    sudo apt-get -qy install "$app" >> "$LOG" 2>&1
-  done
-}
-brew_install() {
-  for app; do
-    echo -e "\n-- $app --\n" >> "$LOG"
-    brew install "$app" >> "$LOG" 2>&1
-  done
-}
-cask_install() {
-  for app; do
-    echo -e "\n-- $app --\n" >> "$LOG"
-    brew cask install "$app" >> "$LOG" 2>&1
-  done
-}
-yum_install() {
-  for app; do
-    echo -e "\n-- $app --\n" >> "$LOG"
-    sudo yum install -qy "$app" >> "$LOG" 2>&1
-  done
-}
 git_setup() {
   if [ "$interactive" -eq 0 ];then
     printf "\n"
@@ -78,16 +54,6 @@ setup_debian() {
     sudo -v
   fi
 
-  [ "$interactive" -eq 0 ] && start_spinner "Updating package list..."
-  { echo -e "\n-- apt-get update --\n";
-    sudo apt-get update;
-  } >> "$LOG" 2>&1
-  [ "$interactive" -eq 0 ] && stop_spinner $?
-
-  [ "$interactive" -eq 0 ] && start_spinner "Installing packages..."
-  apt_install $( cat "$DIR/debian.lst" )
-  [ "$interactive" -eq 0 ] && stop_spinner $?
-
   echo -e "\n-- RCM --\n" >> "$LOG"
   if ! [ "$( which lsrc )" ]; then
     [ "$interactive" -eq 0 ] && start_spinner "Installing RCM..."
@@ -108,10 +74,6 @@ setup_rhel() {
     sudo -v
   fi
 
-  [ "$interactive" -eq 0 ] && start_spinner "Installing wget..."
-  yum_install wget
-  [ "$interactive" -eq 0 ] && stop_spinner $?
-
   [ "$interactive" -eq 0 ] && start_spinner "Installing RCM..."
   if ! (rpm -qa | grep -w rcm > /dev/null 2>&1); then
     { echo -e "\nRCM install\n";
@@ -120,15 +82,6 @@ setup_rhel() {
       sudo yum -qy install rcm;
     } >> "$LOG" 2>&1
   fi
-  [ "$interactive" -eq 0 ] && stop_spinner $?
-
-  [ "$interactive" -eq 0 ] && start_spinner "Installing epel..."
-  yum_install epel-release
-  [ "$interactive" -eq 0 ] && stop_spinner $?
-
-  [ "$interactive" -eq 0 ] && start_spinner "Installing packages..."
-  echo -e "\nPackage install\n" >> "$LOG"
-  yum_install $( cat "$DIR/rhel.lst" )
   [ "$interactive" -eq 0 ] && stop_spinner $?
 
   setup_common
@@ -171,21 +124,6 @@ setup_macos() {
     else
       echo -e "\nRCM already installed\n" >> "$LOG"
     fi
-    stop_spinner $?
-
-    start_spinner "Installing Homebrew apps..."
-    echo -e "\nHomebrew app installation\n" >> "$LOG"
-    brew_install $( cat "$DIR/brew.lst" )
-    stop_spinner $?
-
-    start_spinner "Installing Homebrew Cask apps..."
-    echo -e "\nHomebrew Cask app installation\n" >> "$LOG"
-    cask_install $( cat "$DIR/cask.lst" )
-    stop_spinner $?
-
-    start_spinner "Homebrew cleanup..."
-    echo -e "\nHomebrew cleanup\n" >> "$LOG"
-    brew cleanup >> "$LOG" 2>&1
     stop_spinner $?
 
     start_spinner "Set GNU Bash as default..."
