@@ -10,6 +10,9 @@ git_setup() {
         read -rp "Enter Git Email: " gitEmail
         if ! [ -z "$gitEmail" ]; then
           git config --global user.email "$gitEmail"
+          if ! [ -f ~/.ssh/id_rsa ]; then
+            ssh-keygen -t rsa -C "$gitEmail" -f ~/.ssh/id_rsa
+          fi
         fi
       fi
     fi
