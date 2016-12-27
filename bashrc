@@ -124,6 +124,8 @@ if [ $(uname -s) = "Darwin" ]; then
     command -v md5sum > /dev/null || alias md5sum="md5"
     # OS X has no `sha1sum`, so use `shasum` as a fallback
     command -v sha1sum > /dev/null || alias sha1sum="shasum"
+    # Add /usr/local/sbin to path for Brew
+    export PATH="/usr/local/sbin:$PATH"
 fi
 
 begin() {
@@ -195,3 +197,10 @@ fi
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
+
+# Source any files in ~/.private/
+# Place files that shouldn't be commited to a public repo here
+for file in ~/.private/*; do
+[ -r "$file" ] && [ -f "$file" ] && source "$file";
+done;
+unset file;
