@@ -168,12 +168,3 @@ function! Preserve(command)
     call cursor(l, c)
 endfunction
 
-" Minimalist-TabComplete-Plugin {{{1
-inoremap <expr> <Tab> TabComplete()
-function! TabComplete()
-    if getline('.')[col('.') - 2] =~ '\K' || pumvisible()
-        return "\<C-P>"
-    else
-        return "\<Tab>"
-    endif
-endfunction
