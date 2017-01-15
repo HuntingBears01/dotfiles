@@ -1,147 +1,148 @@
 #!/usr/bin/env bash
 
 git_setup() {
-	if [[ $EUID -ne 0 ]]; then
-		if [ "$interactive" -eq 0 ];then
-			printf "\n"
-			read -rp "Enter Git Name: " gitName
-			if ! [ -z "$gitName" ]; then
-				git config --global user.name "$gitName"
-				read -rp "Enter Git Email: " gitEmail
-				if ! [ -z "$gitEmail" ]; then
-					git config --global user.email "$gitEmail"
-					if ! [ -f ~/.ssh/id_rsa ]; then
-						ssh-keygen -t rsa -C "$gitEmail" -f ~/.ssh/id_rsa
-					fi
-				fi
-			fi
-		fi
-		[ "$interactive" -eq 0 ] && start_spinner "Configuring Git..."
-		git config --global color.ui auto
-		git config --global core.editor "$(which vim)"
-		git config --global core.autocrlf input
-		git config --global push.default current
-		git config --global alias.unstage 'reset HEAD --'
-		git config --global alias.last 'log -1 HEAD'
-		git config --global alias.co checkout
-		git config --global alias.br branch
-		git config --global alias.ci commit
-		git config --global alias.s status
-		git config --global alias.logp 'log --pretty=oneline --graph'
-		[ "$interactive" -eq 0 ] && stop_spinner $?
-	fi
+  if [[ $EUID -ne 0 ]]; then
+    if [ "$interactive" -eq 0 ];then
+      printf "\n"
+      read -rp "Enter Git Name: " gitName
+      if ! [ -z "$gitName" ]; then
+        git config --global user.name "$gitName"
+        read -rp "Enter Git Email: " gitEmail
+        if ! [ -z "$gitEmail" ]; then
+          git config --global user.email "$gitEmail"
+          if ! [ -f ~/.ssh/id_rsa ]; then
+            ssh-keygen -t rsa -C "$gitEmail" -f ~/.ssh/id_rsa
+          fi
+        fi
+      fi
+    fi
+    [ "$interactive" -eq 0 ] && start_spinner "Configuring Git..."
+    git config --global color.ui auto
+    git config --global core.editor "$(which vim)"
+    git config --global core.autocrlf input
+    git config --global push.default current
+    git config --global alias.unstage 'reset HEAD --'
+    git config --global alias.last 'log -1 HEAD'
+    git config --global alias.co checkout
+    git config --global alias.br branch
+    git config --global alias.ci commit
+    git config --global alias.s status
+    git config --global alias.logp 'log --pretty=oneline --graph'
+    [ "$interactive" -eq 0 ] && stop_spinner $?
+  fi
 }
 setup_common() {
-	[ "$interactive" -eq 0 ] && start_spinner "Linking dotfiles to your home directory..."
-	rcup -f -d ~/.dotfiles -x "*:*scripts*" -x "*:*README*" -x "*:*docs*"
-	[ "$interactive" -eq 0 ] && stop_spinner $?
+  [ "$interactive" -eq 0 ] && start_spinner "Linking dotfiles to your home directory..."
+  rcup -f -d ~/.dotfiles -x "*:*scripts*" -x "*:*README*" -x "*:*docs*"
+  [ "$interactive" -eq 0 ] && stop_spinner $?
 
-	git_setup
+  git_setup
 
-	[ "$interactive" -eq 0 ] && start_spinner "Vim configuration"
-	if ! [ -d ~/.vim/bundle/base16-vim ]; then
-		{ echo -e "\n-- Vim base16 --\n";
-			git clone https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim;
-		} >> "$LOG" 2>&1
-	fi
-	if ! [ -d ~/.vim/bundle/Vundle.vim ]; then
-		{ echo -e "\n-- Vim vundle --\n";
-			git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim;
-		} >> "$LOG" 2>&1
-	fi
-	[ "$interactive" -eq 0 ] && vim +PluginInstall +qall || printf "\n\nLogin and run updatey to complete Vim install"
-	[ "$interactive" -eq 0 ] && stop_spinner $?
+  [ "$interactive" -eq 0 ] && start_spinner "Vim configuration"
+  if ! [ -d ~/.vim/bundle/base16-vim ]; then
+    { echo -e "\n-- Vim base16 --\n";
+      git clone https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim;
+    } >> "$LOG" 2>&1
+  fi
+  if ! [ -d ~/.vim/bundle/Vundle.vim ]; then
+    { echo -e "\n-- Vim vundle --\n";
+      git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim;
+    } >> "$LOG" 2>&1
+  fi
+  [ "$interactive" -eq 0 ] && vim +PluginInstall +qall || printf "\n\nLogin and run updatey to complete Vim install"
+  [ "$interactive" -eq 0 ] && stop_spinner $?
 
-	printf "\n\nSetup complete.\nLog saved at %s.\n\n" "$LOG"
+  printf "\n\nSetup complete.\nLog saved at %s.\n\n" "$LOG"
 }
 setup_debian() {
-	if [ "$interactive" -eq 0 ]; then
-		sudo -v
-	fi
+  if [ "$interactive" -eq 0 ]; then
+    sudo -v
+  fi
 
-	echo -e "\n-- RCM --\n" >> "$LOG"
-	if ! [ "$( which lsrc )" ]; then
-		[ "$interactive" -eq 0 ] && start_spinner "Installing RCM..."
-		wget -qO - https://apt.thoughtbot.com/thoughtbot.gpg.key | sudo apt-key add -
-		echo "deb http://apt.thoughtbot.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/thoughtbot.list
-		sudo apt-get update
-		sudo apt-get install rcm
-		[ "$interactive" -eq 0 ] && stop_spinner $?
-	else
-		echo -e "RCM already installed" >> "$LOG"
-	fi
+  echo -e "\n-- RCM --\n" >> "$LOG"
+  if ! [ "$( which lsrc )" ]; then
+    [ "$interactive" -eq 0 ] && start_spinner "Installing RCM..."
+    { wget -qO - https://apt.thoughtbot.com/thoughtbot.gpg.key | sudo apt-key add -
+      echo "deb http://apt.thoughtbot.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/thoughtbot.list
+      sudo apt-get update
+      sudo apt-get install rcm
+    } >> "$LOG" 2>&1
+    [ "$interactive" -eq 0 ] && stop_spinner $?
+  else
+    echo -e "RCM already installed" >> "$LOG"
+  fi
 
-	setup_common
+  setup_common
 }
 setup_rhel() {
-	if [ "$interactive" -eq 0 ]; then
-		sudo -v
-	fi
+  if [ "$interactive" -eq 0 ]; then
+    sudo -v
+  fi
 
-	[ "$interactive" -eq 0 ] && start_spinner "Installing RCM..."
-	if ! (rpm -qa | grep -w rcm > /dev/null 2>&1); then
-		{ echo -e "\nRCM install\n";
-			cd /etc/yum.repos.d/ || exit;
-			sudo wget -q http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo;
-			sudo yum -qy install rcm;
-		} >> "$LOG" 2>&1
-	fi
-	[ "$interactive" -eq 0 ] && stop_spinner $?
+  [ "$interactive" -eq 0 ] && start_spinner "Installing RCM..."
+  if ! (rpm -qa | grep -w rcm > /dev/null 2>&1); then
+    { echo -e "\nRCM install\n";
+      cd /etc/yum.repos.d/ || exit;
+      sudo wget -q http://download.opensuse.org/repositories/utilities/RHEL_6/utilities.repo;
+      sudo yum -qy install rcm;
+    } >> "$LOG" 2>&1
+  fi
+  [ "$interactive" -eq 0 ] && stop_spinner $?
 
-	setup_common
+  setup_common
 }
 setup_macos() {
-	if [ "$(id -u)" -eq 0 ]; then
-		setup_common
-	else
-		sudo -v
-		printf "\n"
-		read -rp "Enter Hostname: " name
-		if [ ! -z "$name" ]; then
-			start_spinner "Updating hostname..."
-			sudo scutil --set ComputerName "$name"
-			sudo scutil --set HostName "$name"
-			sudo scutil --set LocalHostName "$name"
-			sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
-			stop_spinner $?
-		fi
+  if [ "$(id -u)" -eq 0 ]; then
+    setup_common
+  else
+    sudo -v
+    printf "\n"
+    read -rp "Enter Hostname: " name
+    if [ ! -z "$name" ]; then
+      start_spinner "Updating hostname..."
+      sudo scutil --set ComputerName "$name"
+      sudo scutil --set HostName "$name"
+      sudo scutil --set LocalHostName "$name"
+      sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
+      stop_spinner $?
+    fi
 
-		start_spinner "Installing/updating Homebrew..."
-		if ! (which brew > /dev/null 2>&1); then
-			{ echo -e "\nHomebrew install\n";
-				ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
-			} >> "$LOG" 2>&1
-		else
-			{ echo -e "\nHomebrew update\n";
-				brew update;
-				brew upgrade;
-			} >> "$LOG" 2>&1
-		fi
-		stop_spinner $?
+    start_spinner "Installing/updating Homebrew..."
+    if ! (which brew > /dev/null 2>&1); then
+      { echo -e "\nHomebrew install\n";
+        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
+      } >> "$LOG" 2>&1
+    else
+      { echo -e "\nHomebrew update\n";
+        brew update;
+        brew upgrade;
+      } >> "$LOG" 2>&1
+    fi
+    stop_spinner $?
 
-		start_spinner "Installing RCM..."
-		if ! (brew list | grep rcm > /dev/null 2>&1); then
-			{ echo -e "\nRCM install\n";
-				brew tap thoughtbot/formulae;
-				brew install rcm;
-			} >> "$LOG" 2>&1
-		else
-			echo -e "\nRCM already installed\n" >> "$LOG"
-		fi
-		stop_spinner $?
+    start_spinner "Installing RCM..."
+    if ! (brew list | grep rcm > /dev/null 2>&1); then
+      { echo -e "\nRCM install\n";
+        brew tap thoughtbot/formulae;
+        brew install rcm;
+      } >> "$LOG" 2>&1
+    else
+      echo -e "\nRCM already installed\n" >> "$LOG"
+    fi
+    stop_spinner $?
 
-		start_spinner "Set GNU Bash as default..."
-		echo -e "\nGNU Bash setup\n" >> "$LOG"
-		# Add the GNU shell to the list of allowed shells
-		if ([ "$( grep -f '/etc/shells' '/usr/local/bin/bash' )" -ge 1 ]) > /dev/null 2>&1; then
-			sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
-		fi
-		# Change to the GNU shell
-		sudo chsh -s /usr/local/bin/bash "$USER" >> "$LOG" 2>&1
-		stop_spinner $?
+    start_spinner "Set GNU Bash as default..."
+    echo -e "\nGNU Bash setup\n" >> "$LOG"
+    # Add the GNU shell to the list of allowed shells
+    if ([ "$( grep -f '/etc/shells' '/usr/local/bin/bash' )" -ge 1 ]) > /dev/null 2>&1; then
+      sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
+    fi
+    # Change to the GNU shell
+    sudo chsh -s /usr/local/bin/bash "$USER" >> "$LOG" 2>&1
+    stop_spinner $?
 
-		setup_common
-	fi
+    setup_common
+  fi
 }
 
 clear
@@ -150,9 +151,9 @@ printf "Dotfiles Setup Script\n=====================\n\n"
 # Get script directory
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-	DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-	SOURCE="$(readlink "$SOURCE")"
-	[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, resolve it
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, resolve it
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
@@ -165,23 +166,23 @@ echo -e "Dotfiles setup log $(date)\n\n" > "$LOG"
 
 # Check if running from an interactive shell
 if [ -t 0 ]; then
-	echo -e "\nInteractive install\n" >> "$LOG"
-	interactive=0
+  echo -e "\nInteractive install\n" >> "$LOG"
+  interactive=0
 else
-	echo -e "\nNon-interactive install\n" >> "$LOG"
-	interactive=1
+  echo -e "\nNon-interactive install\n" >> "$LOG"
+  interactive=1
 fi
 
 if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
-	echo -e "OS: MacOS\n\n" >> "$LOG"
-	setup_macos
+  echo -e "OS: MacOS\n\n" >> "$LOG"
+  setup_macos
 elif ([ "$( cat /etc/*release | grep -ciwE "debian|ubuntu" )" -ge 1 ]) > /dev/null 2>&1; then
-	echo -e "OS: Debian/Ubuntu\n\n" >> "$LOG"
-	setup_debian
+  echo -e "OS: Debian/Ubuntu\n\n" >> "$LOG"
+  setup_debian
 elif ([ "$( cat /etc/*release | grep -ciwE "red hat|centos" )" -ge 1 ]) > /dev/null 2>&1; then
-	echo -e "OS: RHEL/CentOS\n\n" >> "$LOG"
-	setup_rhel
+  echo -e "OS: RHEL/CentOS\n\n" >> "$LOG"
+  setup_rhel
 else
-	printf "Unknown Distro - Manual install required\n\n"
-	exit
+  printf "Unknown Distro - Manual install required\n\n"
+  exit
 fi
