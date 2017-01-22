@@ -6,9 +6,9 @@ append_once() {
 	string=$1
 	file=$2
 	if ! [ -f "$file" ]; then
-		echo "$string" | tee "$file"
+		echo "$string" | sudo tee "$file"
 	elif [[ $(grep -c "$string" < "$file") -eq 0 ]]; then
-		echo "$string" | tee -a "$file"
+		echo "$string" | sudo tee -a "$file"
 	fi
 }
 
