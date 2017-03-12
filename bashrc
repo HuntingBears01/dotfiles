@@ -191,6 +191,7 @@ alias cls='clear'
 # Non root users only
 if [ ${UID} -ne "0" ]; then
   alias svi='sudo vim'
+  alias sudo='sudo -E'
 fi
 
 # enable programmable completion features (you don't need to enable
