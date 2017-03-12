@@ -160,14 +160,12 @@ function updatey() {
     else
       apt-get update && apt-get -y upgrade && apt-get autoclean
     fi
-  elif ([ "$( cat /etc/*release | grep -ciwE "red hat|centos" )" -ge 1 ]) > /dev/null 2>&1; then
+  elif ([ "$( cat /etc/*release | grep -ciwE "red hat|centos|fedora" )" -ge 1 ]) > /dev/null 2>&1; then
     if [ ${UID} -ne "0" ]; then
       sudo yum update -y
     else
       yum update -y
     fi
-  else
-    exit
   fi
 }
 
