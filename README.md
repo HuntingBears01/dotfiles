@@ -20,7 +20,7 @@ cd && git clone git@github.com:HuntingBears01/dotfiles.git .dotfiles
 
 Run the setup script
 ```
-~/.dotfiles/scripts/setup
+~/.dotfiles/setup
 ```
 
 Apply the new configuration
