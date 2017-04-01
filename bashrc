@@ -128,8 +128,10 @@ if [ $(uname -s) = "Darwin" ]; then
   export PATH="/usr/local/sbin:$PATH"
 fi
 
-begin() {
-  printf "\n \033[0;33m➜\033[0m  %s\n\n" "$*"
+echo_title() {
+  tput setaf 3 # Yellow text
+  printf "\n\n$1\n\n"
+  tput sgr0 # Reset to default
 }
 
 # `up` is a convenient way to navigate back up a file tree, and is a general-use
@@ -152,7 +154,7 @@ function up() {
 function updatey() {
   # Update O/S
   if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
-    begin "Updating brew"
+    echo_title "Updating brew"
     brew update && brew upgrade --cleanup
   elif ([ "$( cat /etc/*release | grep -ciwE "debian|ubuntu" )" -ge 1 ]) > /dev/null 2>&1; then
     if [ ${UID} -ne "0" ]; then
@@ -171,13 +173,16 @@ function updatey() {
 
 function updated() {
   # Update dotfiles
-  begin "Updating dotfiles"
+  echo_title "Updating dotfiles"
   cur_dir=$( pwd )
   cd ~/.dotfiles || exit
   git pull
+  echo_title "Updating base16-shell"
+  cd ~/.config/base16-shell || exit
+  git pull
   cd "${cur_dir}" || exit
   # Update Vim & Vim plugins
-  begin "Updating Vim"
+  echo_title "Updating Vim"
   vim +PluginClean! +PluginUpdate +qall
 }
 
