@@ -47,8 +47,6 @@ if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
   cyan=$(tput setaf 6)
   white=$(tput setaf 7)
   grey=$(tput setaf 8)
-  orange=$(tput setaf 9)
-  violet=$(tput setaf 14)
 fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
@@ -73,14 +71,21 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-  # Highlight the user name when logged in as root.
+  # Highlight the user name when logged in as root
   if [[ "${UID}" -eq "0" ]]; then
     userStyle="${red}";
   else
     userStyle="${green}";
   fi;
 
-  PS1='\[$userStyle\]\u\[$grey\]@\[$yellow\]\h\[$blue\] \w \[$white\]\$\[$reset\] '
+  # Highlight the server name when connected via SSH
+  if [[ $SSH_TTY ]]; then
+    srvStyle="${yellow}";
+  else
+    srvStyle="${green}";
+  fi;
+
+  PS1='\[$userStyle\]\u\[$grey\]@\[$srvStyle\]\h\[$blue\] \w \[$white\]\$\[$reset\] '
 else
   PS1='\u@\h:\w\$ '
 fi
