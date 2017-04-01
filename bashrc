@@ -195,7 +195,7 @@ function updated() {
 alias la='ls -a'
 alias ll='ls -lh'
 alias lla='ls -lha'
-alias reload='cd && . ./.bashrc' # Reload .bashrc
+alias reload='source ~/.bashrc' # Reload .bashrc
 alias vi='vim'
 alias cls='clear'
 # Non root users only
