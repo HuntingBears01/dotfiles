@@ -25,19 +25,21 @@ filetype plugin indent on    " required
 
 " Syntax highlighting {{{1
 if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
-    syntax on
-    set hlsearch " Highlight search pattern
+  syntax on
+  set hlsearch " Highlight search pattern
 endif
 
 " Color scheme {{{1
-let base16colorspace=256
-colorscheme base16-atelier-dune
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256
+  source ~/.vimrc_background
+endif
 set background=dark
 set encoding=utf-8
 
 " Vim-airline config {{{1
 if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
+  let g:airline_symbols = {}
 endif
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
@@ -123,13 +125,13 @@ set splitright
 
 " Folding settings {{{1
 augroup folding
-    autocmd!
-    " Set syntax folding as default
-    autocmd FileType * setlocal foldmethod=syntax
-    " Set marker folding for vim files
-    autocmd FileType vim setlocal foldmethod=marker
-    " Set expr folding for markdown files
-    autocmd FileType markdown setlocal foldmethod=expr
+  autocmd!
+  " Set syntax folding as default
+  autocmd FileType * setlocal foldmethod=syntax
+  " Set marker folding for vim files
+  autocmd FileType vim setlocal foldmethod=marker
+  " Set expr folding for markdown files
+  autocmd FileType markdown setlocal foldmethod=expr
 augroup END
 set nofoldenable
 set foldnestmax=2
@@ -142,29 +144,29 @@ vnoremap <Space> za
 
 " Save cursor position & Git commit config {{{1
 augroup vimrcEx
-    autocmd!
-    " When editing a file, always jump to the last known cursor position.
-    " Don't do it for commit messages, when the position is invalid, or when
-    " inside an event handler (happens when dropping a file on gvim).
-    autocmd BufReadPost *
-                \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
-                \   exe "normal g`\"" |
-                \ endif
-    " Automatically wrap at 72 characters and spell check git commit messages
-    autocmd FileType gitcommit setlocal textwidth=72
-    autocmd FileType gitcommit setlocal spell
+  autocmd!
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it for commit messages, when the position is invalid, or when
+  " inside an event handler (happens when dropping a file on gvim).
+  autocmd BufReadPost *
+        \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
+        \   exe "normal g`\"" |
+        \ endif
+  " Automatically wrap at 72 characters and spell check git commit messages
+  autocmd FileType gitcommit setlocal textwidth=72
+  autocmd FileType gitcommit setlocal spell
 augroup END
 
 " Indentation script {{{1
 function! Preserve(command)
-    " Preparation: save last search, and cursor position.
-    let _s=@/
-    let l = line(".")
-    let c = col(".")
-    " Do the business:
-    execute a:command
-    " Clean up: restore previous search history, and cursor position
-    let @/=_s
-    call cursor(l, c)
+  " Preparation: save last search, and cursor position.
+  let _s=@/
+  let l = line(".")
+  let c = col(".")
+  " Do the business:
+  execute a:command
+  " Clean up: restore previous search history, and cursor position
+  let @/=_s
+  call cursor(l, c)
 endfunction
 

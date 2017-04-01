@@ -27,8 +27,8 @@ shopt -s cdspell
 [ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh;
 
 # Base16 Shell
-BASE16_SHELL="$HOME/.config/base16-shell/base16-atelierdune.dark.sh"
-[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
+BASE16_SHELL="$HOME/.config/base16-shell/"
+[ -n "$PS1" ] && [ -s $BASE16_SHELL/profile_helper.sh ] && eval "$($BASE16_SHELL/profile_helper.sh)"
 
 # Setup colours
 if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then

@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+
+dotfiles="bash_profile bashrc dircolors gvimrc vimrc"
+
+append_once() {
+  # Usage: append_once "string" "file"
+  # Appends a string to a file if string does not already exist
+  string=$1
+  file=$2
+  if ! [ -f "$file" ]; then
+    echo "$string" | sudo tee "$file"
+  elif [[ $(grep -c "$string" < "$file") -eq 0 ]]; then
+    echo "$string" | sudo tee -a "$file"
+  fi
+}
+echo_title() {
+  tput setaf 3 # Yellow text
+  printf "\n\n$1\n\n"
+  tput sgr0 # Reset to default
+}
+setup_git() {
+  if [[ $EUID -ne 0 ]]; then
+    echo_title "Git Configuration"
+    if [ "$interactive" -eq 0 ];then
+      read -rp "Enter Git Name: " gitName
+      if ! [ -z "$gitName" ]; then
+        git config --global user.name "$gitName"
+        read -rp "Enter Git Email: " gitEmail
+        if ! [ -z "$gitEmail" ]; then
+          git config --global user.email "$gitEmail"
+          if ! [ -f ~/.ssh/id_rsa ]; then
+            ssh-keygen -t rsa -C "$gitEmail" -f ~/.ssh/id_rsa
+          fi
+        fi
+      fi
+    fi
+    git config --global color.ui auto
+    git config --global core.editor "$(which vim)"
+    git config --global core.autocrlf input
+    git config --global push.default current
+    git config --global alias.unstage 'reset HEAD --'
+    git config --global alias.last 'log -1 HEAD'
+    git config --global alias.co checkout
+    git config --global alias.br branch
+    git config --global alias.ci commit
+    git config --global alias.s status
+    git config --global alias.logp 'log --pretty=oneline --graph'
+  fi
+}
+setup_linux() {
+  echo_title "Linking dotfiles"
+  for item in ${dotfiles}; do
+    if [ "${script_dir}/${item}" -ef "${HOME}/.${item}" ]; then
+      echo "Skipping ${item}"
+    else
+      rm "${HOME}/.${item}"
+      ln -s "${script_dir}/${item}" "${HOME}/.${item}"
+      echo "Linking ${item}"
+    fi
+  done
+
+  if [ ! -d "${HOME}/.config/base16-shell" ]; then
+    echo_title "Installing base16-shell"
+    git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
+  fi
+
+  if ! [ -d ~/.vim/bundle/base16-vim ]; then
+    echo_title "Installing base16-vim"
+    git clone https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim
+  fi
+  if ! [ -d ~/.vim/bundle/Vundle.vim ]; then
+    echo_title "Installing Vundle"
+    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+  fi
+  vim +PluginInstall +qall
+}
+setup_macos() {
+  # Skip MacOS configuration if root
+  if [ ! "$(id -u)" -eq 0 ]; then
+    sudo -v
+    printf "\n"
+    read -rp "Enter Hostname: " name
+    if [ ! -z "$name" ]; then
+      echo_title "Setting Hostname"
+      sudo scutil --set ComputerName "$name"
+      sudo scutil --set HostName "$name"
+      sudo scutil --set LocalHostName "$name"
+      sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
+    fi
+
+    if ! (which brew > /dev/null 2>&1); then
+      echo_title "Installing Homebrew"
+      ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
+    else
+      echo_title "Updating Homebrew"
+      brew update;
+      brew upgrade;
+    fi
+
+    echo_title "Install GNU Bash"
+    # Add the GNU shell to the list of allowed shells
+    if ([ "$( grep -f '/etc/shells' '/usr/local/bin/bash' )" -ge 1 ]) > /dev/null 2>&1; then
+      sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
+    fi
+    # Change to the GNU shell
+    # shellcheck disable=SC2024
+    sudo chsh -s /usr/local/bin/bash "$USER"
+  fi
+}
+
+clear
+echo_title "Dotfiles Setup Script"
+
+# Get script directory
+source="${BASH_SOURCE[0]}"
+# resolve $source until the file is no longer a symlink
+while [ -h "$source" ]; do
+  script_dir="$( cd -P "$( dirname "$source" )" && pwd )"
+  source="$(readlink "$source")"
+  # if $source was a relative symlink, resolve it
+  [[ $source != /* ]] && source="$script_dir/$source"
+done
+script_dir="$( cd -P "$( dirname "$source" )" && pwd )"
+
+# Check if running from an interactive shell
+if [ -t 0 ]; then
+  interactive=0
+else
+  interactive=1
+fi
+
+if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
+  echo "OS: MacOS"
+  setup_macos
+  setup_linux
+  setup_git
+else
+  echo "OS: Linux"
+  setup_linux
+  setup_git
+fi
+
+printf "\n\nSetup Complete\n\n"
