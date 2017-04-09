@@ -169,9 +169,15 @@ function updatey() {
     fi
   elif ([ "$( cat /etc/*release | grep -ciwE "red hat|centos|fedora" )" -ge 1 ]) > /dev/null 2>&1; then
     if [ ${UID} -ne "0" ]; then
-      sudo yum update -y
+      sudo yum -y update
     else
-      yum update -y
+      yum -y update
+    fi
+  elif ([ "$( cat /etc/*release | grep -ciwE "opensuse" )" -ge 1 ]) > /dev/null 2>&1; then
+    if [ ${UID} -ne "0" ]; then
+      sudo zypper refresh && sudo zypper update -y
+    else
+      zypper refresh && zypper update -y
     fi
   fi
 }
