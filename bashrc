@@ -131,6 +131,8 @@ if [ $(uname -s) = "Darwin" ]; then
   command -v sha1sum > /dev/null || alias sha1sum="shasum"
   # Add /usr/local/sbin to path for Brew
   export PATH="/usr/local/sbin:$PATH"
+  # Add Brew auto completion
+  [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 fi
 
 echo_title() {
