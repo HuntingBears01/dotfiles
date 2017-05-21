@@ -225,3 +225,8 @@ for file in ~/.private/*; do
   [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
+
+# Set default editor
+export VISUAL="/usr/bin/vim"
+export EDITOR="/usr/bin/vim"
+export SUDO_EDITOR="/usr/bin/vim"
