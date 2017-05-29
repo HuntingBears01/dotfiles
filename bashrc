@@ -230,3 +230,6 @@ unset file;
 export VISUAL="/usr/bin/vim"
 export EDITOR="/usr/bin/vim"
 export SUDO_EDITOR="/usr/bin/vim"
+
+# Set default permissions
+umask 0027
