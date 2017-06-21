@@ -28,23 +28,19 @@ shopt -s cdspell
 
 # Base16 Shell
 BASE16_SHELL="$HOME/.config/base16-shell/"
-[ -n "$PS1" ] && [ -s $BASE16_SHELL/profile_helper.sh ] && eval "$($BASE16_SHELL/profile_helper.sh)"
+[ -n "$PS1" ] && [ -s "$BASE16_SHELL/profile_helper.sh" ] && eval "$("$BASE16_SHELL/profile_helper.sh")"
 
 # Setup colours
 if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
   tput sgr0 # reset colors
 
-  bold=$(tput bold)
   reset=$(tput sgr0)
 
   # base16 colours https://chriskempson.github.io/base16/
-  black=$(tput setaf 0)
   red=$(tput setaf 1)
   green=$(tput setaf 2)
   yellow=$(tput setaf 3)
   blue=$(tput setaf 4)
-  magenta=$(tput setaf 5)
-  cyan=$(tput setaf 6)
   white=$(tput setaf 7)
   grey=$(tput setaf 8)
 fi
@@ -102,7 +98,11 @@ esac
 
 # Enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
-  test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+  if [[ -r ~/.dircolors ]];then
+    eval "$(dircolors -b ~/.dircolors)"
+  else
+    eval "$(dircolors -b)"
+  fi
   alias ls='ls --color=auto'
   alias grep='grep --color=auto'
   alias fgrep='fgrep --color=auto'
@@ -110,10 +110,14 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 # OS X specific section
-if [ $(uname -s) = "Darwin" ]; then
+if [ "$(uname -s)" = "Darwin" ]; then
   # Use GNU coreutils if installed
   if [ -x /usr/local/bin/gdircolors ]; then
-    test -r ~/.dircolors && eval "$(gdircolors -b ~/.dircolors)" || eval "$(gdircolors -b)"
+    if [[ -r ~/.dircolors ]];then
+      eval "$(gdircolors -b ~/.dircolors)"
+    else
+      eval "$(gdircolors -b)"
+    fi
     alias ls='gls --color=auto'
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
@@ -137,7 +141,7 @@ fi
 
 echo_title() {
   tput setaf 3 # Yellow text
-  printf "\n\n$1\n\n"
+  printf "\n\n%s\n\n" "$1"
   tput sgr0 # Reset to default
 }
 
@@ -149,12 +153,12 @@ function up() {
   # number of times to move up in the directory tree
   TIMES=$1
 
-  if [ -z ${TIMES} ]; then
+  if [ -z "${TIMES}" ]; then
     TIMES=1
   fi
   while [ ${TIMES} -gt 0 ]; do
     cd ..
-    TIMES=$((${TIMES} - 1))
+    TIMES=$((TIMES - 1))
   done
 }
 
@@ -225,6 +229,11 @@ for file in ~/.private/*; do
   [ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
+
+# Add ~/bin to path if it exists
+if [[ -d ~/bin ]];then
+  PATH=${PATH}:${HOME}/bin
+fi
 
 # Set default editor
 export VISUAL="/usr/bin/vim"
