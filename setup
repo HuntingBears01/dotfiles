@@ -14,7 +14,7 @@ export PATH
 # Global variables
 EXITCODE=0
 PROG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DOTFILES="bash_profile bashrc dircolors gvimrc vimrc"
+DOTFILES="bash_profile bashrc dircolors gvimrc vimrc inputrc"
 
 append_once() {
   # Usage: append_once "string" "file"
@@ -63,14 +63,14 @@ setup_git() {
   # Skip if running as root
   if [[ $EUID -ne 0 ]]; then
     info "Git configuration"
-    if [ "$interactive" -eq 0 ];then
+    if [[ "$interactive" -eq 0 ]];then
       read -rp "Enter Git name: " gitName
-      if ! [ -z "$gitName" ]; then
+      if [[ ! -z "$gitName" ]]; then
         git config --global user.name "$gitName"
         read -rp "Enter Git email: " gitEmail
-        if ! [ -z "$gitEmail" ]; then
+        if [[ ! -z "$gitEmail" ]]; then
           git config --global user.email "$gitEmail"
-          if ! [ -f ~/.ssh/id_rsa ]; then
+          if [[ ! -f ~/.ssh/id_rsa ]]; then
             ssh-keygen -t rsa -C "$gitEmail" -f ~/.ssh/id_rsa
           fi
         fi
@@ -92,20 +92,20 @@ setup_git() {
 }
 
 setup_linux() {
-  info "Linking DOTFILES"
+  info "Linking dotfiles"
   for item in ${DOTFILES}; do
-    if [ "${PROG_DIR}/${item}" -ef "${HOME}/.${item}" ]; then
+    if [[ "${PROG_DIR}/${item}" -ef "${HOME}/.${item}" ]]; then
       echo "Skipping ${item}"
     else
       echo "Linking ${item}"
-      rm "${HOME}/.${item}" &&
+      [[ -f "${HOME}/.${item}" ]] && rm "${HOME}/.${item}"
       ln -s "${PROG_DIR}/${item}" "${HOME}/.${item}"
     fi
   done
   check $? "Dotfile linking"
 
   info "Installing base16-shell"
-  if [ -d "${HOME}/.config/base16-shell" ]; then
+  if [[ -d "${HOME}/.config/base16-shell" ]]; then
     warn "base16-shell directory already exists"
   else
     git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
@@ -113,7 +113,7 @@ setup_linux() {
   fi
   
   info "Installing base16-vim"
-  if [ -d ~/.vim/bundle/base16-vim ]; then
+  if [[ -d ~/.vim/bundle/base16-vim ]]; then
     warn "base16-vim directory already exists"
   else
     git clone https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim
@@ -121,7 +121,7 @@ setup_linux() {
   fi
   
   info "Installing Vundle"
-  if [ -d ~/.vim/bundle/Vundle.vim ]; then
+  if [[ -d ~/.vim/bundle/Vundle.vim ]]; then
     warn "Vundle bundle already exists"
   else
     git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
@@ -135,7 +135,7 @@ setup_linux() {
 
 setup_macos() {
   # Skip MacOS configuration if root
-  if [ ! "$(id -u)" -eq 0 ]; then
+  if [[ ! "$(id -u)" -eq 0 ]]; then
     sudo -v
     info "Setting Hostname"
     read -rp "Enter Hostname: " name
@@ -160,7 +160,7 @@ setup_macos() {
 
     info "Installing GNU Bash"
     # Add the GNU shell to the list of allowed shells
-    if ([ "$( grep -f '/etc/shells' '/usr/local/bin/bash' )" -ge 1 ]) > /dev/null 2>&1; then
+    if [[ "$( grep -f '/etc/shells' '/usr/local/bin/bash' )" -ge 1 ]] > /dev/null 2>&1; then
       sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
     fi
     # Change to the GNU shell
@@ -173,13 +173,13 @@ setup_macos() {
 clear
 
 # Check if running from an interactive shell
-if [ -t 0 ]; then
+if [[ -t 0 ]]; then
   interactive=0
 else
   interactive=1
 fi
 
-if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
+if [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
   setup_macos
   setup_linux
   setup_git
