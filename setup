@@ -157,16 +157,6 @@ setup_macos() {
       brew upgrade
     fi
     check $? "Homebrew installation"
-
-    info "Installing GNU Bash"
-    # Add the GNU shell to the list of allowed shells
-    if [[ "$( grep -f '/etc/shells' '/usr/local/bin/bash' )" -ge 1 ]] > /dev/null 2>&1; then
-      sudo bash -c 'echo /usr/local/bin/bash >> /etc/shells'
-    fi
-    # Change to the GNU shell
-    # shellcheck disable=SC2024
-    sudo chsh -s /usr/local/bin/bash "$USER"
-    check $? "GNU Bash installation"
   fi
 }
 
