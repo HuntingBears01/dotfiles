@@ -104,52 +104,44 @@ if [ -x /usr/bin/dircolors ]; then
     eval "$(dircolors -b)"
   fi
   alias ls='ls --color=auto'
-  alias grep='grep --color=auto'
-  alias fgrep='fgrep --color=auto'
-  alias egrep='egrep --color=auto'
 fi
 
 # OS X specific section
 if [ "$(uname -s)" = "Darwin" ]; then
   # Use GNU coreutils if installed
-  if [ -x /usr/local/bin/gdircolors ]; then
+  if [ -x /usr/local/bin/gls ]; then
+    alias ls='gls --color=auto'
+    alias md5sum='gmd5sum'
+    alias sha1sum='gsha1sum'
+    alias sha224sum='gsha224sum'
+    alias sha256sum='gsha256sum'
+    alias sha384sum='gsha384sum'
+    alias sha512sum='gsha512sum'
     if [[ -r ~/.dircolors ]];then
       eval "$(gdircolors -b ~/.dircolors)"
     else
       eval "$(gdircolors -b)"
     fi
-    alias ls='gls --color=auto'
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
   else
     alias ls='ls -G'
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
     export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
   fi
-  # OS X has no `md5sum`, so use `md5` as a fallback
-  command -v md5sum > /dev/null || alias md5sum="md5"
-  # OS X has no `sha1sum`, so use `shasum` as a fallback
-  command -v sha1sum > /dev/null || alias sha1sum="shasum"
   # Add /usr/local/sbin to path for Brew
   export PATH="/usr/local/sbin:$PATH"
   # Add Brew auto completion
   [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
 fi
 
-echo_title() {
-  tput setaf 3 # Yellow text
-  printf "\n\n%s\n\n" "$1"
-  tput sgr0 # Reset to default
+info(){
+  printf "\n[ "; tput setaf 6; printf "INFO"; tput sgr0; printf " ] "
+  tput setaf 8; printf "%s\n" "${1}"; tput sgr0
 }
 
 # `up` is a convenient way to navigate back up a file tree, and is a general-use
 # replacement for `cd ..`.
 # if no arguments are passed, up is simply an alias for `cd ..`.
 # with any integer argument n, `cd ..` will be performed n times
-function up() {
+up() {
   # number of times to move up in the directory tree
   TIMES=$1
 
@@ -162,10 +154,9 @@ function up() {
   done
 }
 
-function updatey() {
+updatey() {
   # Update O/S
   if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
-    echo_title "Updating brew"
     brew update && brew upgrade --cleanup
   elif ([ "$( cat /etc/*release | grep -ciwE "debian|ubuntu" )" -ge 1 ]) > /dev/null 2>&1; then
     if [ ${UID} -ne "0" ]; then
@@ -188,26 +179,29 @@ function updatey() {
   fi
 }
 
-function updated() {
+updated() {
   # Update dotfiles
-  echo_title "Updating dotfiles"
+  info "Updating dotfiles"
   cur_dir=$( pwd )
   cd ~/.dotfiles || exit
   git pull
-  echo_title "Updating base16-shell"
+  info "Updating base16-shell"
   cd ~/.config/base16-shell || exit
   git pull
   cd "${cur_dir}" || exit
   # Update Vim & Vim plugins
-  echo_title "Updating Vim"
+  info "Updating Vim"
   vim +PluginClean! +PluginUpdate +qall
 }
 
-# Alias definitions.
+# Alias definitions
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
 alias la='ls -a'
 alias ll='ls -lh'
 alias lla='ls -lha'
-alias reload='source ~/.bashrc' # Reload .bashrc
+alias reload='. ~/.bashrc' # Reload .bashrc
 alias vi='vim'
 alias cls='clear'
 # Non root users only
@@ -226,7 +220,7 @@ fi
 # Source any files in ~/.private/
 # Place files that shouldn't be commited to a public repo here
 for file in ~/.private/*; do
-  [ -r "$file" ] && [ -f "$file" ] && source "$file";
+  [ -r "$file" ] && [ -f "$file" ] && . "$file";
 done;
 unset file;
 
