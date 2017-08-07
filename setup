@@ -42,7 +42,7 @@ echo(){
 }
 
 fail(){
-  printf "[ "; tput setaf 1; printf "FAIL"; tput sgr0; printf " ] "
+  [[ "$interactive" -eq 0 ]] && printf "[ "; tput setaf 1; printf "FAIL"; tput sgr0; printf " ] "; \
   tput setaf 8; printf "%s\n\n" "${1}"; tput sgr0
   exit 1
 }
@@ -52,17 +52,17 @@ indent() {
 }
 
 info(){
-  printf "\n[ "; tput setaf 6; printf "INFO"; tput sgr0; printf " ] "
+  [[ "$interactive" -eq 0 ]] && printf "\n[ "; tput setaf 6; printf "INFO"; tput sgr0; printf " ] "; \
   tput setaf 8; printf "%s\n" "${1}"; tput sgr0
 }
 
 okay(){
-  printf "[ "; tput setaf 2; printf "OKAY"; tput sgr0; printf " ] "
+  [[ "$interactive" -eq 0 ]] && printf "[ "; tput setaf 2; printf "OKAY"; tput sgr0; printf " ] "; \
   tput setaf 8; printf "%s\n\n" "${1}"; tput sgr0
 }
 
 warn(){
-  printf "[ "; tput setaf 3; printf "WARN"; tput sgr0; printf " ] "
+  [[ "$interactive" -eq 0 ]] && printf "[ "; tput setaf 3; printf "WARN"; tput sgr0; printf " ] "; \
   tput setaf 8; printf "%s\n\n" "${1}"; tput sgr0
   EXITCODE=$((EXITCODE + 1))
 }
