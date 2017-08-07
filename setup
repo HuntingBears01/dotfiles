@@ -136,7 +136,8 @@ setup_linux() {
     check $? "Vundle installation"
   fi
 
-  vim +PluginInstall +qall
+  # Only install Vim plugins from an interactive shell
+  [[ "$interactive" -eq 0 ]] && vim +PluginInstall +qall
 }
 
 setup_macos() {
