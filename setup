@@ -136,9 +136,7 @@ setup_linux() {
     check $? "Vundle installation"
   fi
 
-  info "Installing Vim plugins"
   vim +PluginInstall +qall
-  check $? "Vim plugin installation"
 }
 
 setup_macos() {
