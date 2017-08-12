@@ -103,14 +103,14 @@ if [ -x /usr/bin/dircolors ]; then
   else
     eval "$(dircolors -b)"
   fi
-  alias ls='ls --color=auto'
+  alias ls='ls -v --color=auto'
 fi
 
 # OS X specific section
 if [ "$(uname -s)" = "Darwin" ]; then
   # Use GNU coreutils if installed
   if [ -x /usr/local/bin/gls ]; then
-    alias ls='gls --color=auto'
+    alias ls='gls -v --color=auto'
     alias md5sum='gmd5sum'
     alias sha1sum='gsha1sum'
     alias sha224sum='gsha224sum'
