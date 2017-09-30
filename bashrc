@@ -157,7 +157,10 @@ up() {
 updatey() {
   # Update O/S
   if ([ "$( uname -s )" = "Darwin" ]) > /dev/null 2>&1; then
+    info "Updating brew"
     brew update && brew upgrade --cleanup
+    info "Updating Vagrant plugins"
+    vagrant plugin update
   elif ([ "$( cat /etc/*release | grep -ciwE "debian|ubuntu" )" -ge 1 ]) > /dev/null 2>&1; then
     if [ ${UID} -ne "0" ]; then
       sudo apt update && sudo apt -y upgrade && sudo apt autoclean
