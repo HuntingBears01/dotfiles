@@ -163,9 +163,9 @@ updatey() {
     vagrant plugin update
   elif ([ "$( cat /etc/*release | grep -ciwE "debian|ubuntu" )" -ge 1 ]) > /dev/null 2>&1; then
     if [ ${UID} -ne "0" ]; then
-      sudo apt update && sudo apt -y upgrade && sudo apt autoclean
+      sudo apt update && sudo apt -y upgrade && sudo apt-get autoclean
     else
-      apt update && apt -y upgrade && apt autoclean
+      apt update && apt -y upgrade && apt-get autoclean
     fi
   elif ([ "$( cat /etc/*release | grep -ciwE "red hat|centos|fedora" )" -ge 1 ]) > /dev/null 2>&1; then
     if [ ${UID} -ne "0" ]; then
