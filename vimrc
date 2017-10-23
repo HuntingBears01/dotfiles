@@ -28,10 +28,8 @@ filetype plugin indent on
 " -------------------- Plugin Configs --------------------
 
 " airblade/vim-gitgutter
-if exists('g:GitGutterEnable')
-  set updatetime=250
-  let g:gitgutter_max_signs = 500
-endif
+set updatetime=250
+let g:gitgutter_max_signs = 500
 
 " chriskempson/base16-vim
 if filereadable(expand("~/.vimrc_background"))
@@ -40,35 +38,29 @@ if filereadable(expand("~/.vimrc_background"))
 endif
 
 " scrooloose/nerdcommenter
-if exists ('g:nerdspacedelims')
-  let g:nerdspacedelims = 1
-  let g:NERDCompactSexyComs = 1
-  let g:NERDDefaultAlign = 'left'
-  let g:NERDCommentEmptyLines = 1
-  let g:NERDTrimTrailingWhitespace = 1
-endif
+let g:nerdspacedelims = 1
+let g:NERDCompactSexyComs = 1
+let g:NERDDefaultAlign = 'left'
+let g:NERDCommentEmptyLines = 1
+let g:NERDTrimTrailingWhitespace = 1
 
 " tpope/vim-fugitive
 autocmd BufReadPost fugitive://* set bufhidden=delete
 
 " w0rp/ale
-if exists ('g:ale_sign_error')
-  let g:ale_sign_error = '>>'
-  let g:ale_sign_warning = '--'
-  let g:airline#extensions#ale#enabled = 1
-  nmap <silent> <leader>j <Plug>(ale_previous_wrap)
-  nmap <silent> <leader>k <Plug>(ale_next_wrap)
-endif
+let g:ale_sign_error = '>>'
+let g:ale_sign_warning = '--'
+let g:airline#extensions#ale#enabled = 1
+nmap <silent> <leader>j <Plug>(ale_previous_wrap)
+nmap <silent> <leader>k <Plug>(ale_next_wrap)
 
 " vim-airline/vim-airline
-if exists ('g:airline')
-  if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
-  endif
-  let g:airline_left_sep = ''
-  let g:airline_right_sep = ''
-  let g:airline#extensions#tabline#enabled = 1
+if !exists('g:airline_symbols')
+  let g:airline_symbols = {}
 endif
+let g:airline_left_sep = ''
+let g:airline_right_sep = ''
+let g:airline#extensions#tabline#enabled = 1
 
 " -------------------- Vim Configs --------------------
 
