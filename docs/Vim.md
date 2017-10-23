@@ -168,10 +168,10 @@ S"      | Surround selection with "
 ## Unimpaired.vim
 Command  | Description       | Vim Command
 -------- | -----------       | -----------
-[a       | Previous file     | :previous
-]a       | Next file         | :next
-[A       | First file        | :first
-]A       | Last file         | :last
+[a       | Previous argument | :previous
+]a       | Next argument     | :next
+[A       | First argument    | :first
+]A       | Last argument     | :last
 [b       | Previous buffer   | :bprevious
 ]b       | Next buffer       | :bnext
 [B       | First buffer      | :bfirst
