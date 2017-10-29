@@ -137,11 +137,11 @@ Command   | Description
 ,cc       | Comment line or selection
 ,cn       | Nested comment
 ,c<space> | Toggle comment
-,cm       | Comment lines with one set of delimeters
+,cm       | Comment lines with one set of delimiters
 ,ci       | Toggle comments on selected lines
 ,cs       | Block comment selected lines
 ,c$       | Comment to end of line
-,cA       | Append commect to end of line
+,cA       | Append comment to end of line
 ,cu       | Uncomment selected lines
 
 
