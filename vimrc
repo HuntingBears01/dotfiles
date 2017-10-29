@@ -1,8 +1,10 @@
 " -------------------- Vundle Config --------------------
 
+" vint: -ProhibitSetNoCompatible
 set nocompatible
+" vint: +ProhibitSetNoCompatible
 filetype off
-set rtp+=~/.vim/bundle/Vundle.vim
+set runtimepath+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 " Let Vundle manage Vundle, required
@@ -13,10 +15,12 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'chriskempson/base16-vim'
 Plugin 'godlygeek/tabular'
 Plugin 'scrooloose/nerdcommenter'
+Plugin 'sheerun/vim-polyglot'
 Plugin 'tommcdo/vim-exchange'
 Plugin 'tpope/vim-eunuch'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-repeat'
+Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'w0rp/ale'
 Plugin 'vim-airline/vim-airline'
@@ -32,8 +36,8 @@ set updatetime=250
 let g:gitgutter_max_signs = 500
 
 " chriskempson/base16-vim
-if filereadable(expand("~/.vimrc_background"))
-  let base16colorspace=256
+if filereadable(expand('~/.vimrc_background'))
+  let g:base16colorspace=256
   source ~/.vimrc_background
 endif
 
@@ -43,9 +47,6 @@ let g:NERDCompactSexyComs = 1
 let g:NERDDefaultAlign = 'left'
 let g:NERDCommentEmptyLines = 1
 let g:NERDTrimTrailingWhitespace = 1
-
-" tpope/vim-fugitive
-autocmd BufReadPost fugitive://* set bufhidden=delete
 
 " w0rp/ale
 let g:ale_sign_error = '>>'
@@ -67,71 +68,80 @@ let g:airline#extensions#hunks#enabled = 0
 
 " -------------------- Vim Configs --------------------
 
-set background=dark                                       " dark background
-set encoding=utf-8                                        " text encoding
-syntax enable                                             " enable syntax highlighting
-set ts=2 sts=2 sw=2 expandtab                             " expand tabs to 2 spaces
-set shiftround                                            " Align indents to shiftwidth
-set nowrap                                                " no word wrap
-set linebreak                                             " Break long lines by word
-set textwidth=100                                         " Wrap at 100 columns
-set formatoptions=tcqnl1j                                 " See help: formatoptions
-set number                                                " Show line numbers
-set numberwidth=5                                         " number column width
-set hlsearch                                              " highlight search matches
-set ignorecase                                            " case insensitive searching
-set smartcase                                             " unless query uses capital letters
-set infercase                                             " Completion recognises capitalisation
-set incsearch                                             " search characters as they're entered
-set timeout timeoutlen=1000                               " Timeout of 1s for normal keys
-set ttimeoutlen=100                                       " Timeout 0f 0.1s for special keys (CTRL, ESC etc.)
-set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_,extends:›,precedes:‹ " Customise “invisible” characters
-set spelllang=en_gb                                       " Set British English as default
-set colorcolumn=80                                        " Highlight column 80
-set autoindent                                            " Copy indent from previous line
-set cindent                                               " Automatic indenting
-set copyindent                                            " Copy indent characters from previous line
-set backspace=indent,eol,start                            " Let backspace work as expected
-set laststatus=2                                          " Always display statusline
-set noshowmode                                            " Hide mode since airline shows it
-set hidden                                                " Hide buffers
-set mouse=nvc                                             " Use mouse except in insert mode
-set scrolloff=5                                           " Keep 15 lines visible above & below cursor
-set sidescrolloff=10                                      " Keep 10 characters visible either side of cursor
-set wildmenu                                              " Show completions
-silent! nohlsearch                                        " Clear search highlights at startup
+set background=dark                                             " dark background
+set encoding=utf-8                                              " text encoding
+scriptencoding utf-8                                            " script encoding
+syntax enable                                                   " enable syntax highlighting
+set tabstop=2 sts=2 shiftwidth=2 expandtab                      " expand tabs to 2 spaces
+set shiftround                                                  " Align indents to shiftwidth
+set nowrap                                                      " no word wrap
+set linebreak                                                   " Break long lines by word
+set textwidth=100                                               " Wrap at 100 columns
+set formatoptions=tcqnl1j                                       " See help: formatoptions
+set number                                                      " Show line numbers
+set numberwidth=5                                               " number column width
+set hlsearch                                                    " highlight search matches
+set ignorecase                                                  " case insensitive searching
+set smartcase                                                   " unless query uses capital letters
+set infercase                                                   " Completion recognises capitalisation
+set incsearch                                                   " search characters as they're entered
+set timeout timeoutlen=1000                                     " Timeout of 1s for normal keys
+set ttimeoutlen=100                                             " Timeout 0f 0.1s for special keys (CTRL, ESC etc.)
+set listchars=tab:▸\ ,trail:·,eol:¬,nbsp:_,extends:›,precedes:‹ " Customise “invisible” characters
+set spelllang=en_gb                                             " Set British English as default
+set colorcolumn=80                                              " Highlight column 80
+set autoindent                                                  " Copy indent from previous line
+set cindent                                                     " Automatic indenting
+set copyindent                                                  " Copy indent characters from previous line
+set backspace=indent,eol,start                                  " Let backspace work as expected
+set laststatus=2                                                " Always display statusline
+set noshowmode                                                  " Hide mode since airline shows it
+set hidden                                                      " Hide buffers
+set mouse=nvc                                                   " Use mouse except in insert mode
+set scrolloff=5                                                 " Keep 15 lines visible above & below cursor
+set sidescrolloff=10                                            " Keep 10 characters visible either side of cursor
+set wildmenu                                                    " Show completions
+silent! nohlsearch                                              " Clear search highlights at startup
 
 " -------------------- Filetype Configs --------------------
 
-if has("autocmd")
+if has('autocmd')
   filetype on
 
-  " Syntax of these languages is fussy over tabs Vs spaces
-  autocmd FileType make setlocal ts=8 sts=8 sw=8 noexpandtab
-  autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+  augroup vimrc
+    " Remove all vimrc autocommands
+    autocmd!
 
-  " Enable word wrap for the following filetypes
-  autocmd FileType markdown setlocal wrap
-  autocmd FileType html setlocal wrap
-  autocmd FileType text setlocal wrap
+    " Syntax of these languages is fussy over tabs Vs spaces
+    autocmd FileType make setlocal ts=8 sts=8 sw=8 noexpandtab
+    autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
-  " j and k don't skip over wrapped lines in following filetypes, unless given a count
-  autocmd FileType html,markdown,text nnoremap <expr> j v:count ? 'j' : 'gj'
-  autocmd FileType html,markdown,text nnoremap <expr> k v:count ? 'k' : 'gk'
-  autocmd FileType html,markdown,text vnoremap <expr> j v:count ? 'j' : 'gj'
-  autocmd FileType html,markdown,text vnoremap <expr> k v:count ? 'k' : 'gk'
+    " Enable word wrap for the following filetypes
+    autocmd FileType markdown setlocal wrap
+    autocmd FileType html setlocal wrap
+    autocmd FileType text setlocal wrap
 
-  " Automatically wrap at 72 characters and spell check git commit messages
-  autocmd FileType gitcommit setlocal textwidth=72
-  autocmd FileType gitcommit setlocal spell
+    " j and k don't skip over wrapped lines in following filetypes, unless given a count
+    autocmd FileType html,markdown,text nnoremap <expr> j v:count ? 'j' : 'gj'
+    autocmd FileType html,markdown,text nnoremap <expr> k v:count ? 'k' : 'gk'
+    autocmd FileType html,markdown,text vnoremap <expr> j v:count ? 'j' : 'gj'
+    autocmd FileType html,markdown,text vnoremap <expr> k v:count ? 'k' : 'gk'
 
-  " Example - Treat .rss files as XML
-  " autocmd BufNewFile,BufRead *.rss setfiletype xml
+    " Automatically wrap at 72 characters and spell check git commit messages
+    autocmd FileType gitcommit setlocal textwidth=72
+    autocmd FileType gitcommit setlocal spell
+
+    " Delete fugitive hidden buffers
+    autocmd BufReadPost fugitive://* set bufhidden=delete
+
+    " Example - Treat .rss files as XML
+    " autocmd BufNewFile,BufRead *.rss setfiletype xml
+  augroup END
 endif
 
 " -------------------- Key Mappings --------------------
 
-let mapleader = ","
+let g:mapleader = ','
 
 set pastetoggle=<F5>
 nnoremap <F6> :set wrap! linebreak! nolist<CR>
@@ -167,12 +177,12 @@ vmap <C-Down> ]egv
 
 function! Preserve(command)
   " Save last search, and cursor position.
-  let _s=@/
-  let l = line(".")
-  let c = col(".")
+  let l:_s=@/
+  let l:l = line('.')
+  let l:c = col('.')
   " Do the business
   execute a:command
   " Restore previous search history, and cursor position
-  let @/=_s
-  call cursor(l, c)
+  let @/=l:_s
+  call cursor(l:l, l:c)
 endfunction
