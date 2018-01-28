@@ -223,6 +223,7 @@ fi
 # Source any files in ~/.private/
 # Place files that shouldn't be commited to a public repo here
 for file in ~/.private/*; do
+  # shellcheck disable=SC1090
   [ -r "$file" ] && [ -f "$file" ] && . "$file";
 done;
 unset file;

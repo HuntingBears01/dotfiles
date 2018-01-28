@@ -27,55 +27,37 @@ append_once() {
     echo "$string" | sudo tee -a "$file"
   fi
 }
-
 check(){
   # Usage: check $? "Task description"
-  if [[ ${1} -eq 0 ]]; then
-    okay "${2} complete"
+  if [[ $1 -eq 0 ]]; then
+    okay "$2 complete"
   else
-    fail "${2} failed"
+    fail "$2 failed"
   fi
 }
-
-echo(){
-  printf "         %s\n" "${1}"
-}
-
 fail(){
-  printf "[ "; tput setaf 1; printf "FAIL"; tput sgr0; printf " ] "; \
-  tput setaf 8; printf "%s\n\n" "${1}"; tput sgr0
+  printf "\\n[ "; tput setaf 1; printf "FAIL"; tput sgr0; printf " ] %s\\n\\n" "$1"
   exit 1
 }
-
-indent() {
-  sed 's/^/         /'
-}
-
 info(){
-  printf "\n[ "; tput setaf 6; printf "INFO"; tput sgr0; printf " ] "; \
-  tput setaf 8; printf "%s\n" "${1}"; tput sgr0
+  printf "\\n[ "; tput setaf 6; printf "INFO"; tput sgr0; printf " ] %s\\n\\n" "$1"
 }
-
 okay(){
-  printf "[ "; tput setaf 2; printf "OKAY"; tput sgr0; printf " ] "; \
-  tput setaf 8; printf "%s\n\n" "${1}"; tput sgr0
+  printf "\\n[ "; tput setaf 2; printf " OK "; tput sgr0; printf " ] %s\\n\\n" "$1"
 }
-
 warn(){
-  printf "[ "; tput setaf 3; printf "WARN"; tput sgr0; printf " ] "; \
-  tput setaf 8; printf "%s\n\n" "${1}"; tput sgr0
+  printf "\\n[ "; tput setaf 3; printf "WARN"; tput sgr0; printf " ] %s\\n\\n" "$1"
   EXITCODE=$((EXITCODE + 1))
 }
-
 setup_git() {
   # Skip if running as root
   if [[ $EUID -ne 0 ]]; then
     info "Git configuration"
     if [[ "$interactive" -eq 0 ]];then
-      read -rp "         Enter Git name: " gitName
+      read -rp "Enter Git name: " gitName
       if [[ ! -z "$gitName" ]]; then
         git config --global user.name "$gitName"
-        read -rp "         Enter Git email: " gitEmail
+        read -rp "Enter Git email: " gitEmail
         if [[ ! -z "$gitEmail" ]]; then
           git config --global user.email "$gitEmail"
           if [[ ! -f ~/.ssh/id_rsa ]]; then
@@ -98,7 +80,6 @@ setup_git() {
     check $? "Git configuration"
   fi
 }
-
 setup_linux() {
   info "Linking dotfiles"
   for item in ${DOTFILES}; do
@@ -107,14 +88,14 @@ setup_linux() {
     else
       echo "Linking ${item}"
       [[ -f "${HOME}/.${item}" ]] && rm "${HOME}/.${item}"
-      ln -s "${PROG_DIR}/${item}" "${HOME}/.${item}" | indent
+      ln -s "${PROG_DIR}/${item}" "${HOME}/.${item}"
     fi
   done
   check $? "Dotfile linking"
 
   info "Installing base16-shell"
   if [[ -d "${HOME}/.config/base16-shell" ]]; then
-    warn "base16-shell directory already exists"
+    warn "base16-shell directory already exists, skipping"
   else
     git clone -q https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
     check $? "base16-shell installation"
@@ -122,7 +103,7 @@ setup_linux() {
   
   info "Installing base16-vim"
   if [[ -d ~/.vim/bundle/base16-vim ]]; then
-    warn "base16-vim directory already exists"
+    warn "base16-vim directory already exists, skipping"
   else
     git clone -q https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim
     check $? "base16-vim installation"
@@ -130,27 +111,27 @@ setup_linux() {
   
   info "Installing Vundle"
   if [[ -d ~/.vim/bundle/Vundle.vim ]]; then
-    warn "Vundle bundle already exists"
+    warn "Vundle bundle already exists, skipping"
   else
     git clone -q https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
     check $? "Vundle installation"
   fi
 
-  # Only install Vim plugins from an interactive shell
-  [[ "$interactive" -eq 0 ]] && vim +PluginInstall +qall
+  info "Installing Vim plugins"
+  vim -E -s -c "source ~/.vimrc" -c PluginInstall -c qa
+  check $? "Vim plugin installation"
 }
-
 setup_macos() {
   # Skip MacOS configuration if root
   if [[ ! "$(id -u)" -eq 0 ]]; then
     sudo -v
     info "Setting Hostname"
-    read -rp "         Enter Hostname: " name
+    read -rp "Enter Hostname: " name
     if [ ! -z "$name" ]; then
-      sudo scutil --set ComputerName "$name" | indent &&
-      sudo scutil --set HostName "$name" | indent &&
-      sudo scutil --set LocalHostName "$name" | indent &&
-      sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name" | indent
+      sudo scutil --set ComputerName "$name" &&
+      sudo scutil --set HostName "$name" &&
+      sudo scutil --set LocalHostName "$name" &&
+      sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
       check $? "Hostname setup"
     else
       warn "Hostname unchanged"
@@ -158,16 +139,14 @@ setup_macos() {
     
     info "Installing Homebrew"
     if ! (which brew > /dev/null 2>&1); then
-      ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" | indent
+      ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     else
-      brew update | indent &&
-      brew upgrade | indent
+      brew update &&
+      brew upgrade
     fi
     check $? "Homebrew installation"
   fi
 }
-
-clear
 
 # Check if running from an interactive shell
 if [[ -t 0 ]]; then

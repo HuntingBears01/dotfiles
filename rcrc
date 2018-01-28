@@ -1,2 +1,0 @@
-DOTFILES_DIRS=".dotfiles"
-EXCLUDES="*:*scripts* *:*README* *:*docs*"

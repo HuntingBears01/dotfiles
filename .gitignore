@@ -1,7 +1,4 @@
-# Swap files #
-##############
 *.swp
-
-# Log files #
-#############
 *.log
+.DS_Store
+*.sublime-*
