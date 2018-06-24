@@ -142,6 +142,9 @@ linkFiles(){
   destDir="$2"
   fileList=$(ls -A "${sourceDir}")
   info "Linking files in ${sourceDir} to ${destDir}"
+  if [[ ! -d "${destDir}" ]]; then
+    mkdir "${destDir}"
+  fi
   for item in ${fileList}; do
     if [[ "${sourceDir}/${item}" -ef "${destDir}/${item}" ]]; then
       # Skip if file is already linked
@@ -203,6 +206,7 @@ if isMac; then
 fi
 
 # Link dotfiles
+
 linkFiles "${progDir}/home" "${HOME}"
 linkFiles "${progDir}/config" "${HOME}/.config"
 linkFiles "${progDir}/bin" "${HOME}/bin"
