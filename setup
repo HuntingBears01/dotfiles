@@ -1,7 +1,12 @@
-#!/usr/bin/env bash
-#
+#! /usr/bin/env bash
+
 # Dotfiles setup script
 # Author: Conor Martin
+
+
+#------------------------------------------------------------------------------
+# >> Configuration
+#------------------------------------------------------------------------------
 
 # Secure the script, this breaks $* but you should probably be using $@ anyway
 IFS='
@@ -12,22 +17,46 @@ PATH=/usr/local/bin:/usr/bin:/bin
 export PATH
 
 # Global variables
-EXITCODE=0
-PROG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DOTFILES="bash_profile bashrc dircolors gvimrc vimrc inputrc"
+progDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+progName=$(basename "$0")
 
-append_once() {
-  # Usage: append_once "string" "file"
-  # Appends a string to a file if string does not already exist
+# Text colours
+red='tput setaf 1'
+green='tput setaf 2'
+yellow='tput setaf 3'
+magenta='tput setaf 5'
+cyan='tput setaf 6'
+grey='tput setaf 8'
+reset='tput sgr0'
+
+# Set default file & folder permissions for this script
+umask 0077
+
+
+#------------------------------------------------------------------------------
+# >> Functions
+#------------------------------------------------------------------------------
+
+appendOnce() {
+  # Appends a string to a file if it doesn't already exist
+  # Usage: appendOnce "string" "/path/to/file"
   string=$1
   file=$2
-  if ! [ -f "$file" ]; then
-    echo "$string" | sudo tee "$file"
-  elif [[ $(grep -c "$string" < "$file") -eq 0 ]]; then
-    echo "$string" | sudo tee -a "$file"
+  if ! [ -f "${file}" ]; then
+    echo "${string}" | sudo tee "${file}"
+  elif [[ $(grep -c "${string}" < "${file}") -eq 0 ]]; then
+    echo "${string}" | sudo tee -a "${file}"
   fi
 }
+begin() {
+  # Prints full path to program
+  ${grey}; printf "\\n- - - "
+  ${magenta}; printf "%s/%s" "${progDir}" "${progName}"
+  ${grey}; printf " - - -\\n\\n"
+  ${reset}
+}
 check(){
+  # Check return code and display appropriate message
   # Usage: check $? "Task description"
   if [[ $1 -eq 0 ]]; then
     okay "$2 complete"
@@ -36,132 +65,191 @@ check(){
   fi
 }
 fail(){
-  printf "\\n[ "; tput setaf 1; printf "FAIL"; tput sgr0; printf " ] %s\\n\\n" "$1"
-  exit 1
+  # Task failed
+  # Usage: fail "Message"
+  ${red}; printf "✗"
+  ${grey}; printf " %s\\n" "$1"
+  ${reset}; exit 1
 }
 info(){
-  printf "\\n[ "; tput setaf 6; printf "INFO"; tput sgr0; printf " ] %s\\n\\n" "$1"
+  # Task begin
+  # Usage: info "Message"
+  ${cyan}; printf "ℹ︎"
+  ${grey}; printf " %s\\n" "$1"
+  ${reset}
 }
 okay(){
-  printf "\\n[ "; tput setaf 2; printf " OK "; tput sgr0; printf " ] %s\\n\\n" "$1"
+  # Task completed successfully
+  # Usage: okay "Message"
+  ${green}; printf "✓"
+  ${grey}; printf " %s\\n\\n" "$1"
+  ${reset}
 }
 warn(){
-  printf "\\n[ "; tput setaf 3; printf "WARN"; tput sgr0; printf " ] %s\\n\\n" "$1"
-  EXITCODE=$((EXITCODE + 1))
+  # Task completed with warnings
+  # Usage: warn "Message"
+  ${yellow}; printf "!"
+  ${grey}; printf " %s\\n\\n" "$1"
+  ${reset}
 }
-setup_git() {
-  # Skip if running as root
-  if [[ $EUID -ne 0 ]]; then
-    info "Git configuration"
-    if [[ "$interactive" -eq 0 ]];then
-      read -rp "Enter Git name: " gitName
-      if [[ ! -z "$gitName" ]]; then
-        git config --global user.name "$gitName"
-        read -rp "Enter Git email: " gitEmail
-        if [[ ! -z "$gitEmail" ]]; then
-          git config --global user.email "$gitEmail"
-          if [[ ! -f ~/.ssh/id_rsa ]]; then
-            ssh-keygen -t rsa -C "$gitEmail" -f ~/.ssh/id_rsa | indent
-          fi
-        fi
-      fi
-    fi &&
-    git config --global color.ui auto &&
-    git config --global core.editor "$(which vim)" &&
-    git config --global core.autocrlf input &&
-    git config --global push.default current &&
-    git config --global alias.unstage 'reset HEAD --' &&
-    git config --global alias.last 'log -1 HEAD' &&
-    git config --global alias.co checkout &&
-    git config --global alias.br branch &&
-    git config --global alias.ci commit &&
-    git config --global alias.s status &&
-    git config --global alias.logp 'log --pretty=oneline --graph'
-    check $? "Git configuration"
+isInteractive(){
+  # Check if running from an interactive shell
+  if [[ -t 0 ]]; then
+    return 0
+  else
+    return 1
   fi
 }
-setup_linux() {
-  info "Linking dotfiles"
-  for item in ${DOTFILES}; do
-    if [[ "${PROG_DIR}/${item}" -ef "${HOME}/.${item}" ]]; then
-      echo "Skipping ${item}"
+isMac(){
+  # Check if running on MacOS
+  if [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
+    return 0
+  else
+    return 1
+  fi
+}
+isRoot(){
+  # Check if running as root
+  if [[ ${EUID} -eq 0 ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+cloneGitRepo(){
+  # Clones repository from GitHub
+  # Usage cloneGitRepo "repo URL" "/path/to/destination/dir"
+  repoURL=$1
+  destDir=$2
+  repoName=$(basename -s .git "${repoURL}")
+  info "Cloning ${repoName}"
+  if [[ -L "${destDir}/${repoName}" ]]; then
+    info "Deleting existing symlink ${destDir}"
+    rm "${destDir}"
+    git clone -q "${repoURL}" "${destDir}"
+    check $? "${repoName} cloning"
+  elif [[ -d "${destDir}" ]]; then
+    warn "${repoName} directory already exists, skipping"
+  else
+    git clone -q "${repoURL}" "${destDir}"
+    check $? "${repoName} cloning"
+  fi
+}
+linkFiles(){
+  # Links all files in source directory to destination directory
+  # Usage: linkFiles "/path/to/source/dir" "/path/to/destination/dir"
+  sourceDir="$1"
+  destDir="$2"
+  fileList=$(ls -A "${sourceDir}")
+  info "Linking files in ${sourceDir} to ${destDir}"
+  for item in ${fileList}; do
+    if [[ "${sourceDir}/${item}" -ef "${destDir}/${item}" ]]; then
+      # Skip if file is already linked
+      info "Skipping, ${item} already linked to ${sourceDir}"
+    elif [[ -L "${destDir}/${item}" ]]; then
+      # Delete broken links & create new ones
+      info "Deleting broken link for ${item}"
+      rm "${destDir}/${item}"
+      info "Linking ${item} to ${sourceDir}"
+      ln -s "${sourceDir}/${item}" "${destDir}/${item}"
+    elif [[ -e "${destDir}/${item}" ]]; then
+      # Backup existing files and create new links
+      info "Backing up ${destDir}/${item} to ${destDir}/${item}.bak"
+      mv "${destDir}/${item}" "${destDir}/${item}.bak"
+      info "Linking ${item} to ${sourceDir}"
+      ln -s "${sourceDir}/${item}" "${destDir}/${item}"
     else
-      echo "Linking ${item}"
-      [[ -f "${HOME}/.${item}" ]] && rm "${HOME}/.${item}"
-      ln -s "${PROG_DIR}/${item}" "${HOME}/.${item}"
+      # Create links
+      info "Linking ${item} to ${sourceDir}"
+      ln -s "${sourceDir}/${item}" "${destDir}/${item}"
     fi
   done
-  check $? "Dotfile linking"
-
-  info "Installing base16-shell"
-  if [[ -d "${HOME}/.config/base16-shell" ]]; then
-    warn "base16-shell directory already exists, skipping"
-  else
-    git clone -q https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
-    check $? "base16-shell installation"
-  fi
-  
-  info "Installing base16-vim"
-  if [[ -d ~/.vim/bundle/base16-vim ]]; then
-    warn "base16-vim directory already exists, skipping"
-  else
-    git clone -q https://github.com/chriskempson/base16-vim.git ~/.vim/bundle/base16-vim
-    check $? "base16-vim installation"
-  fi
-  
-  info "Installing Vundle"
-  if [[ -d ~/.vim/bundle/Vundle.vim ]]; then
-    warn "Vundle bundle already exists, skipping"
-  else
-    git clone -q https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-    check $? "Vundle installation"
-  fi
-
-  info "Installing Vim plugins"
-  vim -E -s -c "source ~/.vimrc" -c PluginInstall -c qa
-  check $? "Vim plugin installation"
+  check $? "Linking"
 }
-setup_macos() {
-  # Skip MacOS configuration if root
-  if [[ ! "$(id -u)" -eq 0 ]]; then
+
+
+#------------------------------------------------------------------------------
+# >> Main
+#------------------------------------------------------------------------------
+
+begin
+
+# Setup MacOS
+if isMac; then
+  if isRoot; then
+    fail "This program must not be run as root"
+  else
     sudo -v
     info "Setting Hostname"
     read -rp "Enter Hostname: " name
-    if [ ! -z "$name" ]; then
-      sudo scutil --set ComputerName "$name" &&
-      sudo scutil --set HostName "$name" &&
-      sudo scutil --set LocalHostName "$name" &&
-      sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$name"
-      check $? "Hostname setup"
-    else
+    if [ -z "${name}" ]; then
       warn "Hostname unchanged"
+    else
+      sudo scutil --set ComputerName "${name}" &&
+      sudo scutil --set HostName "${name}" &&
+      sudo scutil --set LocalHostName "${name}" &&
+      sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "${name}"
+      check $? "Hostname setup"
     fi
     
     info "Installing Homebrew"
-    if ! (which brew > /dev/null 2>&1); then
-      ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    if (which brew > /dev/null 2>&1); then
+      warn "Homebrew already installed"
     else
-      brew update &&
-      brew upgrade
+      ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+      check $? "Homebrew installation"
     fi
-    check $? "Homebrew installation"
   fi
-}
-
-# Check if running from an interactive shell
-if [[ -t 0 ]]; then
-  interactive=0
-else
-  interactive=1
 fi
 
-if [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
-  setup_macos
-  setup_linux
-  setup_git
+# Link dotfiles
+linkFiles "${progDir}/home" "${HOME}"
+linkFiles "${progDir}/config" "${HOME}/.config"
+linkFiles "${progDir}/bin" "${HOME}/bin"
+
+# Configure Git
+if isRoot; then
+  fail "This program must not be run as root"
 else
-  setup_linux
-  setup_git
+  info "Git configuration"
+  if isInteractive; then
+    read -rp "Enter Git name: " gitName
+    if [[ ! -z "${gitName}" ]]; then
+      git config --global user.name "${gitName}"
+      read -rp "Enter Git email: " gitEmail
+      if [[ ! -z "${gitEmail}" ]]; then
+        git config --global user.email "${gitEmail}"
+        if [[ ! -f ~/.ssh/id_rsa ]]; then
+          ssh-keygen -t rsa -C "${gitEmail}" -f ~/.ssh/id_rsa
+        fi
+      fi
+    fi
+  fi &&
+  git config --global color.ui auto &&
+  git config --global core.editor "$(which vim)" &&
+  git config --global core.autocrlf input &&
+  git config --global core.excludesfile ~/.gitignore &&
+  git config --global push.default current &&
+  git config --global alias.unstage 'reset HEAD --' &&
+  git config --global alias.last 'log -1 HEAD' &&
+  git config --global alias.co checkout &&
+  git config --global alias.br branch &&
+  git config --global alias.ci commit &&
+  git config --global alias.s status &&
+  git config --global alias.logp 'log --pretty=oneline --graph'
+  check $? "Git configuration"
+fi
+
+# Configure Vim
+cloneGitRepo "https://github.com/morhetz/gruvbox.git" "${HOME}/.vim/bundle/gruvbox"
+cloneGitRepo "https://github.com/arcticicestudio/nord-vim.git" "${HOME}/.vim/bundle/nord-vim"
+cloneGitRepo "https://github.com/VundleVim/Vundle.vim.git" "${HOME}/.vim/bundle/Vundle.vim"
+if isInteractive; then
+  info "Installing Vim plugins"
+  vim +PluginInstall +qall
+  check $? "Vim plugin installation"
+else
+  vim -E -s -c "source ~/.vimrc" -c PluginInstall -c qa
 fi
 
 exit 0

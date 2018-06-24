@@ -1,0 +1,221 @@
+# i3 config file (v4)
+
+# -----------------------------------------------------------------------------
+#   Basic configuration
+# -----------------------------------------------------------------------------
+
+set $mod                            Mod4
+set $alt                            Mod1
+set $term                           urxvt
+set $browser                        firefox
+
+# Set workspace names
+set $ws1                            "1"
+set $ws2                            "2"
+set $ws3                            "3"
+set $ws4                            "4"
+set $ws5                            "5"
+set $ws6                            "6"
+set $ws7                            "7"
+set $ws8                            "8"
+set $ws9                            "9"
+set $ws10                           "10"
+
+hide_edge_borders                   smart
+font                                pango:FiraSans-Regular 10
+focus_follows_mouse                 no
+focus_on_window_activation          smart
+floating_modifier                   $mod
+popup_during_fullscreen             smart
+workspace_auto_back_and_forth       yes
+
+# Global window settings
+for_window [class=".*"]             title_format " %class"
+
+# Application specific settings
+for_window [class="Plexamp"]        floating enable
+for_window [class="Pavucontrol"]    floating enable
+for_window [class="Arandr"]         floating enable
+for_window [class="Lxappearance"]   floating enable
+for_window [class="Sublime_text"]   title_format " Sublime Text"
+
+# Dropdown Terminal
+for_window [instance="dropdown"] floating enable
+for_window [instance="dropdown"] resize set 960 600
+for_window [instance="dropdown"] move scratchpad
+for_window [instance="dropdown"] border pixel 2
+exec --no-startup-id urxvt -name dropdown
+
+
+# -----------------------------------------------------------------------------
+#   Colours
+# -----------------------------------------------------------------------------
+
+# Shell Colours
+set_from_resource   $blk            i3wm.color0         #000000
+set_from_resource   $red            i3wm.color1         #000000
+set_from_resource   $grn            i3wm.color2         #000000
+set_from_resource   $ylw            i3wm.color3         #000000
+set_from_resource   $blu            i3wm.color4         #000000
+set_from_resource   $mag            i3wm.color5         #000000
+set_from_resource   $cya            i3wm.color6         #000000
+set_from_resource   $wht            i3wm.color7         #000000
+set_from_resource   $gry            i3wm.color8         #000000
+
+# Theme Colours
+set_from_resource   $thmBG          i3wm.thmBG          #000000
+set_from_resource   $thmFG          i3wm.thmFG          #000000
+set_from_resource   $selFG          i3wm.selFG          #000000
+set_from_resource   $selBG          i3wm.selBG          #000000
+set_from_resource   $thmOra         i3wm.thmOra         #000000
+set_from_resource   $thmRed         i3wm.thmRed         #000000
+set_from_resource   $thmGrn         i3wm.thmGrn         #000000
+set_from_resource   $thmGry         i3wm.thmGry         #000000
+set_from_resource   $link           i3wm.link           #000000
+
+
+#                         border    bg        text      indicator child border
+client.focused            $thmBG    $thmBG    $thmFG    $ylw      $thmBG
+client.unfocused          $thmBG    $thmBG    $thmGry   $ylw      $thmBG
+client.focused_inactive   $thmBG    $thmBG    $thmGry   $ylw      $thmBG
+client.urgent             $thmBG    $thmBG    $thmRed   $ylw      $thmBG
+
+
+# -----------------------------------------------------------------------------
+#   Keyboard Bindings
+# -----------------------------------------------------------------------------
+
+# Letters
+bindsym $mod+a                  focus parent
+bindsym $mod+shift+a            nop
+bindsym $mod+b                  exec --no-startup-id i3run -c "Firefox" -g -e firefox
+bindsym $mod+shift+b            nop
+bindsym $mod+c                  nop
+bindsym $mod+shift+c            reload
+bindsym $mod+d                  nop
+bindsym $mod+shift+d            nop
+bindsym $mod+e                  layout default
+bindsym $mod+shift+e            exec "i3-nagbar -t warning -m 'Exit i3?' -b 'Yes' 'i3-msg exit'"
+bindsym $mod+f                  fullscreen toggle
+bindsym $mod+shift+f            nop
+bindsym $mod+g                  nop
+bindsym $mod+shift+g            nop
+bindsym $mod+h                  focus left
+bindsym $mod+shift+h            move left
+bindsym $mod+$alt+h             resize shrink width 10 px or 10 ppt
+bindsym $mod+i                  nop
+bindsym $mod+shift+i            nop
+bindsym $mod+j                  focus down
+bindsym $mod+shift+j            move down
+bindsym $mod+$alt+j             resize shrink height 10 px or 10ppt
+bindsym $mod+k                  focus up
+bindsym $mod+shift+k            move up
+bindsym $mod+$alt+k             resize grow height 10 px or 10 ppt
+bindsym $mod+l                  focus right
+bindsym $mod+shift+l            move right
+bindsym $mod+$alt+l             resize grow width 10 px or 10 ppt
+bindsym $mod+m                  exec --no-startup-id $HOME/.config/i3/display-setup
+bindsym $mod+shift+m            nop
+bindsym $mod+n                  nop
+bindsym $mod+shift+n            nop
+bindsym $mod+o                  nop
+bindsym $mod+shift+o            nop
+bindsym $mod+p                  split toggle
+bindsym $mod+shift+p            nop
+bindsym $mod+q                  kill
+bindsym $mod+shift+q            kill
+bindsym $mod+r                  exec rofi -opacity 90% -show run
+bindsym $mod+shift+r            exec --no-startup-id $HOME/.config/i3/restart
+bindsym $mod+s                  exec --no-startup-id i3run -c "Sublime_text" -g -e subl
+bindsym $mod+shift+s            nop
+bindsym $mod+t                  [instance="dropdown"] scratchpad show; [instance="dropdown"] move position center
+bindsym $mod+shift+t            nop
+bindsym $mod+u                  nop
+bindsym $mod+shift+u            nop
+bindsym $mod+v                  nop
+bindsym $mod+shift+v            nop
+bindsym $mod+w                  nop
+bindsym $mod+shift+w            nop
+bindsym $mod+x                  exec --no-startup-id $HOME/.config/i3/lock
+bindsym $mod+shift+x            nop
+bindsym $mod+y                  nop
+bindsym $mod+shift+y            nop
+bindsym $mod+z                  workspace back_and_forth
+bindsym $mod+shift+z            nop
+
+# Numbers
+bindsym $mod+1                  workspace $ws1
+bindsym $mod+Shift+1            move container to workspace $ws1
+bindsym $mod+2                  workspace $ws2
+bindsym $mod+Shift+2            move container to workspace $ws2
+bindsym $mod+3                  workspace $ws3
+bindsym $mod+Shift+3            move container to workspace $ws3
+bindsym $mod+4                  workspace $ws4
+bindsym $mod+Shift+4            move container to workspace $ws4
+bindsym $mod+5                  workspace $ws5
+bindsym $mod+Shift+5            move container to workspace $ws5
+bindsym $mod+6                  workspace $ws6
+bindsym $mod+Shift+6            move container to workspace $ws6
+bindsym $mod+7                  workspace $ws7
+bindsym $mod+Shift+7            move container to workspace $ws7
+bindsym $mod+8                  workspace $ws8
+bindsym $mod+Shift+8            move container to workspace $ws8
+bindsym $mod+9                  workspace $ws9
+bindsym $mod+Shift+9            move container to workspace $ws9
+bindsym $mod+0                  workspace $ws10
+bindsym $mod+Shift+0            move container to workspace $ws10
+
+# Arrow keys
+bindsym $mod+Left               focus left
+bindsym $mod+Shift+Left         move left
+bindsym $mod+$alt+Left          resize shrink width 10 px or 10 ppt
+bindsym $mod+Down               focus down
+bindsym $mod+Shift+Down         move down
+bindsym $mod+$alt+Down          resize shrink height 10 px or 10 ppt
+bindsym $mod+Up                 focus up
+bindsym $mod+Shift+Up           move up
+bindsym $mod+$alt+Up            resize grow height 10 px or 10 ppt
+bindsym $mod+Right              focus right
+bindsym $mod+Shift+Right        move right
+bindsym $mod+$alt+Right         resize grow width 10 px or 10 ppt
+
+# Other keys
+bindsym $mod+Return             exec --no-startup-id $term
+bindsym $mod+shift+Return       nop
+bindsym $mod+space              floating toggle
+bindsym $mod+shift+space        nop
+bindsym $mod+tab                nop
+bindsym $mod+shift+Tab          nop
+
+# Print screen or current window
+bindsym Print                   exec --no-startup-id "scrot -e 'mv $f ~/Screenshots'"
+bindsym $mod+Print              exec --no-startup-id "scrot -ue 'mv $f ~/Screenshots'"
+
+# Special Keys
+bindsym XF86AudioRaiseVolume    exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%
+bindsym XF86AudioLowerVolume    exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%
+bindsym XF86AudioMute           exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+bindsym XF86MonBrightnessUp     exec --no-startup-id xbacklight -inc 5
+bindsym XF86MonBrightnessDown   exec --no-startup-id xbacklight -dec 5
+bindsym XF86AudioPlay           exec --no-startup-id playerctl play
+bindsym XF86AudioPause          exec --no-startup-id playerctl pause
+bindsym XF86AudioNext           exec --no-startup-id playerctl next
+bindsym XF86AudioPrev           exec --no-startup-id playerctl previous
+
+
+# -----------------------------------------------------------------------------
+#   Startup Items
+# -----------------------------------------------------------------------------
+
+exec_always --no-startup-id $HOME/.config/polybar/start
+exec --no-startup-id xset dpms 300
+exec --no-startup-id xautolock -time 4 -locker '$HOME/.config/i3/lock'
+exec --no-startup-id ~/.fehbg
+exec --no-startup-id compton
+exec --no-startup-id nm-applet
+exec --no-startup-id syncthing -no-browser
+exec --no-startup-id caffeine
+exec --no-startup-id dropbox start
+exec --no-startup-id redshift
+
+# vim: ft=i3

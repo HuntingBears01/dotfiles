@@ -1,0 +1,256 @@
+; -----------------------------------------------------------------------------
+;   Colours
+; -----------------------------------------------------------------------------
+
+[colors]
+blk                                 = ${xrdb:color0:#000000}
+red                                 = ${xrdb:color1:#000000}
+grn                                 = ${xrdb:color2:#000000}
+ylw                                 = ${xrdb:color3:#000000}
+blu                                 = ${xrdb:color4:#000000}
+mag                                 = ${xrdb:color5:#000000}
+cya                                 = ${xrdb:color6:#000000}
+wht                                 = ${xrdb:color7:#000000}
+gry                                 = ${xrdb:color8:#000000}
+thmFG                               = ${xrdb:thmFG:#000000}
+thmBG                               = ${xrdb:thmBG:#000000}
+selBG                               = ${xrdb:selBG:#000000}
+selFG                               = ${xrdb:selFG:#000000}
+thmOra                              = ${xrdb:thmOra:#000000}
+thmRed                              = ${xrdb:thmRed:#000000}
+thmGrn                              = ${xrdb:thmGrn:#000000}
+thmGry                              = ${xrdb:thmGry:#000000}
+link                                = ${xrdb:link:#000000}
+
+
+; -----------------------------------------------------------------------------
+;   Bar Settings
+; -----------------------------------------------------------------------------
+
+[bar/topbar]
+width                               = 100%
+height                              = 20
+radius                              = 0.0
+fixed-center                        = true
+background                          = ${colors.thmBG}
+foreground                          = ${colors.thmFG}
+line-size                           = 0
+border-size                         = 4
+border-color                        = ${colors.thmBG}
+padding                             = 1
+module-margin                       = 2
+font-0                              = "FiraSans-Regular:size=11;2"
+font-1                              = "FontAwesome:size=11;2"
+font-2                              = "FiraSans-Regular:size=8;2"
+modules-left                        = i3 xbacklight alsa network-eth network-wlan
+modules-center                      = date time
+modules-right                       = cpu memory filesystem battery
+tray-position                       = right
+tray-padding                        = 0
+enable-ipc                          = true
+monitor                             = ${env:MONITOR}
+
+
+; -----------------------------------------------------------------------------
+;   Global WM Settings
+; -----------------------------------------------------------------------------
+
+[global/wm]
+margin-top                          = 5
+margin-bottom                       = 5
+
+
+; -----------------------------------------------------------------------------
+;   Application Settings
+; -----------------------------------------------------------------------------
+
+[settings]
+screenchange-reload                 = true
+
+
+; -----------------------------------------------------------------------------
+;   Modules
+; -----------------------------------------------------------------------------
+
+[module/alsa]
+type                                = internal/alsa
+
+format-volume                       = <label-volume>
+format-volume-prefix                = VOL
+format-volume-prefix-font           = 3
+format-volume-prefix-padding        = 2
+
+format-muted                        = MUTE
+format-muted-prefix                 = VOL
+format-muted-prefix-font            = 3
+format-muted-prefix-padding         = 2
+
+label                               = %percentage%%
+
+
+[module/battery]
+type                                = internal/battery
+
+battery                             = BAT0
+adapter                             = AC
+full-at                             = 98
+
+format-charging                     = <label-charging>
+format-charging-prefix              = AC
+format-charging-prefix-font         = 3
+format-charging-prefix-padding      = 2
+
+format-discharging                  = <label-discharging>
+format-discharging-prefix           = BAT
+format-discharging-prefix-font      = 3
+format-discharging-prefix-padding   = 2
+
+format-full                         = 100%
+format-full-prefix                  = AC
+format-full-prefix-font             = 3
+format-full-prefix-padding          = 2
+
+label                               = %percentage%%
+
+
+[module/cpu]
+type                                = internal/cpu
+
+interval                            = 2
+
+format                              = <label>
+format-prefix                       = CPU
+format-prefix-font                  = 3
+format-prefix-padding               = 2
+
+label                               = %percentage%%
+
+
+[module/date]
+type                                = internal/date
+
+interval                            = 5
+date                                = "%A, %d %B"
+
+label                               = %date%
+
+
+[module/time]
+type                                = internal/date
+
+interval                            = 5
+time                                = %H:%M
+
+label                               = %time%
+
+
+[module/filesystem]
+type                                = internal/fs
+
+interval                            = 25
+mount-0                             = /
+
+format-mounted                      = <label-mounted>
+format-mounted-prefix               = SSD
+format-mounted-prefix-font          = 3
+format-mounted-prefix-padding       = 2
+
+label-mounted                       = %free%
+
+
+[module/i3]
+type                                = internal/i3
+
+format                              = <label-state> <label-mode>
+index-sort                          = true
+wrapping-scroll                     = false
+pin-workspaces                      = true
+
+label-focused                       = %name%
+label-focused-background            = ${colors.selBG}
+label-focused-foreground            = ${colors.selFG}
+label-focused-padding               = 2
+
+label-unfocused                     = %name%
+label-unfocused-foreground          = ${colors.thmGry}
+label-unfocused-padding             = 2
+
+label-visible                       = %name%
+label-visible-background            = ${self.label-focused-background}
+label-visible-foreground            = ${self.label-focused-foreground}
+label-visible-padding               = ${self.label-focused-padding}
+
+label-urgent                        = %name%
+label-urgent-background             = ${colors.thmRed}
+label-urgent-forefround             = ${colors.selFG}
+label-urgent-padding                = 2
+
+
+[module/memory]
+type                                = internal/memory
+
+interval                            = 2
+
+format                              = <label>
+format-prefix                       = MEM
+format-prefix-font                  = 3
+format-prefix-padding               = 2
+
+label                               = %gb_free%
+
+
+[module/network-eth]
+type                                = internal/network
+
+interface                           = enxa44cc8a3bb31
+interval                            = 3
+
+format-connected                    = <label-connected>
+format-connected-prefix             = ETH
+format-connected-prefix-font        = 3
+format-connected-prefix-padding     = 2
+
+format-disconnected                 = <label-disconnected>
+format-disconnected-foreground      = ${colors.thmGry}
+format-disconnected-prefix          = ETH
+format-disconnected-prefix-font     = 3
+format-disconnected-prefix-padding  = 2
+
+label-connected                     = %local_ip%
+label-disconnected                  = -
+
+
+[module/network-wlan]
+type                                = internal/network
+
+interface                           = wlp58s0
+interval                            = 3
+
+format-connected                    = <label-connected>
+format-connected-prefix             = WI-FI
+format-connected-prefix-font        = 3
+format-connected-prefix-padding     = 2
+
+format-disconnected                 = <label-disconnected>
+format-disconnected-foreground      = ${colors.thmGry}
+format-disconnected-prefix          = WI-FI
+format-disconnected-prefix-font     = 3
+format-disconnected-prefix-padding  = 2
+
+label-connected                     = %essid% – %local_ip%
+
+label-disconnected                  = -
+
+
+[module/xbacklight]
+type                                = internal/xbacklight
+
+format                              = <label>
+format-prefix                       = BRI
+format-prefix-font                  = 3
+format-prefix-padding               = 2
+
+label                               = %percentage%%
+
+
+; vim: ft=cfg

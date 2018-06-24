@@ -1,4 +1,6 @@
-" -------------------- Vundle Config --------------------
+"------------------------------------------------------------------------------
+"  Vundle Config
+"------------------------------------------------------------------------------
 
 " vint: -ProhibitSetNoCompatible
 set nocompatible
@@ -12,8 +14,9 @@ Plugin 'VundleVim/Vundle.vim'
 
 " List plugins here
 Plugin 'airblade/vim-gitgutter'
-Plugin 'chriskempson/base16-vim'
+Plugin 'arcticicestudio/nord-vim'
 Plugin 'godlygeek/tabular'
+Plugin 'morhetz/gruvbox'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'tommcdo/vim-exchange'
@@ -29,17 +32,24 @@ Plugin 'vim-airline/vim-airline-themes'
 call vundle#end()
 filetype plugin indent on
 
-" -------------------- Plugin Configs --------------------
+
+"------------------------------------------------------------------------------
+"  Plugin Config
+"------------------------------------------------------------------------------
 
 " airblade/vim-gitgutter
 set updatetime=250
 let g:gitgutter_max_signs = 500
 
-" chriskempson/base16-vim
-if filereadable(expand('~/.vimrc_background'))
-  let g:base16colorspace=256
-  source ~/.vimrc_background
+" Theme
+if !has('mac')
+  let g:gruvbox_italic=1
 endif
+if has('termguicolors')
+  set termguicolors
+endif
+colorscheme gruvbox
+" colorscheme nord
 
 " scrooloose/nerdcommenter
 let g:nerdspacedelims = 1
@@ -63,7 +73,10 @@ let g:airline_left_sep = ''
 let g:airline_right_sep = ''
 let g:airline#extensions#hunks#enabled = 0
 
-" -------------------- Vim Configs --------------------
+
+"------------------------------------------------------------------------------
+"  Vim Config
+"------------------------------------------------------------------------------
 
 set background=dark                                             " dark background
 set encoding=utf-8                                              " text encoding
@@ -100,7 +113,10 @@ set sidescrolloff=10                                            " Keep 10 charac
 set wildmenu                                                    " Show completions
 silent! nohlsearch                                              " Clear search highlights at startup
 
-" -------------------- Filetype Configs --------------------
+
+"------------------------------------------------------------------------------
+"  Filetype Config
+"------------------------------------------------------------------------------
 
 if has('autocmd')
   filetype on
@@ -131,12 +147,23 @@ if has('autocmd')
     " Delete fugitive hidden buffers
     autocmd BufReadPost fugitive://* set bufhidden=delete
 
+    " Highlight trailing whitespace
+    highlight ExtraWhitespace ctermbg=DarkRed guibg=DarkRed
+    match ExtraWhitespace /\s\+$/
+    autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+    autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+    autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+    autocmd BufWinLeave * call clearmatches()
+
     " Example - Treat .rss files as XML
     " autocmd BufNewFile,BufRead *.rss setfiletype xml
   augroup END
 endif
 
-" -------------------- Key Mappings --------------------
+
+"------------------------------------------------------------------------------
+"  Key Bindings
+"------------------------------------------------------------------------------
 
 let g:mapleader = ','
 
@@ -170,7 +197,10 @@ nmap <C-Down> ]e
 vmap <C-Up> [egv
 vmap <C-Down> ]egv
 
-" -------------------- Vim Functions --------------------
+
+"------------------------------------------------------------------------------
+"  Vim Functions
+"------------------------------------------------------------------------------
 
 function! Preserve(command)
   " Save last search, and cursor position.
