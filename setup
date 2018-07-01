@@ -210,6 +210,9 @@ fi
 linkFiles "${progDir}/home" "${HOME}"
 linkFiles "${progDir}/config" "${HOME}/.config"
 linkFiles "${progDir}/bin" "${HOME}/bin"
+if (which i3 > /dev/null 2>&1); then
+  linkFiles "${progDir}/i3-bin" "${HOME}/bin"
+fi
 
 # Configure Git
 if isRoot; then
