@@ -230,8 +230,8 @@ for file in\
 # Aliases for commonly used directories
 # Format: "directory relative to $HOME":alias
 for dir in\
-    "Music":mus "Videos":vid "Desktop":dt "Pictures":pic\
-    "Downloads":dl "Documents":doc "Archive":arc "Dropbox":dbx
+    "Music":mus "Videos":vid "Desktop":dt "Pictures":pic ".dotfiles":dot\
+    "Downloads":dl "Documents":doc "Archive":arc "Dropbox":dbx "bin":bin
   do
     if [ -d "$HOME/${dir%:*}" ]; then
       alias ${dir/*:}="cd $HOME/${dir%:*} && ls"
