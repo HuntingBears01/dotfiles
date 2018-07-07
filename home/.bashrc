@@ -47,10 +47,10 @@ if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
   tput sgr0 # reset colors
 
   reset=$(tput sgr0)
-  red=$(tput setaf 9)
-  green=$(tput setaf 10)
-  yellow=$(tput setaf 11)
-  blue=$(tput setaf 12)
+  red=$(tput setaf 1)
+  green=$(tput setaf 2)
+  yellow=$(tput setaf 3)
+  blue=$(tput setaf 4)
   white=$(tput setaf 7)
   grey=$(tput setaf 8)
 fi
@@ -194,7 +194,7 @@ fi
 
 
 
-export LS_COLORS="di=00;94:ow=00;94:ln=00;95:ex=00;91:or=00;97;101:su=01;41;97:sg=01;41;97"
+export LS_COLORS="di=00;34:ow=00;34:ln=00;35:ex=00;31:or=00;37;101:su=01;41;37:sg=01;41;37"
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
