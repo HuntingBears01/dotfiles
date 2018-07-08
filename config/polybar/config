@@ -44,7 +44,7 @@ font-1                              = "FontAwesome:size=11;2"
 font-2                              = "FiraSans-Regular:size=8;2"
 modules-left                        = i3 xbacklight alsa network-eth network-wlan
 modules-center                      = date time
-modules-right                       = cpu memory filesystem battery
+modules-right                       = cpu memory filesystem battery spacer
 tray-position                       = right
 tray-padding                        = 0
 enable-ipc                          = true
@@ -240,6 +240,14 @@ format-disconnected-prefix-padding  = 2
 label-connected                     = %essid% – %local_ip%
 
 label-disconnected                  = -
+
+
+[module/spacer]
+type                                = custom/text
+content                             = .
+content-padding                     = 0
+content-background                  = ${colors.thmBG}
+content-foreground                  = ${colors.thmBG}
 
 
 [module/xbacklight]
