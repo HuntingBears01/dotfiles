@@ -50,12 +50,11 @@ progDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 progName=$(basename "$0")
 
 # Text colours
-red='tput setaf 9'
-green='tput setaf 10'
-yellow='tput setaf 11'
-magenta='tput setaf 13'
-cyan='tput setaf 14'
-grey='tput setaf 8'
+red='tput setaf 1'
+green='tput setaf 2'
+yellow='tput setaf 3'
+magenta='tput setaf 5'
+cyan='tput setaf 6'
 reset='tput sgr0'
 
 # Set default file & folder permissions for this script
@@ -76,8 +75,7 @@ usage() {
 begin() {
   # Purpose:  Prints full path to program
   # Usage:    begin
-  ${grey}; printf "\\n> "
-  ${magenta}; printf "%s/%s\\n\\n" "${progDir}" "${progName}"
+  ${magenta}; printf "\\n%s/%s\\n\\n" "${progDir}" "${progName}"
   ${reset}
 }
 check() {
@@ -92,30 +90,27 @@ check() {
 fail() {
   # Purpose:  Display a task failed message and exit
   # Usage:    fail "Message"
-  ${red}; printf "✗"
-  ${grey}; printf " %s\\n\\n" "$1"
-  ${reset}; exit 1
+  ${red}; printf " ✗ "
+  ${reset}; printf " %s\\n\\n" "$1"
+  exit 1
 }
 info() {
   # Purpose:  Display an informational message
   # Usage:    info "Message"
-  ${cyan}; printf "ℹ︎"
-  ${grey}; printf " %s\\n" "$1"
-  ${reset}
+  ${cyan}; printf " ℹ︎ "
+  ${reset}; printf " %s\\n" "$1"
 }
 okay() {
   # Purpose:  Display a task successful message
   # Usage:    okay "Message"
-  ${green}; printf "✓"
-  ${grey}; printf " %s\\n\\n" "$1"
-  ${reset}
+  ${green}; printf " ✓ "
+  ${reset}; printf " %s\\n\\n" "$1"
 }
 warn() {
   # Purpose:  Display a warning message and continue
   # Usage:    warn "Message"
-  ${yellow}; printf "!"
-  ${grey}; printf " %s\\n\\n" "$1"
-  ${reset}
+  ${yellow}; printf " ! "
+  ${reset}; printf " %s\\n\\n" "$1"
 }
 
 
