@@ -6,7 +6,7 @@ mapfile -t monitors < <(xrandr | grep '\Wconnected' | awk '{ print $1 }')
 
 case ${#monitors[@]} in
   1)
-    xrandr --output "${monitors[0]}" --auto --primary
+    xrandr --dpi 144 --output "${monitors[0]}" --auto --primary
   ;;
   2)
     if [[ "${monitors[0]}" = "${laptop}" ]]; then

@@ -8,22 +8,21 @@
 # Configuration
 #------------------------------------------------------------------------------
 
-# Set PATH to sane defaults
-PATH=/usr/local/bin:/usr/bin:/bin
-export PATH
-
-# Global variables
+# Script variables
+# shellcheck disable=SC2034
 progDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 progName=$(basename "$0")
+logName="${progName%.*}"
+logFile="${progDir}/${logName}.log"
 
-# Text colours
-red='tput setaf 9'
-green='tput setaf 10'
-yellow='tput setaf 11'
-magenta='tput setaf 13'
-cyan='tput setaf 14'
-grey='tput setaf 8'
-reset='tput sgr0'
+# Import common functions
+# shellcheck disable=SC1090
+if [[ -f "${HOME}/.scripts/script-common.sh" ]]; then
+  . "${HOME}/.scripts/script-common.sh"
+else
+  echo "Unable to open script-common.sh"
+  exit 1
+fi
 
 # Update the version numbers below as required
 # CentOS versions
@@ -53,10 +52,6 @@ cpu="1"
 mem="512"
 publicIP=""
 destDir="."
-
-# Set default file & folder permissions for this script
-umask 0077
-
 
 #------------------------------------------------------------------------------
 # Functions
@@ -90,50 +85,6 @@ usage() {
   echo "  --help                    Display this help"
   echo
 }
-begin() {
-  # Purpose:  Prints full path to program
-  # Usage:    begin
-  ${grey}; printf "\\n> "
-  ${magenta}; printf "%s/%s\\n\\n" "${progDir}" "${progName}"
-  ${reset}
-}
-check() {
-  # Purpose:  Checks the return code and displays an appropriate message
-  # Usage:    check $? "Task description"
-  if [[ $1 -eq 0 ]]; then
-    okay "$2 complete"
-  else
-    fail "$2 failed"
-  fi
-}
-fail() {
-  # Purpose:  Display a task failed message and exit
-  # Usage:    fail "Message"
-  ${red}; printf "✗"
-  ${grey}; printf " %s\\n\\n" "$1"
-  ${reset}; exit 1
-}
-info() {
-  # Purpose:  Display an informational message
-  # Usage:    info "Message"
-  ${cyan}; printf "ℹ︎"
-  ${grey}; printf " %s\\n" "$1"
-  ${reset}
-}
-okay() {
-  # Purpose:  Display a task successful message
-  # Usage:    okay "Message"
-  ${green}; printf "✓"
-  ${grey}; printf " %s\\n\\n" "$1"
-  ${reset}
-}
-warn() {
-  # Purpose:  Display a warning message and continue
-  # Usage:    warn "Message"
-  ${yellow}; printf "!"
-  ${grey}; printf " %s\\n\\n" "$1"
-  ${reset}
-}
 incrementIP() {
   # Purpose:  Increment the last octet of an IP address
   # Usage:    incrementIP "x.x.x.x"
@@ -148,24 +99,6 @@ incrementIP() {
     lsv=$(( lsv + 1 ))
     nextIP="${base}.${lsv}"
   fi
-}
-ipValid() {
-  # Purpose:  Check if argument is a valid IP address
-  # Usage:    ipValid "x.x.x.x"
-  local ip=${1:-1.2.3.4}
-  # shellcheck disable=SC2206
-  local IFS=.; local -a a=(${ip})
-  # Start with a regex format test
-  if ! [[ ${ip} =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    return 1
-  fi
-  # Test values of quads
-  for quad in {0..3}; do
-    if [[ "${a[$quad]}" -gt 255 ]]; then
-      return 1
-    fi
-  done
-  return 0
 }
 isDirectory() {
   # Purpose:  Check if argument is a directory

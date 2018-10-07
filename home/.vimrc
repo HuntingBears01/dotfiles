@@ -1,37 +1,31 @@
 "------------------------------------------------------------------------------
-"  Vundle Config
+"  Plugin Management
 "------------------------------------------------------------------------------
 
-" vint: -ProhibitSetNoCompatible
-set nocompatible
-" vint: +ProhibitSetNoCompatible
-filetype off
-set runtimepath+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
+" Install plug if necessary
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 
-" Let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-
-" List plugins here
-Plugin 'airblade/vim-gitgutter'
-Plugin 'arcticicestudio/nord-vim'
-Plugin 'godlygeek/tabular'
-Plugin 'morhetz/gruvbox'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'sheerun/vim-polyglot'
-Plugin 'tommcdo/vim-exchange'
-Plugin 'tpope/vim-eunuch'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-repeat'
-Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-unimpaired'
-Plugin 'w0rp/ale'
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
-
-call vundle#end()
-filetype plugin indent on
-
+" Install plugins
+call plug#begin('~/.vim/bundle')
+Plug 'airblade/vim-gitgutter'
+Plug 'chriskempson/base16-vim'
+Plug 'godlygeek/tabular'
+Plug 'scrooloose/nerdcommenter'
+Plug 'sheerun/vim-polyglot'
+Plug 'tommcdo/vim-exchange'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-unimpaired'
+Plug 'w0rp/ale'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+call plug#end()
 
 "------------------------------------------------------------------------------
 "  Plugin Config
@@ -42,14 +36,10 @@ set updatetime=250
 let g:gitgutter_max_signs = 500
 
 " Theme
-if !has('mac')
-  let g:gruvbox_italic=1
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256
+  source ~/.vimrc_background
 endif
-if has('termguicolors')
-  set termguicolors
-endif
-colorscheme gruvbox
-" colorscheme nord
 
 " scrooloose/nerdcommenter
 let g:nerdspacedelims = 1
@@ -59,18 +49,21 @@ let g:NERDCommentEmptyLines = 1
 let g:NERDTrimTrailingWhitespace = 1
 
 " w0rp/ale
+let g:ale_enabled = 0
 let g:ale_sign_error = '>>'
 let g:ale_sign_warning = '--'
 let g:airline#extensions#ale#enabled = 1
-nmap <silent> <leader>j <Plug>(ale_previous_wrap)
-nmap <silent> <leader>k <Plug>(ale_next_wrap)
+let g:ale_open_list = 1
 
 " vim-airline/vim-airline
 if !exists('g:airline_symbols')
   let g:airline_symbols = {}
 endif
-let g:airline_left_sep = ''
-let g:airline_right_sep = ''
+" Comment below line if Powerline fonts are not installed
+let g:airline_powerline_fonts = 1
+" Uncomment 2 lines below if Powerline fonts are not installed
+" let g:airline_left_sep = ''
+" let g:airline_right_sep = ''
 let g:airline#extensions#hunks#enabled = 0
 
 
@@ -108,9 +101,10 @@ set laststatus=2                                                " Always display
 set noshowmode                                                  " Hide mode since airline shows it
 set hidden                                                      " Hide buffers
 set mouse=nvc                                                   " Use mouse except in insert mode
-set scrolloff=5                                                 " Keep 15 lines visible above & below cursor
+set scrolloff=5                                                 " Keep 5 lines visible above & below cursor
 set sidescrolloff=10                                            " Keep 10 characters visible either side of cursor
 set wildmenu                                                    " Show completions
+set ttyfast                                                     " Fast terminal
 silent! nohlsearch                                              " Clear search highlights at startup
 
 
@@ -167,16 +161,29 @@ endif
 
 let g:mapleader = ','
 
-set pastetoggle=<F5>
+" [F2] - Toggle paste mode
+set pastetoggle=<F2>
+" [F3] - Toggle line numbering
+nnoremap <F3> :set invnumber<CR>
+" [F4] - Toggle spellcheck
+nnoremap <F4> :set spell!<CR>
+" [F5] - Toggle syntax checking
+nnoremap <F5> :ALEToggle<CR>
+" [F6] - Toggle wordwrap
 nnoremap <F6> :set wrap! linebreak! nolist<CR>
-nnoremap <Leader>h :nohlsearch<CR>
+" [,c] - Clear search highlighting
+nnoremap <Leader>c :nohlsearch<CR>
+" [,h] - Show hidden characters
+nnoremap <leader>h :set list!<CR>
+" [,i] - Fix indentation
 nnoremap <Leader>i :call Preserve("normal gg=G")<CR>
-nnoremap <Leader>l :set list!<CR>
-nnoremap <Leader>n :set invnumber<CR>
-nnoremap <Leader>s :set spell!<CR>
+" [,t] - Remove trailing whitespace
+nnoremap <Leader>t :call Preserve("%s/\\s\\+$//e")<CR>
+" [,ve] - Edit vimrc in a new tab
 nnoremap <leader>ve :tabedit $MYVIMRC<CR>
+" [,vr] - Reload vimrc
 nnoremap <leader>vr :source $MYVIMRC<CR>
-nnoremap <Leader>w :call Preserve("%s/\\s\\+$//e")<CR>
+
 
 " Use CTRL h/j/k/l to switch windows
 map <C-h> <C-w>h
@@ -191,12 +198,15 @@ map <leader>es :sp %%
 map <leader>ev :vsp %%
 map <leader>et :tabe %%
 
-" Move current line up/down (requires tpope/vim-unimpaired)
+" Move selected line(s) up/down (requires tpope/vim-unimpaired)
 nmap <C-Up> [e
 nmap <C-Down> ]e
 vmap <C-Up> [egv
 vmap <C-Down> ]egv
 
+" Move to next previous ALE linter issue
+nmap <silent> <leader>j <Plug>(ale_previous_wrap)
+nmap <silent> <leader>k <Plug>(ale_next_wrap)
 
 "------------------------------------------------------------------------------
 "  Vim Functions

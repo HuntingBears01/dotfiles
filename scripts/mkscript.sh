@@ -38,91 +38,41 @@ else
 
 
 #------------------------------------------------------------------------------
-# Configuration
+#  Configuration
 #------------------------------------------------------------------------------
 
-# Set PATH to sane defaults
-PATH=/usr/local/bin:/usr/bin:/bin
-export PATH
-
-# Global variables
+# Script variables
+# shellcheck disable=SC2034
 progDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 progName=$(basename "$0")
+logName="${progName%.*}"
+logFile="${progDir}/${logName}.log"
 
-# Text colours
-red='tput setaf 1'
-green='tput setaf 2'
-yellow='tput setaf 3'
-magenta='tput setaf 5'
-cyan='tput setaf 6'
-reset='tput sgr0'
-
-# Set default file & folder permissions for this script
-umask 0077
-
-
-#------------------------------------------------------------------------------
-# Functions
-#------------------------------------------------------------------------------
-
-usage() {
-  # Purpose:  Display usage instructions
-  # Usage:    usage
-  echo
-  echo "Usage: ${progName} "
-  echo
-}
-begin() {
-  # Purpose:  Prints full path to program
-  # Usage:    begin
-  ${magenta}; printf "\\n%s/%s\\n\\n" "${progDir}" "${progName}"
-  ${reset}
-}
-check() {
-  # Purpose:  Checks the return code and displays an appropriate message
-  # Usage:    check $? "Task description"
-  if [[ $1 -eq 0 ]]; then
-    okay "$2 complete"
-  else
-    fail "$2 failed"
-  fi
-}
-fail() {
-  # Purpose:  Display a task failed message and exit
-  # Usage:    fail "Message"
-  ${red}; printf " ✗ "
-  ${reset}; printf " %s\\n\\n" "$1"
+# Import common functions
+# shellcheck disable=SC1090
+if [[ -f "${HOME}/.scripts/script-common.sh" ]]; then
+  . "${HOME}/.scripts/script-common.sh"
+else
+  echo "Unable to open script-common.sh"
   exit 1
-}
-info() {
-  # Purpose:  Display an informational message
-  # Usage:    info "Message"
-  ${cyan}; printf " ℹ︎ "
-  ${reset}; printf " %s\\n" "$1"
-}
-okay() {
-  # Purpose:  Display a task successful message
-  # Usage:    okay "Message"
-  ${green}; printf " ✓ "
-  ${reset}; printf " %s\\n\\n" "$1"
-}
-warn() {
-  # Purpose:  Display a warning message and continue
-  # Usage:    warn "Message"
-  ${yellow}; printf " ! "
-  ${reset}; printf " %s\\n\\n" "$1"
-}
+fi
 
 
 #------------------------------------------------------------------------------
-# Main
+#  Functions
+#------------------------------------------------------------------------------
+
+
+
+#------------------------------------------------------------------------------
+#  Main
 #------------------------------------------------------------------------------
 
 begin
 
 if [[ $# -eq 0 ]]; then
   usage
-  exit 0
+  exit 1
 fi
 
 exit 0

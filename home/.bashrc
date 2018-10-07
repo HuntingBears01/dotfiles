@@ -1,4 +1,6 @@
 # shellcheck disable=SC2148
+# shellcheck disable=SC1090
+# shellcheck disable=SC1091
 # ~/.bashrc: executed by bash(1) for non-login shells.
 
 # If not running interactively, don't do anything
@@ -6,7 +8,7 @@
 
 
 #------------------------------------------------------------------------------
-# >> Bash Configuration
+#  Bash Configuration
 #------------------------------------------------------------------------------
 
 # don't put duplicate lines or lines starting with space in the history.
@@ -32,15 +34,25 @@ shopt -s cdspell
 # Set default permissions
 umask 0027
 
-# Add ~/bin to path if it exists
-if [[ -d ~/bin ]];then
-  PATH=${PATH}:${HOME}/bin
+# Add ~/.scripts to path if it exists
+if [[ -d ~/.scripts ]];then
+  PATH=${PATH}:${HOME}/.scripts
 fi
 
+#------------------------------------------------------------------------------
+#  Colours
+#------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------
-# >> Colours
-#------------------------------------------------------------------------------
+# Base16 Shell
+BASE16_SHELL="${HOME}/.config/base16-shell/"
+if [[ -n "$PS1" ]]; then
+  if [[ -s "${BASE16_SHELL}/profile_helper.sh" ]]; then
+    eval "$("${BASE16_SHELL}/profile_helper.sh")"
+  fi
+fi
+if [[ -d ${HOME}/.config/base16-shell/hooks ]]; then
+  export BASE16_SHELL_HOOKS="${HOME}/.config/base16-shell/hooks"
+fi
 
 # Setup colours
 if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
@@ -80,14 +92,14 @@ if [ "${color_prompt}" = yes ]; then
     userStyle="${red}"
   else
     userStyle="${green}"
-  fi;
+  fi
 
   # Highlight the server name when connected via SSH
   if [[ ${SSH_TTY} ]]; then
     srvStyle="${yellow}"
   else
     srvStyle="${green}"
-  fi;
+  fi
 
   PS1='\[$userStyle\]\u\[$grey\]@\[$srvStyle\]\h\[$blue\] \w \[$white\]\$\[$reset\] '
 else
@@ -97,7 +109,7 @@ unset color_prompt force_color_prompt
 
 
 #------------------------------------------------------------------------------
-# >> Useful Tweaks
+#  Useful Tweaks
 #------------------------------------------------------------------------------
 
 # Add tab completion for SSH hostnames based on ~/.ssh/config, ignoring wildcards
@@ -107,21 +119,21 @@ fi
 
 # enable programmable completion features
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
-  # shellcheck disable=SC1091
-  . /etc/bash_completion
+  source /etc/bash_completion
 fi
 
 # Source any files in ~/.private/
 # Place files that shouldn't be commited to a public repo here
 for file in ~/.private/*; do
-  # shellcheck disable=SC1090
-  [ -r "${file}" ] && [ -f "${file}" ] && . "${file}";
-done;
-unset file;
+  if [[ -f "${file}" ]]; then
+    source "${file}"
+  fi
+done
+unset file
 
 
 #------------------------------------------------------------------------------
-# >> Other Applications
+#  Other Applications
 #------------------------------------------------------------------------------
 
 # Set default editor
@@ -129,7 +141,7 @@ export VISUAL="/usr/bin/vim"
 export EDITOR="/usr/bin/vim"
 export SUDO_EDITOR="/usr/bin/vim"
 
-# Set less colors
+# Configure less
 export LESS_TERMCAP_mb=$'\e[31m'        # begin bold
 export LESS_TERMCAP_md=$'\e[36m'        # begin blink
 export LESS_TERMCAP_so=$'\e[01;44;37m'  # begin reverse video
@@ -138,10 +150,11 @@ export LESS_TERMCAP_me=$'\e[0m'         # reset bold/blink
 export LESS_TERMCAP_se=$'\e[0m'         # reset reverse video
 export LESS_TERMCAP_ue=$'\e[0m'         # reset underline
 export GROFF_NO_SGR=1                   # for konsole and gnome-terminal
+export LESS="-FgiqR"                    # see man less
 
 
 #------------------------------------------------------------------------------
-# >> Aliases
+#  Aliases
 #------------------------------------------------------------------------------
 
 if [ -f /etc/os-release ]; then
@@ -150,12 +163,11 @@ if [ -f /etc/os-release ]; then
   if [ -x /usr/bin/dircolors ]; then
     alias ls='ls -v --color=auto'
   fi
-  # shellcheck disable=SC1091
-  . /etc/os-release
+  source /etc/os-release
   os="${ID}"
   case "${os}" in
     debian | ubuntu )
-      alias updy='sudo apt update && sudo apt upgrade -y'
+      alias updy='sudo apt update && sudo apt upgrade -Vy'
       ;;
     centos )
       alias updy='sudo yum update -y'
@@ -174,6 +186,7 @@ elif [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
   alias sudoedit='sudo vim'
   # Use GNU coreutils if installed
   if [ -x /usr/local/bin/gls ]; then
+    alias date='gdate'
     alias ls='gls -v --color=auto'
     alias md5sum='gmd5sum'
     alias sha1sum='gsha1sum'
@@ -188,8 +201,9 @@ elif [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
   # Add /usr/local/sbin to path for Brew
   export PATH="/usr/local/sbin:${PATH}"
   # Add Brew auto completion
-  # shellcheck disable=SC1091
-  [ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+  if [ -f /usr/local/etc/bash_completion ]; then
+    source /usr/local/etc/bash_completion
+  fi
 fi
 
 
@@ -208,39 +222,40 @@ alias sudo='sudo -E'
 
 # Aliases for commonly edited files
 # Format: "filename relative to $HOME":alias
-for file in\
-    ".vimrc":vimrc ".bashrc":bashrc\
+for file in ".vimrc":vimrc ".bashrc":bashrc \
     ".config/i3/config":i3c ".config/compton.conf":compc
   do
     if [ -f "$HOME/${file%:*}" ]; then
+      # shellcheck disable=SC2139
       alias ${file/*:}="vim $HOME/${file%:*}"
     fi
   done
 
 # Aliases for commonly edited root owned files
-# Format: "filename relative to $HOME":alias
-for file in\
-    "/etc/hosts":hosts "/etc/fstab":fstab "/etc/modules":modules
+# Format: "/path/to/file":alias
+for file in "/etc/hosts":hosts "/etc/fstab":fstab "/etc/modules":modules
   do
     if [ -f "${file%:*}" ]; then
+      # shellcheck disable=SC2139
       alias ${file/*:}="sudoedit ${file%:*}"
     fi
   done
 
 # Aliases for commonly used directories
 # Format: "directory relative to $HOME":alias
-for dir in\
-    "Music":mus "Videos":vid "Desktop":dt "Pictures":pic ".dotfiles":dot\
-    "Downloads":dl "Documents":doc "Archive":arc "Dropbox":dbx "bin":bin
+for dir in "Music":mus "Videos":vid "Desktop":dt "Pictures":pic \
+    ".dotfiles":dot "Downloads":dl "Documents":doc "Archive":arc \
+    ".config":cnf ".sync":syn ".scripts":scr
   do
     if [ -d "$HOME/${dir%:*}" ]; then
+      # shellcheck disable=SC2139
       alias ${dir/*:}="cd $HOME/${dir%:*} && ls"
     fi
   done
 
 
 #------------------------------------------------------------------------------
-# >> Functions
+#  Functions
 #------------------------------------------------------------------------------
 
 up() {
@@ -255,4 +270,10 @@ up() {
     cd ..
     TIMES=$((TIMES - 1))
   done
+}
+
+rmrecursive() {
+  # Deletes the specified file recursively
+  # Usage: rmrecursive "*.bak"
+  find . -type f -name "$1" -delete
 }

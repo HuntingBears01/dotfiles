@@ -3,6 +3,7 @@
 "------------------------------------------------------------------------------
 
 set lines=80 columns=200
-set guifont=Hack\ Regular\ 10
-set go-=r
-set go-=L
+set guifont=Hack\ Nerd\ Font\ 12
+set guioptions-=r
+set guioptions-=L
+set guioptions-=T

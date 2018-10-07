@@ -1,34 +1,16 @@
-! Include base16 theme
-#include ".config/xresources/gruvbox-dark.xresources"
-! #include ".config/xresources/gruvbox-light.xresources"
-! #include ".config/xresources/nord.xresources"
-
-! Theme colours
-*thmBG:                       #2f343f
-*thmFG:                       #cfdae7
-*selBG:                       #5294e2
-*selFG:                       #ffffff
-*bordr:                       #dcdfe3
-*thmOra:                      #F27835
-*thmRed:                      #FC4138
-*thmGrn:                      #73d216
-*thmGry:                      #676E7D
-*link:                        #2679db
-
-*thmBase:                     #404552
-*thmText:                     #D3DAE3
-*thmBackground:               #383C4A
-*thmForeground:               #D3DAE3
-*thmSelFG:                    #ffffff
-*thmSelBG:                    #5294e2
-*thmWarning:                  #F27835
-*thmError:                    #FC4138
-*thmSuccess:                  #73d216
-
-
+! Include theme
+#include ".base16.xresources"
 
 ! -----------------------------------------------------------------------------
-! >> rxvt-unicode settings
+!  Theme colours
+! -----------------------------------------------------------------------------
+
+! Menu & titlebar colours
+*ina_txt:                     #eeeeee
+*act_txt:                     #ffffff
+
+! -----------------------------------------------------------------------------
+!  rxvt-unicode settings
 ! -----------------------------------------------------------------------------
 
 ! General
@@ -58,16 +40,15 @@ URxvt*externalBorder:         0
 URxvt*internalBorder:         5
 
 ! Fonts
-Xft.dpi:                      96
 Xft.antialias:                true
 Xft.hinting:                  true
-Xft.rgba:                     rgb
+Xft.rgba:                     none
 Xft.autohint:                 false
 Xft.hintstyle:                hintslight
 Xft.lcdfilter:                lcddefault
-URxvt*font:                   xft:Hack:size=10
-URxvt*boldFont:               xft:Hack:Bold:size=10
-URxvt*letterSpace:            -2
+URxvt*font:                   xft:Hack Nerd Font:size=12
+URxvt*boldFont:               xft:Hack Nerd Font:Bold:size=12
+URxvt*letterSpace:            -1
 
 ! Disable perl
 URxvt*perl-ext:

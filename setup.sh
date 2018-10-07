@@ -3,95 +3,30 @@
 # Dotfiles setup script
 # Author: Conor Martin
 
-
 #------------------------------------------------------------------------------
-# >> Configuration
+# Configuration
 #------------------------------------------------------------------------------
 
-# Secure the script, this breaks $* but you should probably be using $@ anyway
-IFS='
-  '
-
-# Set PATH to sane defaults
-PATH=/usr/local/bin:/usr/bin:/bin
-export PATH
-
-# Global variables
+# Script variables
+# shellcheck disable=SC2034
 progDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 progName=$(basename "$0")
+logName="${progName%.*}"
+logFile="${progDir}/${logName}.log"
 
-# Text colours
-red='tput setaf 1'
-green='tput setaf 2'
-yellow='tput setaf 3'
-magenta='tput setaf 5'
-cyan='tput setaf 6'
-grey='tput setaf 8'
-reset='tput sgr0'
-
-# Set default file & folder permissions for this script
-umask 0077
-
+# Import common functions
+# shellcheck disable=SC1090
+if [[ -f "${progDir}/scripts/script-common.sh" ]]; then
+  . "${progDir}/scripts/script-common.sh"
+else
+  echo "Unable to open script-common.sh"
+  exit 1
+fi
 
 #------------------------------------------------------------------------------
-# >> Functions
+# Functions
 #------------------------------------------------------------------------------
 
-appendOnce() {
-  # Appends a string to a file if it doesn't already exist
-  # Usage: appendOnce "string" "/path/to/file"
-  string=$1
-  file=$2
-  if ! [ -f "${file}" ]; then
-    echo "${string}" | sudo tee "${file}"
-  elif [[ $(grep -c "${string}" < "${file}") -eq 0 ]]; then
-    echo "${string}" | sudo tee -a "${file}"
-  fi
-}
-begin() {
-  # Prints full path to program
-  ${grey}; printf "\\n- - - "
-  ${magenta}; printf "%s/%s" "${progDir}" "${progName}"
-  ${grey}; printf " - - -\\n\\n"
-  ${reset}
-}
-check(){
-  # Check return code and display appropriate message
-  # Usage: check $? "Task description"
-  if [[ $1 -eq 0 ]]; then
-    okay "$2 complete"
-  else
-    fail "$2 failed"
-  fi
-}
-fail(){
-  # Task failed
-  # Usage: fail "Message"
-  ${red}; printf "✗"
-  ${grey}; printf " %s\\n" "$1"
-  ${reset}; exit 1
-}
-info(){
-  # Task begin
-  # Usage: info "Message"
-  ${cyan}; printf "ℹ︎"
-  ${grey}; printf " %s\\n" "$1"
-  ${reset}
-}
-okay(){
-  # Task completed successfully
-  # Usage: okay "Message"
-  ${green}; printf "✓"
-  ${grey}; printf " %s\\n\\n" "$1"
-  ${reset}
-}
-warn(){
-  # Task completed with warnings
-  # Usage: warn "Message"
-  ${yellow}; printf "!"
-  ${grey}; printf " %s\\n\\n" "$1"
-  ${reset}
-}
 isInteractive(){
   # Check if running from an interactive shell
   if [[ -t 0 ]]; then
@@ -170,9 +105,8 @@ linkFiles(){
   check $? "Linking"
 }
 
-
 #------------------------------------------------------------------------------
-# >> Main
+# Main
 #------------------------------------------------------------------------------
 
 begin
@@ -196,7 +130,7 @@ if isMac; then
     fi
     
     info "Installing Homebrew"
-    if (which brew > /dev/null 2>&1); then
+    if (command -v brew > /dev/null 2>&1); then
       warn "Homebrew already installed"
     else
       ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -206,12 +140,11 @@ if isMac; then
 fi
 
 # Link dotfiles
-
 linkFiles "${progDir}/home" "${HOME}"
 linkFiles "${progDir}/config" "${HOME}/.config"
-linkFiles "${progDir}/bin" "${HOME}/bin"
-if (which i3 > /dev/null 2>&1); then
-  linkFiles "${progDir}/i3-bin" "${HOME}/bin"
+linkFiles "${progDir}/scripts" "${HOME}/.scripts"
+if (command -v i3 > /dev/null 2>&1); then
+  linkFiles "${progDir}/i3-scripts" "${HOME}/.scripts"
 fi
 
 # Configure Git
@@ -233,9 +166,9 @@ else
     fi
   fi &&
   git config --global color.ui auto &&
-  git config --global core.editor "$(which vim)" &&
+  git config --global core.editor "$(command -v vim)" &&
   git config --global core.autocrlf input &&
-  git config --global core.excludesfile ~/.gitignore &&
+  git config --global core.excludesfile "${HOME}/.gitignore" &&
   git config --global push.default current &&
   git config --global alias.unstage 'reset HEAD --' &&
   git config --global alias.last 'log -1 HEAD' &&
@@ -247,16 +180,6 @@ else
   check $? "Git configuration"
 fi
 
-# Configure Vim
-cloneGitRepo "https://github.com/morhetz/gruvbox.git" "${HOME}/.vim/bundle/gruvbox"
-cloneGitRepo "https://github.com/arcticicestudio/nord-vim.git" "${HOME}/.vim/bundle/nord-vim"
-cloneGitRepo "https://github.com/VundleVim/Vundle.vim.git" "${HOME}/.vim/bundle/Vundle.vim"
-if isInteractive; then
-  info "Installing Vim plugins"
-  vim +PluginInstall +qall
-  check $? "Vim plugin installation"
-else
-  vim -E -s -c "source ~/.vimrc" -c PluginInstall -c qa
-fi
+end
 
 exit 0

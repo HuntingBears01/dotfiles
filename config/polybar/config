@@ -1,264 +1,286 @@
+; vim: ft=cfg
+
 ; -----------------------------------------------------------------------------
-;   Colours
+;  Colours
 ; -----------------------------------------------------------------------------
 
 [colors]
-blk                                 = ${xrdb:color0:#000000}
-red                                 = ${xrdb:color1:#000000}
-grn                                 = ${xrdb:color2:#000000}
-ylw                                 = ${xrdb:color3:#000000}
-blu                                 = ${xrdb:color4:#000000}
-mag                                 = ${xrdb:color5:#000000}
-cya                                 = ${xrdb:color6:#000000}
-wht                                 = ${xrdb:color7:#000000}
-gry                                 = ${xrdb:color8:#000000}
-thmFG                               = ${xrdb:thmFG:#000000}
-thmBG                               = ${xrdb:thmBG:#000000}
-selBG                               = ${xrdb:selBG:#000000}
-selFG                               = ${xrdb:selFG:#000000}
-thmOra                              = ${xrdb:thmOra:#000000}
-thmRed                              = ${xrdb:thmRed:#000000}
-thmGrn                              = ${xrdb:thmGrn:#000000}
-thmGry                              = ${xrdb:thmGry:#000000}
-link                                = ${xrdb:link:#000000}
-
+; Colours
+blk     = ${xrdb:color0:#000000}
+red     = ${xrdb:color1:#000000}
+grn     = ${xrdb:color2:#000000}
+ylw     = ${xrdb:color3:#000000}
+blu     = ${xrdb:color4:#000000}
+pur     = ${xrdb:color5:#000000}
+cya     = ${xrdb:color6:#000000}
+wht     = ${xrdb:color7:#000000}
+ora     = ${xrdb:color16:#000000}
+gry     = ${xrdb:color8:#000000}
+; Background colours
+bg0     = ${xrdb:color0:#000000}
+bg1     = ${xrdb:color18:#000000}
+bg2     = ${xrdb:color19:#000000}
+bg3     = ${xrdb:color8:#000000}
+; Foreground colours
+fg0     = ${xrdb:color21:#000000}
+fg1     = ${xrdb:color7:#000000}
+fg2     = ${xrdb:color20:#000000}
+; Menu & titlebar colours
+ina_txt = ${xrdb:ina_txt:#000000}
+act_txt = ${xrdb:act_txt:#000000}
+active  = ${xrdb:active:#000000}
 
 ; -----------------------------------------------------------------------------
-;   Bar Settings
+;  Bar Settings
 ; -----------------------------------------------------------------------------
 
 [bar/topbar]
-width                               = 100%
-height                              = 20
-radius                              = 0.0
-fixed-center                        = true
-background                          = ${colors.thmBG}
-foreground                          = ${colors.thmFG}
-line-size                           = 0
-border-size                         = 4
-border-color                        = ${colors.thmBG}
-padding                             = 1
-module-margin                       = 2
-font-0                              = "FiraSans-Regular:size=11;2"
-font-1                              = "FontAwesome:size=11;2"
-font-2                              = "FiraSans-Regular:size=8;2"
-modules-left                        = i3 xbacklight alsa network-eth network-wlan
-modules-center                      = date time
-modules-right                       = cpu memory filesystem battery spacer
-tray-position                       = right
-tray-padding                        = 0
-enable-ipc                          = true
-monitor                             = ${env:MONITOR}
-
+width           = 100%
+height          = 24
+radius          = 0.0
+fixed-center    = true
+background      = ${colors.bg0}
+foreground      = ${colors.ina_txt}
+line-size       = 0
+border-size     = 6
+border-color    = ${colors.bg0}
+padding         = 0
+module-margin   = 1
+font-0          = "NotoSans Nerd Font:size=12;3"
+font-1          = "NotoMono Nerd Font:size=12;3"
+modules-left    = i3 spacer xbacklight audio network-ip network-wlan
+modules-center  = date spacer time
+modules-right   = battery load updates spacer
+tray-position   = right
+tray-padding    = 1
+tray-background = ${colors.bg0}
+enable-ipc      = true
+monitor         = ${env:MONITOR}
 
 ; -----------------------------------------------------------------------------
-;   Global WM Settings
+;  Global WM Settings
 ; -----------------------------------------------------------------------------
 
 [global/wm]
-margin-top                          = 5
-margin-bottom                       = 5
-
+margin-bottom = 0
+margin-top    = 0
 
 ; -----------------------------------------------------------------------------
-;   Application Settings
+;  Application Settings
 ; -----------------------------------------------------------------------------
 
 [settings]
-screenchange-reload                 = true
-
+screenchange-reload = true
 
 ; -----------------------------------------------------------------------------
-;   Modules
+;  Modules
 ; -----------------------------------------------------------------------------
 
-[module/alsa]
-type                                = internal/alsa
-
-format-volume                       = <label-volume>
-format-volume-prefix                = VOL
-format-volume-prefix-font           = 3
-format-volume-prefix-padding        = 2
-
-format-muted                        = MUTE
-format-muted-prefix                 = VOL
-format-muted-prefix-font            = 3
-format-muted-prefix-padding         = 2
-
-label                               = %percentage%%
-
+[module/audio]
+type                            = internal/pulseaudio
+; Volume
+format-volume                   = <label-volume>
+format-volume-prefix            = 墳
+format-volume-prefix-background = ${colors.bg2}
+format-volume-prefix-padding    = 2
+label-volume                    = %percentage:2%%
+label-volume-padding            = 2
+label-volume-font               = 2
+; Muted
+format-muted                    = <label-muted>
+format-muted-prefix             = 婢
+format-muted-prefix-background  = ${colors.bg1}
+format-muted-prefix-padding     = 2
+label-muted                     = %percentage:2%%
+label-muted-foreground          = ${colors.fg2}
+label-muted-padding             = 2
+label-muted-font                = 2
 
 [module/battery]
-type                                = internal/battery
-
-battery                             = BAT0
-adapter                             = AC
-full-at                             = 98
-
-format-charging                     = <label-charging>
-format-charging-prefix              = AC
-format-charging-prefix-font         = 3
-format-charging-prefix-padding      = 2
-
-format-discharging                  = <label-discharging>
-format-discharging-prefix           = BAT
-format-discharging-prefix-font      = 3
-format-discharging-prefix-padding   = 2
-
-format-full                         = 100%
-format-full-prefix                  = AC
-format-full-prefix-font             = 3
-format-full-prefix-padding          = 2
-
-label                               = %percentage%%
-
+type                              = internal/battery
+battery                           = BAT0
+adapter                           = AC
+full-at                           = 98
+; Charged
+format-full                       = <label-full>
+format-full-prefix                = 
+format-full-prefix-background     = ${colors.grn}
+format-full-prefix-foreground     = ${colors.blk}
+format-full-prefix-padding        = 2
+label-full                        = Full
+label-full-padding                = 2
+; Charging
+format-charging                   = <label-charging>
+format-charging-prefix            = 
+format-charging-prefix-background = ${colors.ylw}
+format-charging-prefix-foreground = ${colors.blk}
+format-charging-prefix-padding    = 2
+label-charging                    = %percentage:2%%
+label-charging-padding            = 2
+label-charging-font               = 2
+; Discharging
+format-discharging                = <ramp-capacity> <label-discharging>
+label-discharging                 = %percentage:2%%
+label-discharging-padding         = 2
+label-discharging-font            = 2
+ramp-capacity-background          = ${colors.bg2}
+ramp-capacity-padding             = 2
+ramp-capacity-0                   = 
+ramp-capacity-0-background        = ${colors.red}
+ramp-capacity-1                   = 
+ramp-capacity-1-background        = ${colors.red}
+ramp-capacity-2                   = 
+ramp-capacity-2-background        = ${colors.ora}
+ramp-capacity-3                   = 
+ramp-capacity-4                   = 
+ramp-capacity-5                   = 
+ramp-capacity-6                   = 
+ramp-capacity-7                   = 
+ramp-capacity-8                   = 
+ramp-capacity-9                   = 
 
 [module/cpu]
-type                                = internal/cpu
-
-interval                            = 2
-
-format                              = <label>
-format-prefix                       = CPU
-format-prefix-font                  = 3
-format-prefix-padding               = 2
-
-label                               = %percentage%%
-
+type                     = internal/cpu
+interval                 = 2
+format                   = <label>
+format-prefix            = 
+format-prefix-background = ${colors.bg2}
+format-prefix-padding    = 2
+label                    = %percentage:2%%
+label-padding            = 2
+label-font               = 2
 
 [module/date]
-type                                = internal/date
-
-interval                            = 5
-date                                = "%A, %d %B"
-
-label                               = %date%
-
+type     = internal/date
+interval = 5
+date     = "%a, %d %b"
+label    = %date%
 
 [module/time]
-type                                = internal/date
-
-interval                            = 5
-time                                = %H:%M
-
-label                               = %time%
-
+type     = internal/date
+interval = 5
+time     = %H:%M
+label    = %time%
 
 [module/filesystem]
-type                                = internal/fs
-
-interval                            = 25
-mount-0                             = /
-
-format-mounted                      = <label-mounted>
-format-mounted-prefix               = SSD
-format-mounted-prefix-font          = 3
-format-mounted-prefix-padding       = 2
-
-label-mounted                       = %free%
-
+type                             = internal/fs
+interval                         = 25
+mount-0                          = /
+format-mounted                   = <label-mounted>
+format-mounted-prefix            = 
+format-mounted-prefix-background = ${colors.bg2}
+format-mounted-prefix-padding    = 2
+label-mounted                    = %free:6%
+label-mounted-padding            = 2
+label-mounted-font               = 2
 
 [module/i3]
-type                                = internal/i3
+type                       = internal/i3
+format                     = <label-state> <label-mode>
+index-sort                 = true
+wrapping-scroll            = false
+pin-workspaces             = true
+; Focused workspace
+label-focused              = %name%
+label-focused-background   = ${colors.active}
+label-focused-foreground   = ${colors.act_txt}
+label-focused-padding      = 2
+label-focused-font         = 2
+; Unfocused workspace
+label-unfocused            = %name%
+label-unfocused-foreground = ${colors.ina_txt}
+label-unfocused-padding    = 2
+label-unfocused-font       = 2
+; Visible workspace
+label-visible              = %name%
+label-visible-background   = ${self.label-focused-background}
+label-visible-foreground   = ${self.label-focused-foreground}
+label-visible-padding      = ${self.label-focused-padding}
+label-visible-font         = 2
+; Urgent workspace
+label-urgent               = %name%
+label-urgent-background    = ${colors.red}
+label-urgent-foreground    = ${colors.act_txt}
+label-urgent-padding       = 2
+label-urgent-font          = 2
 
-format                              = <label-state> <label-mode>
-index-sort                          = true
-wrapping-scroll                     = false
-pin-workspaces                      = true
-
-label-focused                       = %name%
-label-focused-background            = ${colors.selBG}
-label-focused-foreground            = ${colors.selFG}
-label-focused-padding               = 2
-
-label-unfocused                     = %name%
-label-unfocused-foreground          = ${colors.thmGry}
-label-unfocused-padding             = 2
-
-label-visible                       = %name%
-label-visible-background            = ${self.label-focused-background}
-label-visible-foreground            = ${self.label-focused-foreground}
-label-visible-padding               = ${self.label-focused-padding}
-
-label-urgent                        = %name%
-label-urgent-background             = ${colors.thmRed}
-label-urgent-forefround             = ${colors.selFG}
-label-urgent-padding                = 2
-
+[module/load]
+type                     = custom/script
+exec                     = ~/.config/polybar/get-load.sh
+interval                 = 5
+format                   = <label>
+format-prefix            = 
+format-prefix-background = ${colors.bg2}
+format-prefix-padding    = 2
+label-padding            = 2
+label-font               = 2
 
 [module/memory]
-type                                = internal/memory
+type                     = internal/memory
+interval                 = 2
+format                   = <label>
+format-prefix            = 
+format-prefix-background = ${colors.bg2}
+format-prefix-padding    = 2
+label                    = %gb_free:8%
+label-padding            = 2
+label-font               = 2
 
-interval                            = 2
-
-format                              = <label>
-format-prefix                       = MEM
-format-prefix-font                  = 3
-format-prefix-padding               = 2
-
-label                               = %gb_free%
-
-
-[module/network-eth]
-type                                = internal/network
-
-interface                           = enxa44cc8a3bb31
-interval                            = 3
-
-format-connected                    = <label-connected>
-format-connected-prefix             = ETH
-format-connected-prefix-font        = 3
-format-connected-prefix-padding     = 2
-
-format-disconnected                 = <label-disconnected>
-format-disconnected-foreground      = ${colors.thmGry}
-format-disconnected-prefix          = ETH
-format-disconnected-prefix-font     = 3
-format-disconnected-prefix-padding  = 2
-
-label-connected                     = %local_ip%
-label-disconnected                  = -
-
+[module/network-ip]
+type                     = custom/script
+exec                     = ~/.config/polybar/get-IP.sh
+interval                 = 10
+format                   = <label>
+format-prefix            = 
+format-prefix-background = ${colors.bg2}
+format-prefix-padding    = 2
+label-padding            = 2
 
 [module/network-wlan]
-type                                = internal/network
-
-interface                           = wlp58s0
-interval                            = 3
-
-format-connected                    = <label-connected>
-format-connected-prefix             = WI-FI
-format-connected-prefix-font        = 3
-format-connected-prefix-padding     = 2
-
-format-disconnected                 = <label-disconnected>
-format-disconnected-foreground      = ${colors.thmGry}
-format-disconnected-prefix          = WI-FI
-format-disconnected-prefix-font     = 3
-format-disconnected-prefix-padding  = 2
-
-label-connected                     = %essid% – %local_ip%
-
-label-disconnected                  = -
-
+type                                  = internal/network
+interface                             = wlp58s0
+interval                              = 10
+; Wi-Fi connected
+format-connected                      = <label-connected>
+format-connected-prefix               = 直
+format-connected-prefix-background    = ${colors.bg2}
+format-connected-prefix-padding       = 2
+label-connected                       = %essid%
+label-connected-padding               = 2
+; Wi-Fi disconnected
+format-disconnected                   = <label-disconnected>
+format-disconnected-prefix            = 睊
+format-disconnected-prefix-background = ${colors.bg1}
+format-disconnected-prefix-padding    = 2
+label-disconnected                    = -
+label-disconnected-foreground         = ${colors.fg2}
+label-disconnected-padding            = 2
 
 [module/spacer]
-type                                = custom/text
-content                             = .
-content-padding                     = 0
-content-background                  = ${colors.thmBG}
-content-foreground                  = ${colors.thmBG}
+type               = custom/text
+content            = .
+content-padding    = 0
+content-background = ${colors.bg0}
+content-foreground = ${colors.bg0}
 
+[module/updates]
+type                     = custom/script
+exec                     = ~/.config/polybar/get-updates.sh
+interval                 = 3600
+format                   = <label>
+format-prefix            = 
+format-prefix-background = ${colors.bg2}
+format-prefix-padding    = 2
+label-padding            = 2
+label-font               = 2
 
 [module/xbacklight]
-type                                = internal/xbacklight
-
-format                              = <label>
-format-prefix                       = BRI
-format-prefix-font                  = 3
-format-prefix-padding               = 2
-
-label                               = %percentage%%
-
-
-; vim: ft=cfg
+type                     = internal/xbacklight
+format                   = <label>
+format-prefix            = 盛
+format-prefix-background = ${colors.bg2}
+format-prefix-font       = 1
+format-prefix-padding    = 2
+label                    = %percentage:2%%
+label-padding            = 2
+label-font               = 2
