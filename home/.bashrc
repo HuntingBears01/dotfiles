@@ -166,7 +166,7 @@ if [ -f /etc/os-release ]; then
   source /etc/os-release
   os="${ID}"
   case "${os}" in
-    debian | ubuntu )
+    debian | ubuntu | raspbian )
       alias updy='sudo apt update && sudo apt upgrade -Vy'
       ;;
     centos )
