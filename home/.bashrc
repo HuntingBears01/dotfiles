@@ -107,6 +107,15 @@ else
 fi
 unset color_prompt force_color_prompt
 
+# If this is an xterm set the title
+case "$TERM" in
+  xterm*|rxvt*)
+    PS1="\[\e]0;\W [\H]\a\]$PS1"
+    ;;
+  *)
+    ;;
+esac
+
 
 #------------------------------------------------------------------------------
 #  Useful Tweaks
@@ -223,7 +232,7 @@ alias sudo='sudo -E'
 # Aliases for commonly edited files
 # Format: "filename relative to $HOME":alias
 for file in ".vimrc":vimrc ".bashrc":bashrc \
-    ".config/i3/config":i3c ".config/compton.conf":compc
+  ".config/i3/config":i3c ".config/compton.conf":compc
   do
     if [ -f "$HOME/${file%:*}" ]; then
       # shellcheck disable=SC2139
@@ -231,9 +240,9 @@ for file in ".vimrc":vimrc ".bashrc":bashrc \
     fi
   done
 
-# Aliases for commonly edited root owned files
-# Format: "/path/to/file":alias
-for file in "/etc/hosts":hosts "/etc/fstab":fstab "/etc/modules":modules
+  # Aliases for commonly edited root owned files
+  # Format: "/path/to/file":alias
+  for file in "/etc/hosts":hosts "/etc/fstab":fstab "/etc/modules":modules
   do
     if [ -f "${file%:*}" ]; then
       # shellcheck disable=SC2139
@@ -241,17 +250,17 @@ for file in "/etc/hosts":hosts "/etc/fstab":fstab "/etc/modules":modules
     fi
   done
 
-# Aliases for commonly used directories
-# Format: "directory relative to $HOME":alias
-for dir in "Music":mus "Videos":vid "Desktop":dt "Pictures":pic \
+  # Aliases for commonly used directories
+  # Format: "directory relative to $HOME":alias
+  for dir in "Music":mus "Videos":vid "Desktop":dt "Pictures":pic \
     ".dotfiles":dot "Downloads":dl "Documents":doc "Archive":arc \
-    ".config":cnf ".sync":syn ".scripts":scr
-  do
-    if [ -d "$HOME/${dir%:*}" ]; then
-      # shellcheck disable=SC2139
-      alias ${dir/*:}="cd $HOME/${dir%:*} && ls"
-    fi
-  done
+    ".config":cnf ".sync":syn ".scripts":scr "Projects":prj
+do
+  if [ -d "$HOME/${dir%:*}" ]; then
+    # shellcheck disable=SC2139
+    alias ${dir/*:}="cd $HOME/${dir%:*} && ls"
+  fi
+done
 
 
 #------------------------------------------------------------------------------
