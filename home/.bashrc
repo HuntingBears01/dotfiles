@@ -227,7 +227,6 @@ alias lla='ls -lha'
 alias reload='. ~/.bashrc'
 alias vi='vim'
 alias cls='clear'
-alias sudo='sudo -E'
 
 # Aliases for commonly edited files
 # Format: "filename relative to $HOME":alias
