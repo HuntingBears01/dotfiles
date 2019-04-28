@@ -141,11 +141,11 @@ fi
 
 # Link dotfiles
 linkFiles "${progDir}/home" "${HOME}"
-linkFiles "${progDir}/scripts" "${HOME}/.scripts"
+linkFiles "${progDir}/scripts" "${HOME}/bin"
 if (command -v i3 > /dev/null 2>&1); then
   linkFiles "${progDir}/i3/home" "${HOME}"
   linkFiles "${progDir}/i3/config" "${HOME}/.config"
-  linkFiles "${progDir}/i3/scripts" "${HOME}/.scripts"
+  linkFiles "${progDir}/i3/scripts" "${HOME}/bin"
 fi
 
 # Update Xresources

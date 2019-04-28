@@ -34,9 +34,9 @@ shopt -s cdspell
 # Set default permissions
 umask 0027
 
-# Add ~/.scripts to path if it exists
-if [[ -d ~/.scripts ]];then
-  PATH=${PATH}:${HOME}/.scripts
+# Add ~/bin to path if it exists
+if [[ -d ~/bin ]];then
+  PATH=${PATH}:${HOME}/bin
 fi
 
 #------------------------------------------------------------------------------
