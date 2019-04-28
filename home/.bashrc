@@ -255,8 +255,8 @@ for file in ".vimrc":vimrc ".bashrc":bashrc \
   # Aliases for commonly used directories
   # Format: "directory relative to $HOME":alias
   for dir in "Music":mus "Videos":vid "Desktop":dt "Pictures":pic \
-    ".dotfiles":dot "Downloads":dl "Documents":doc "Archive":arc \
-    ".config":cnf ".sync":syn ".scripts":scr "Projects":prj
+    ".config/dotfiles":dot "Downloads":dl "Documents":doc "Archive":arc \
+    ".config":cnf ".config":cfg ".config/sync":syn "Projects":prj
 do
   if [ -d "$HOME/${dir%:*}" ]; then
     # shellcheck disable=SC2139
