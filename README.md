@@ -3,24 +3,24 @@ dotfiles
 
 ## Installation
 
-Download the files to your **home** directory:
+Download the files to your **config** directory:
 
 #### Git
 
 Via HTTPS
 ```
-cd && git clone https://github.com/huntingbears01/dotfiles.git .dotfiles
+cd ~/.config && git clone https://github.com/huntingbears01/dotfiles.git
 ```
 Or SSH
 ```
-cd && git clone git@github.com:HuntingBears01/dotfiles.git .dotfiles
+cd ~/.config && git clone git@github.com:HuntingBears01/dotfiles.git
 ```
 
 ## Setup
 
 Run the setup script
 ```
-~/.dotfiles/setup
+~/.config/dotfiles/setup.sh
 ```
 
 Apply the new configuration
