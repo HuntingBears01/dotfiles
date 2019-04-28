@@ -33,13 +33,19 @@ else
   cat << 'EOF' > "${scriptFile}"
 #! /usr/bin/env bash
 
-# Purpose:  
+# Purpose:
 # Author:   Conor Martin
 
 
 #------------------------------------------------------------------------------
 #  Configuration
 #------------------------------------------------------------------------------
+
+# Catch all errors in a pipeline
+set -o pipefail
+
+# Exit trap
+trap cleanup EXIT
 
 # Script variables
 # shellcheck disable=SC2034
@@ -62,7 +68,17 @@ fi
 #  Functions
 #------------------------------------------------------------------------------
 
-
+cleanup() {
+  # Purpose:  Cleanup before exiting
+  # Usage:    Always runs even if script fails
+}
+usage() {
+  # Purpose:  Display usage instructions
+  # Usage:    usage
+  echo
+  echo "Usage: ${progName}"
+  echo
+}
 
 #------------------------------------------------------------------------------
 #  Main
@@ -79,5 +95,5 @@ exit 0
 EOF
 
   chmod +x "${scriptFile}"
-  subl "${scriptFile}"
+  subl -n "${scriptFile}"
 fi
