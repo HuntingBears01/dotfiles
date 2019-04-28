@@ -169,6 +169,9 @@ if [ -f /etc/os-release ]; then
     debian | ubuntu | raspbian )
       alias updy='sudo apt update && sudo apt upgrade -Vy'
       ;;
+    manjaro )
+      alias updy='sudo pacman -Syu --noconfirm'
+      ;;
     centos )
       alias updy='sudo yum update -y'
       ;;
