@@ -148,6 +148,13 @@ if (command -v i3 > /dev/null 2>&1); then
   linkFiles "${progDir}/i3/scripts" "${HOME}/.scripts"
 fi
 
+# Update Xresources
+if (command -v xrdb > /dev/null 2>&1); then
+  info "Updating Xresources"
+  xrdb ~/.Xresources
+  check $? "Xresources update"
+fi
+
 # Configure Git
 if isRoot; then
   fail "This program must not be run as root"
