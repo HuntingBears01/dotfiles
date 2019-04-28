@@ -162,10 +162,10 @@ else
   info "Git configuration"
   if isInteractive; then
     read -rp "Enter Git name: " gitName
-    if [[ ! -z "${gitName}" ]]; then
+    if [[ -n "${gitName}" ]]; then
       git config --global user.name "${gitName}"
       read -rp "Enter Git email: " gitEmail
-      if [[ ! -z "${gitEmail}" ]]; then
+      if [[ -n "${gitEmail}" ]]; then
         git config --global user.email "${gitEmail}"
         if [[ ! -f ~/.ssh/id_rsa ]]; then
           ssh-keygen -t rsa -C "${gitEmail}" -f ~/.ssh/id_rsa
