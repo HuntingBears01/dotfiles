@@ -36,10 +36,9 @@ else
 # Purpose:
 # Author:   Conor Martin
 
-
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Configuration
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Catch all errors in a pipeline
 set -o pipefail
@@ -51,22 +50,27 @@ trap cleanup EXIT
 # shellcheck disable=SC2034
 progDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 progName=$(basename "$0")
+logDir="${HOME}/logs"
 logName="${progName%.*}"
-logFile="${progDir}/${logName}.log"
+logFile="${logDir}/${logName}.log"
+
+# Create log directory
+if [[ ! -d ${logDir} ]]; then
+  mkdir "${logDir}"
+fi
 
 # Import common functions
 # shellcheck disable=SC1090
-if [[ -f "${HOME}/.scripts/script-common.sh" ]]; then
-  . "${HOME}/.scripts/script-common.sh"
+if [[ -f "${HOME}/scripts/script-common.sh" ]]; then
+  . "${HOME}/scripts/script-common.sh"
 else
   echo "Unable to open script-common.sh"
   exit 1
 fi
 
-
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Functions
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 cleanup() {
   # Purpose:  Cleanup before exiting
@@ -80,9 +84,9 @@ usage() {
   echo
 }
 
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Main
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 begin
 

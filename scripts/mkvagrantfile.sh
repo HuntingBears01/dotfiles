@@ -1,24 +1,29 @@
 #! /usr/bin/env bash
 #
 # Purpose:  Build a custom Vagrantfile using specified options
-# Author:   Conor Martin
+# Usage:    mkvagrantfile.sh release [options...] foldername [servername1, servername2 ...]
 
-
-#------------------------------------------------------------------------------
-# Configuration
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   Configuration
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Script variables
 # shellcheck disable=SC2034
 progDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 progName=$(basename "$0")
+logDir="${HOME}/logs"
 logName="${progName%.*}"
-logFile="${progDir}/${logName}.log"
+logFile="${logDir}/${logName}.log"
+
+# Create log directory
+if [[ ! -d ${logDir} ]]; then
+  mkdir "${logDir}"
+fi
 
 # Import common functions
 # shellcheck disable=SC1090
-if [[ -f "${HOME}/.scripts/script-common.sh" ]]; then
-  . "${HOME}/.scripts/script-common.sh"
+if [[ -f "${HOME}/scripts/script-common.sh" ]]; then
+  . "${HOME}/scripts/script-common.sh"
 else
   echo "Unable to open script-common.sh"
   exit 1
@@ -26,14 +31,14 @@ fi
 
 # Update the version numbers below as required
 # CentOS versions
-centosCurrVersion="7"
-centosPrevVersion="6"
+centosCurrVersion="8"
+centosPrevVersion="7"
 centosPlatform="x86_64"
 centosCurrRelease="centos-${centosCurrVersion}-${centosPlatform}"
 centosPrevRelease="centos-${centosPrevVersion}-${centosPlatform}"
 # Debian versions
-debianCurrVersion="9"
-debianPrevVersion="8"
+debianCurrVersion="10"
+debianPrevVersion="9"
 debianPlatform="amd64"
 debianCurrRelease="debian-${debianCurrVersion}-${debianPlatform}"
 debianPrevRelease="debian-${debianPrevVersion}-${debianPlatform}"
@@ -49,13 +54,13 @@ declare -a selectedServerNames=()
 
 # Default values
 cpu="1"
-mem="512"
+mem="1024"
 publicIP=""
 destDir="."
 
-#------------------------------------------------------------------------------
-# Functions
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   Functions
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 usage() {
   echo
@@ -130,10 +135,9 @@ createDir() {
   fi
 }
 
-
-#------------------------------------------------------------------------------
-# Vagrantfile creation functions
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   Vagrantfile creation functions
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 vagrantfileBegin() {
   # Usage:  vagrantfileBegin "/path/to/dir"
@@ -185,10 +189,9 @@ end
 EOF
 }
 
-
-#------------------------------------------------------------------------------
-# Main
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   Main
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 begin
 
@@ -321,7 +324,7 @@ if [[ "${box}" = "multi" ]];then
     box="${selectedBoxes[i]}"
     name="${selectedBoxNames[i]}"
     vagrantfileDefineVM "${name}" "${box}" "${mem}" "${cpu}"
-    if ! [ -z "${publicIP}" ]; then
+    if [ -n "${publicIP}" ]; then
       vagrantfilePublicIP "${name}" "${publicIP}"
       incrementIP "${publicIP}"
       publicIP=${nextIP}
@@ -338,7 +341,7 @@ else
   do
     name="${selectedServerNames[i]}"
     vagrantfileDefineVM "${name}" "${box}" "${mem}" "${cpu}"
-    if ! [ -z "${publicIP}" ]; then
+    if [ -n "${publicIP}" ]; then
       vagrantfilePublicIP "${name}" "${publicIP}"
       incrementIP "${publicIP}"
       publicIP=${nextIP}

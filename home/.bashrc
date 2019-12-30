@@ -7,9 +7,9 @@
 [ -z "${PS1}" ] && return
 
 
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Bash Configuration
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # don't put duplicate lines or lines starting with space in the history.
 export HISTCONTROL=ignoreboth:erasedups
@@ -34,14 +34,17 @@ shopt -s cdspell
 # Set default permissions
 umask 0027
 
-# Add ~/bin to path if it exists
-if [[ -d ~/bin ]];then
-  PATH=${PATH}:${HOME}/bin
+# Add ~/scripts to path if it exists
+if [[ -d ~/scripts ]];then
+  PATH=${PATH}:${HOME}/scripts
 fi
 
-#------------------------------------------------------------------------------
+# Silence Bash warnings in MacOS
+export BASH_SILENCE_DEPRECATION_WARNING=1
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Colours
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Base16 Shell
 BASE16_SHELL="${HOME}/.config/base16-shell/"
@@ -93,16 +96,14 @@ if [ "${color_prompt}" = yes ]; then
   else
     userStyle="${green}"
   fi
-
-  # Highlight the server name when connected via SSH
+  # Only show the server name when connected via SSH
   if [[ ${SSH_TTY} ]]; then
-    srvStyle="${yellow}"
+    PS1='\[$userStyle\]\u\[$grey\]@\[$yellow\]\h\[$grey\]:\[$blue\]\w \[$white\]\$\[$reset\] '
   else
-    srvStyle="${green}"
+    PS1='\[$userStyle\]\u\[$grey\]:\[$blue\]\w \[$white\]\$\[$reset\] '
   fi
-
-  PS1='\[$userStyle\]\u\[$grey\]@\[$srvStyle\]\h\[$blue\] \w \[$white\]\$\[$reset\] '
 else
+  # Fallback option
   PS1='\u@\h:\w\$ '
 fi
 unset color_prompt force_color_prompt
@@ -117,9 +118,9 @@ case "$TERM" in
 esac
 
 
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Useful Tweaks
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Add tab completion for SSH hostnames based on ~/.ssh/config, ignoring wildcards
 if [ -e "${HOME}/.ssh/config" ]; then
@@ -141,9 +142,9 @@ done
 unset file
 
 
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Other Applications
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Set default editor
 export VISUAL="/usr/bin/vim"
@@ -162,9 +163,9 @@ export GROFF_NO_SGR=1                   # for konsole and gnome-terminal
 export LESS="-FgiqR"                    # see man less
 
 
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Aliases
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if [ -f /etc/os-release ]; then
   # Linux specific section
@@ -233,41 +234,41 @@ alias cls='clear'
 
 # Aliases for commonly edited files
 # Format: "filename relative to $HOME":alias
-for file in ".vimrc":vimrc ".bashrc":bashrc \
-  ".config/i3/config":i3c ".config/compton.conf":compc
-  do
-    if [ -f "$HOME/${file%:*}" ]; then
-      # shellcheck disable=SC2139
-      alias ${file/*:}="vim $HOME/${file%:*}"
-    fi
-  done
+for file in ".vimrc":vimrc ".bashrc":bashrc
+do
+  if [ -f "$HOME/${file%:*}" ]; then
+    # shellcheck disable=SC2139
+    alias ${file/*:}="vim $HOME/${file%:*}"
+  fi
+done
 
-  # Aliases for commonly edited root owned files
-  # Format: "/path/to/file":alias
-  for file in "/etc/hosts":hosts "/etc/fstab":fstab "/etc/modules":modules
-  do
-    if [ -f "${file%:*}" ]; then
-      # shellcheck disable=SC2139
-      alias ${file/*:}="sudoedit ${file%:*}"
-    fi
-  done
+# Aliases for commonly edited root owned files
+# Format: "/path/to/file":alias
+for file in "/etc/hosts":hosts "/etc/fstab":fstab
+do
+  if [ -f "${file%:*}" ]; then
+    # shellcheck disable=SC2139
+    alias ${file/*:}="sudoedit ${file%:*}"
+  fi
+done
 
-  # Aliases for commonly used directories
-  # Format: "directory relative to $HOME":alias
-  for dir in "Music":mus "Videos":vid "Desktop":dt "Pictures":pic \
-    ".config/dotfiles":dot "Downloads":dl "Documents":doc "Archive":arc \
-    ".config":cnf ".config":cfg ".config/sync":syn "Projects":prj
+# Aliases for commonly used directories
+# Format: "directory relative to $HOME":alias
+for dir in "Music":mus "Videos":vid "Desktop":dt "Pictures":pic \
+  "Downloads":dl "Documents":doc "Archive":arc \
+  ".config":cnf ".config":cfg "Projects":prj "Library/Application Support/Firefox":fox \
+  ".mozilla/firefox":fox
 do
   if [ -d "$HOME/${dir%:*}" ]; then
     # shellcheck disable=SC2139
-    alias ${dir/*:}="cd $HOME/${dir%:*} && ls"
+    alias ${dir/*:}="cd '$HOME/${dir%:*}' && ls"
   fi
 done
 
 
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Functions
-#------------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 up() {
   # Moves up the directory tree a {number} of times
