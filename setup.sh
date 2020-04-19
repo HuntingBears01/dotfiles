@@ -66,6 +66,7 @@ linkDotfiles() {
   # Link dotfiles
   linkFiles "${progDir}/home" "${HOME}"
   linkFiles "${progDir}/scripts" "${HOME}/scripts"
+  linkFiles "${progDir}/vagrant" "${HOME}/scripts/.vagrant"
 }
 gitConfig() {
   # Configure Git
@@ -135,8 +136,8 @@ workstation() {
           sudo yum install -y epel-release
           check $? "EPEL install"
           info "Installing applications"
-          sudo yum install -y bzip2 curl htop mtr python3 libselinux-python \
-            tree unzip vim-enhanced wget yum-utils
+          sudo yum install -y bzip2 curl htop mtr python3 tree unzip \
+            vim-enhanced wget yum-utils
           check $? "Application install"
           ;;
         fedora )

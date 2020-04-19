@@ -33,15 +33,22 @@ fi
 # CentOS versions
 centosCurrVersion="8"
 centosPrevVersion="7"
-centosPlatform="x86_64"
-centosCurrRelease="centos-${centosCurrVersion}-${centosPlatform}"
-centosPrevRelease="centos-${centosPrevVersion}-${centosPlatform}"
+centosCurrRelease="bento/centos-${centosCurrVersion}"
+centosPrevRelease="bento/centos-${centosPrevVersion}"
 # Debian versions
 debianCurrVersion="10"
 debianPrevVersion="9"
-debianPlatform="amd64"
-debianCurrRelease="debian-${debianCurrVersion}-${debianPlatform}"
-debianPrevRelease="debian-${debianPrevVersion}-${debianPlatform}"
+debianCurrRelease="bento/debian-${debianCurrVersion}"
+debianPrevRelease="bento/debian-${debianPrevVersion}"
+# Ubuntu versions
+ubuntuCurrMajorVersion="18"
+ubuntuPrevMajorVersion="16"
+ubuntuCurrMinorVersion="04"
+ubuntuPrevMinorVersion="04"
+ubuntuCurrVersion="${ubuntuCurrMajorVersion}.${ubuntuCurrMinorVersion}"
+ubuntuPrevVersion="${ubuntuPrevMajorVersion}.${ubuntuPrevMinorVersion}"
+ubuntuCurrRelease="bento/ubuntu-${ubuntuCurrVersion}"
+ubuntuPrevRelease="bento/ubuntu-${ubuntuPrevVersion}"
 # NOTE  All the *CurrVersion & *PrevVersion vars above must contain
 # only numbers. No special characters allowed.
 
@@ -70,15 +77,18 @@ usage() {
   echo
   echo "  --centos-current          Setup a CentOS ${centosCurrVersion} box"
   echo "  --debian-current          Setup a Debian ${debianCurrVersion} box"
+  echo "  --debian-current          Setup a Ubuntu ${ubuntuCurrVersion} box"
   echo
   echo "  Previous releases:"
   echo
   echo "  --centos-previous         Setup a CentOS ${centosPrevVersion} box"
   echo "  --debian-previous         Setup a Debian ${debianPrevVersion} box"
+  echo "  --debian-previous         Setup a Ubuntu ${ubuntuPrevVersion} box"
   echo
   echo "  --all                     Setup all releases in one file"
   echo "  --centos-all              Setup all CentOS releases in one file"
   echo "  --debian-all              Setup all Debian releases in one file"
+  echo "  --ubuntu-all              Setup all Ubuntu releases in one file"
   echo
   echo "  Options:"
   echo
@@ -176,6 +186,17 @@ vagrantfilePublicIP() {
     ]
 EOF
 }
+vagrantfileProvision() {
+  # Usage:  vagrantfileProvision
+  cat << EOF >> Vagrantfile
+  config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/tmp/id_rsa.pub"
+  config.vm.provision "shell", path: "~/scripts/.vagrant/user-ansible.sh"
+  config.vm.provision "shell", path: "~/scripts/.vagrant/ssh-keys.sh"
+  config.vm.provision "shell", path: "~/scripts/.vagrant/sudoers.sh"
+  config.vm.provision "shell", path: "~/scripts/.vagrant/install-apps.sh"
+  config.vm.provision "shell", path: "~/scripts/.vagrant/dotfiles.sh"
+EOF
+}
 vagrantfileEndVM() {
   # Usage: vagrantfileEndVM
   cat << EOF >> Vagrantfile
@@ -212,10 +233,12 @@ while [[ $# -gt 0 ]]; do
       selectedBoxes=(
         "${centosCurrRelease}" "${centosPrevRelease}"
         "${debianCurrRelease}" "${debianPrevRelease}"
+        "${ubuntuCurrRelease}" "${ubuntuPrevRelease}"
         )
       selectedBoxNames=(
         "centos${centosCurrVersion}" "centos${centosPrevVersion}"
         "debian${debianCurrVersion}" "debian${debianPrevVersion}"
+        "ubuntu${ubuntuCurrMajorVersion}${ubuntuCurrMinorVersion}" "ubuntu${ubuntuPrevMajorVersion}${ubuntuPrevMinorVersion}"
         )
       ;;
     --centos-current | -centos-current | -cc )
@@ -246,6 +269,21 @@ while [[ $# -gt 0 ]]; do
         )
       selectedBoxNames=(
         "debian${debianCurrVersion}" "debian${debianPrevVersion}"
+        )
+      ;;
+    --ubuntu-current | -ubuntu-current | -uc )
+      box=${ubuntuCurrRelease}
+      ;;
+    --ubuntu-previous | -ubuntu-previous | -up )
+      box=${ubuntuPrevRelease}
+      ;;
+    --ubuntu-all | -ubuntu-all | -ua )
+      box="multi"
+      selectedBoxes=(
+        "${ubuntuCurrRelease}" "${ubuntuPrevRelease}"
+        )
+      selectedBoxNames=(
+        "ubuntu${ubuntuCurrMajorVersion}${ubuntuCurrMinorVersion}" "ubuntu${ubuntuPrevMajorVersion}${ubuntuPrevMinorVersion}"
         )
       ;;
     --cpu | -cpu )
@@ -331,6 +369,7 @@ if [[ "${box}" = "multi" ]];then
     fi
     vagrantfileEndVM
   done
+  vagrantfileProvision
   vagrantfileEnd
   okay "Vagrantfile setup complete"
   exit 0
@@ -348,6 +387,7 @@ else
     fi
     vagrantfileEndVM
   done
+  vagrantfileProvision
   vagrantfileEnd
   okay "Vagrantfile setup complete"
   exit 0
