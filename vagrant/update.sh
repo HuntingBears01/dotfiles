@@ -6,8 +6,14 @@ if [ -f /etc/os-release ]; then
   os="${ID}"
   case "${os}" in
     debian | ubuntu | raspbian )
-      apt update
-      apt upgrade -y
+      apt-get update
+      apt-get -y dist-upgrade
+      apt-get -y autoclean
+      apt-get -y autoremove
+      # Reboot if new kernel has been installed
+      if [[ $(needrestart -kb | grep 'NEEDRESTART-KSTA' | awk -F' ' '{print $2}') -gt 1 ]]; then
+        shutdown -r 1
+      fi
       ;;
     centos )
       # Get EL major version
@@ -18,6 +24,9 @@ if [ -f /etc/os-release ]; then
         dnf -y update
       else
         yum -y update
+      fi
+      if (needs-restarting -r | grep 'Reboot' | grep 'required'); then
+        shutdown -r 1
       fi
       ;;
   esac

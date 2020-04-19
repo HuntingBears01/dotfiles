@@ -195,6 +195,8 @@ vagrantfileProvision() {
   config.vm.provision "shell", path: "~/scripts/.vagrant/sudoers.sh"
   config.vm.provision "shell", path: "~/scripts/.vagrant/install-apps.sh"
   config.vm.provision "shell", path: "~/scripts/.vagrant/dotfiles.sh"
+  config.vm.provision "shell", path: "~/scripts/.vagrant/update.sh",
+    run: "always"
 EOF
 }
 vagrantfileEndVM() {
