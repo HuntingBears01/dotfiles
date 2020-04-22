@@ -1,13 +1,25 @@
-#!/bin/bash -eux
+#!/bin/bash -eu
 
+echo "Install apps"
 if [ -f /etc/os-release ]; then
   # shellcheck disable=SC1091
   source /etc/os-release
   os="${ID}"
   case "${os}" in
-    debian | ubuntu | raspbian )
-      apt-get update
-      apt-get install -y curl git htop jq mtr-tiny needrestart openssl python3 \
+    debian | raspbian )
+      apt-get -q update
+      # Install prerequisites for guest additions
+      apt-get -yq install build-essential dkms linux-headers-amd64
+      # Install useful apps
+      apt-get -yq install curl git htop jq mtr-tiny needrestart openssl python3 \
+        python3-apt shellcheck tree unzip vim wget whois
+      ;;
+    ubuntu )
+      apt-get -q update
+      # Install prerequisites for guest additions
+      apt-get -yq install build-essential dkms linux-headers-generic
+      # Install useful apps
+      apt-get -yq install curl git htop jq mtr-tiny needrestart openssl python3 \
         python3-apt shellcheck tree unzip vim wget whois
       ;;
     centos )
@@ -16,11 +28,19 @@ if [ -f /etc/os-release ]; then
 
       # Use dnf on EL 8+
       if [ "${major_version}" -ge 8 ]; then
+        # Install EPEL
         dnf -y install epel-release
+        # Install prerequisites for guest additions
+        dnf -y install dkms gcc kernel-devel kernel-headers make perl
+        # Install useful apps
         dnf -y install bzip2 dnf-utils git htop jq mtr python3 tar tree unzip \
           vim-enhanced whois wget
       else
+        # Install EPEL
         yum -y install epel-release
+        # Install prerequisites for guest additions
+        yum -y install dkms gcc kernel-devel kernel-headers make perl
+        # Install useful apps
         yum -y install bzip2 git htop jq mtr openssl python libselinux-python \
           tree unzip vim-enhanced whois wget yum-utils
       fi

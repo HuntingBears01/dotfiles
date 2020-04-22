@@ -214,6 +214,11 @@ workstation() {
       else
         vagrant plugin install vagrant-hostsupdater
       fi
+      if (vagrant plugin list | grep -q vagrant-vbguest); then
+        vagrant plugin update vagrant-vbguest
+      else
+        vagrant plugin install vagrant-vbguest
+      fi
       if ! [ -f /private/etc/sudoers.d/vagrant_hostsupdater ]; then
       cat << EOF | sudo tee /private/etc/sudoers.d/vagrant_hostsupdater
 # Allow passwordless startup of Vagrant with vagrant-hostsupdater

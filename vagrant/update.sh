@@ -1,15 +1,16 @@
-#!/bin/bash -eux
+#!/bin/bash -eu
 
+echo "Install updates"
 if [ -f /etc/os-release ]; then
   # shellcheck disable=SC1091
   source /etc/os-release
   os="${ID}"
   case "${os}" in
     debian | ubuntu | raspbian )
-      apt-get update
-      apt-get -y dist-upgrade
-      apt-get -y autoclean
-      apt-get -y autoremove
+      apt-get -q update
+      apt-get -yq dist-upgrade
+      apt-get -yq autoclean
+      apt-get -yq autoremove
       # Reboot if new kernel has been installed
       if [[ $(needrestart -kb | grep 'NEEDRESTART-KSTA' | awk -F' ' '{print $2}') -gt 1 ]]; then
         shutdown -r 1
