@@ -17,7 +17,7 @@ for user_id in ansbl vagrant; do
   if [[ ! -d "/home/${user_id}/.ssh" ]]; then
     mkdir -p "/home/${user_id}/.ssh"
   fi
-   appendOnce "$(cat "/tmp/id_rsa.pub" > /dev/null 2>&1)" "/home/${user_id}/.ssh/authorized_keys"
+   appendOnce "$(cat "/tmp/id_rsa.pub")" "/home/${user_id}/.ssh/authorized_keys" > /dev/null 2>&1
 
   chown -R ${user_id}:${user_id} "/home/${user_id}/.ssh"
   chmod 700 "/home/${user_id}/.ssh"
