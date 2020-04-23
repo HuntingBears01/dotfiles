@@ -7,10 +7,11 @@ if [ -f /etc/os-release ]; then
   os="${ID}"
   case "${os}" in
     debian | ubuntu | raspbian )
+      export DEBIAN_FRONTEND=noninteractive
       apt-get -q update
-      apt-get -yq dist-upgrade
-      apt-get -yq autoclean
-      apt-get -yq autoremove
+      apt-get -qy dist-upgrade
+      apt-get -qy autoclean
+      apt-get -qy autoremove
       # Reboot if new kernel has been installed
       if [[ $(needrestart -kb | grep 'NEEDRESTART-KSTA' | awk -F' ' '{print $2}') -gt 1 ]]; then
         shutdown -r 1

@@ -10,11 +10,11 @@ fi
 
 if [[ ! -d "${dotfilesDir}" ]]; then
   echo "Install dotfiles"
-  git clone https://github.com/huntingbears01/dotfiles.git "${dotfilesDir}"
+  git clone -q https://github.com/huntingbears01/dotfiles.git "${dotfilesDir}"
 else
   echo "Update dotfiles"
   cd "${dotfilesDir}"
-  git pull
+  git pull -q
 fi
 
 echo "Setup dotfiles"

@@ -52,13 +52,13 @@ base16() {
   if [[ -d "${base16_shell_dir}" ]]; then
     info "Updating base16-shell"
     cd "${base16_shell_dir}" &&
-    git pull
+    git pull -q
     check $? "base16-shell update"
     # shellcheck disable=SC2164
     cd "${progDir}"
   else
     info "Installing base16-shell"
-    git clone https://github.com/chriskempson/base16-shell.git "${base16_shell_dir}"
+    git clone -q https://github.com/chriskempson/base16-shell.git "${base16_shell_dir}"
     check $? "base16-shell install"
   fi
 }

@@ -7,19 +7,21 @@ if [ -f /etc/os-release ]; then
   os="${ID}"
   case "${os}" in
     debian | raspbian )
+      export DEBIAN_FRONTEND=noninteractive
       apt-get -q update
       # Install prerequisites for guest additions
-      apt-get -yq install build-essential dkms linux-headers-amd64
+      apt-get -qy install build-essential dkms linux-headers-amd64
       # Install useful apps
-      apt-get -yq install curl git htop jq mtr-tiny needrestart openssl python3 \
+      apt-get -qy install curl git htop jq mtr-tiny needrestart openssl python3 \
         python3-apt shellcheck tree unzip vim wget whois
       ;;
     ubuntu )
+      export DEBIAN_FRONTEND=noninteractive
       apt-get -q update
       # Install prerequisites for guest additions
-      apt-get -yq install build-essential dkms linux-headers-generic
+      apt-get -qy install build-essential dkms linux-headers-generic
       # Install useful apps
-      apt-get -yq install curl git htop jq mtr-tiny needrestart openssl python3 \
+      apt-get -qy install curl git htop jq mtr-tiny needrestart openssl python3 \
         python3-apt shellcheck tree unzip vim wget whois
       ;;
     centos )
