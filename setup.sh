@@ -102,6 +102,46 @@ gitConfig() {
     check $? "Git configuration"
   fi
 }
+pythonApps() {
+  info "Installing Python applications"
+  pip3 install ansible-lint yamllint vim-vint
+  check $? "Python application installation"
+}
+vagrantPlugins() {
+  info "Installing Vagrant plugins"
+  if (vagrant plugin list | grep -q vagrant-hostsupdater); then
+    vagrant plugin update vagrant-hostupdater
+  else
+    vagrant plugin install vagrant-hostsupdater
+  fi
+  if (vagrant plugin list | grep -q vagrant-vbguest); then
+    vagrant plugin update vagrant-vbguest
+  else
+    vagrant plugin install vagrant-vbguest
+  fi
+  # MacOS only
+  if [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
+    if ! [ -f /private/etc/sudoers.d/vagrant_hostsupdater ]; then
+      cat << EOF | sudo tee /private/etc/sudoers.d/vagrant_hostsupdater
+# Allow passwordless startup of Vagrant with vagrant-hostsupdater
+Cmnd_Alias VAGRANT_HOSTS_ADD = /bin/sh -c echo "*" >> /etc/hosts
+Cmnd_Alias VAGRANT_HOSTS_REMOVE = /usr/bin/sed -i -e /*/ d /etc/hosts
+%admin ALL=(root) NOPASSWD: VAGRANT_HOSTS_ADD, VAGRANT_HOSTS_REMOVE
+EOF
+    fi
+  # Linux only
+  else
+    if ! [ -f /etc/sudoers.d/vagrant_hostsupdater ]; then
+      cat << EOF | sudo tee /etc/sudoers.d/vagrant_hostsupdater
+# Allow passwordless startup of Vagrant with vagrant-hostsupdater.
+Cmnd_Alias VAGRANT_HOSTS_ADD = /bin/sh -c echo "*" >> /etc/hosts
+Cmnd_Alias VAGRANT_HOSTS_REMOVE = /bin/sed -i -e /*/ d /etc/hosts
+%sudo ALL=(root) NOPASSWD: VAGRANT_HOSTS_ADD, VAGRANT_HOSTS_REMOVE
+EOF
+    fi
+  fi
+  check $? "Vagrant plugin installation"
+}
 workstation() {
   if isRoot; then
     fail "This program must not be run as root"
@@ -112,11 +152,10 @@ workstation() {
       source /etc/os-release
       os="${ID}"
       case "${os}" in
-        debian | ubuntu | raspbian )
+        debian | raspbian )
           notify "Debian based distribution detected"
           # Authenticate once
           sudo -v
-          # Update apt cache
           info "Updating apt cache"
           sudo apt update
           check $? "Apt cache update"
@@ -124,6 +163,9 @@ workstation() {
           sudo apt install -y curl htop mtr-tiny python3 shellcheck tree unzip \
             vim wget whois
           check $? "Application install"
+
+          pythonApps
+          vagrantPlugins
           ;;
         manjaro )
           notify "Arch based distribution detected"
@@ -139,12 +181,30 @@ workstation() {
           sudo yum install -y bzip2 curl htop mtr python3 tree unzip \
             vim-enhanced wget yum-utils
           check $? "Application install"
+
+          pythonApps
+          vagrantPlugins
           ;;
         fedora )
           notify "Fedora detected"
           ;;
         opensuse )
           notify "OpenSUSE detected"
+          ;;
+        ubuntu )
+          notify "Ubuntu based distribution detected"
+          # Authenticate once
+          sudo -v
+          info "Updating apt cache"
+          sudo apt update
+          check $? "Apt cache update"
+          info "Installing applications"
+          sudo apt install -y ansible curl htop mtr-tiny neofetch packer \
+            python3 shellcheck tidy tree unzip vim wget whois
+          check $? "Application install"
+
+          pythonApps
+          vagrantPlugins
           ;;
       esac
     fi
@@ -155,7 +215,6 @@ workstation() {
       # Authenticate once
       sudo -v
 
-      # Set hostname
       info "Setting Hostname"
       read -rp "Enter Hostname: " name
       if [ -z "${name}" ]; then
@@ -168,7 +227,6 @@ workstation() {
         check $? "Hostname setup"
       fi
 
-      # Install/update Homebrew
       if (command -v brew > /dev/null 2>&1); then
         info "Updating Homebrew"
         brew update && brew upgrade
@@ -179,7 +237,6 @@ workstation() {
         check $? "Homebrew installation"
       fi
 
-      # Install GNU Bash
       if [[ -f "/usr/local/bin/bash" ]]; then
         info "GNU Bash already installed"
       else
@@ -197,37 +254,12 @@ workstation() {
         check $? "Setting default shell"
       fi
 
-      # Install software from Brewfile
       info "Installing Brew software"
       brew bundle
       check $? "Brew software installation"
 
-      # Install Python applications
-      info "Installing Python applications"
-      pip3 install ansible-lint yamllint vim-vint
-      check $? "Python application installation"
-
-      # Install Vagrant plugins
-      info "Installing Vagrant plugins"
-      if (vagrant plugin list | grep -q vagrant-hostsupdater); then
-        vagrant plugin update vagrant-hostupdater
-      else
-        vagrant plugin install vagrant-hostsupdater
-      fi
-      if (vagrant plugin list | grep -q vagrant-vbguest); then
-        vagrant plugin update vagrant-vbguest
-      else
-        vagrant plugin install vagrant-vbguest
-      fi
-      if ! [ -f /private/etc/sudoers.d/vagrant_hostsupdater ]; then
-      cat << EOF | sudo tee /private/etc/sudoers.d/vagrant_hostsupdater
-# Allow passwordless startup of Vagrant with vagrant-hostsupdater
-Cmnd_Alias VAGRANT_HOSTS_ADD = /bin/sh -c echo "*" >> /etc/hosts
-Cmnd_Alias VAGRANT_HOSTS_REMOVE = /usr/bin/sed -i -e /*/ d /etc/hosts
-%admin ALL=(root) NOPASSWD: VAGRANT_HOSTS_ADD, VAGRANT_HOSTS_REMOVE
-EOF
-      fi
-      check $? "Vagrant plugin installation"
+      pythonApps
+      vagrantPlugins
     fi
   fi
 }

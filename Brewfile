@@ -1,6 +1,7 @@
 brew 'ansible'
 brew 'htop'
 brew 'mtr'
+brew 'neofetch'
 brew 'packer'
 brew 'packer-completion'
 brew 'python'
