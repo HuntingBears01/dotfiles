@@ -102,11 +102,6 @@ gitConfig() {
     check $? "Git configuration"
   fi
 }
-pythonApps() {
-  info "Installing Python applications"
-  pip3 install ansible-lint yamllint vim-vint
-  check $? "Python application installation"
-}
 vagrantPlugins() {
   info "Installing Vagrant plugins"
   if (vagrant plugin list | grep -q vagrant-hostsupdater); then
@@ -164,7 +159,10 @@ workstation() {
             vim wget whois
           check $? "Application install"
 
-          pythonApps
+          # info "Installing Python applications"
+          # pip3 install ansible-lint yamllint vim-vint
+          # check $? "Python application installation"
+
           vagrantPlugins
           ;;
         manjaro )
@@ -182,7 +180,10 @@ workstation() {
             vim-enhanced wget yum-utils
           check $? "Application install"
 
-          pythonApps
+          # info "Installing Python applications"
+          # pip3 install ansible-lint yamllint vim-vint
+          # check $? "Python application installation"
+
           vagrantPlugins
           ;;
         fedora )
@@ -199,11 +200,15 @@ workstation() {
           sudo apt update
           check $? "Apt cache update"
           info "Installing applications"
-          sudo apt install -y ansible curl htop mtr-tiny neofetch packer \
-            python3 shellcheck tidy tree unzip vagrant vim wget whois
+          sudo apt install -y ansible ansible-lint curl htop mtr-tiny neofetch \
+            packer python3 python3-pip shellcheck tidy tree unzip vagrant vim \
+            wget whois yamllint
           check $? "Application install"
 
-          pythonApps
+          info "Installing Python applications"
+          pip3 install vim-vint
+          check $? "Python application installation"
+
           vagrantPlugins
           ;;
       esac
@@ -258,7 +263,10 @@ workstation() {
       brew bundle
       check $? "Brew software installation"
 
-      pythonApps
+      info "Installing Python applications"
+      pip3 install ansible-lint yamllint vim-vint
+      check $? "Python application installation"
+
       vagrantPlugins
     fi
   fi
