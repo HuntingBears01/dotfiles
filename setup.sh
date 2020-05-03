@@ -200,7 +200,7 @@ workstation() {
           check $? "Apt cache update"
           info "Installing applications"
           sudo apt install -y ansible curl htop mtr-tiny neofetch packer \
-            python3 shellcheck tidy tree unzip vim wget whois
+            python3 shellcheck tidy tree unzip vagrant vim wget whois
           check $? "Application install"
 
           pythonApps
