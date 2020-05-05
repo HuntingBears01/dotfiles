@@ -155,13 +155,9 @@ workstation() {
           sudo apt update
           check $? "Apt cache update"
           info "Installing applications"
-          sudo apt install -y curl htop mtr-tiny python3 shellcheck tree unzip \
-            vim wget whois
+          sudo apt install -y curl htop mtr-tiny shellcheck tree unzip vim \
+            wget whois
           check $? "Application install"
-
-          # info "Installing Python applications"
-          # pip3 install ansible-lint yamllint vim-vint
-          # check $? "Python application installation"
 
           vagrantPlugins
           ;;
@@ -176,13 +172,9 @@ workstation() {
           sudo yum install -y epel-release
           check $? "EPEL install"
           info "Installing applications"
-          sudo yum install -y bzip2 curl htop mtr python3 tree unzip \
-            vim-enhanced wget yum-utils
+          sudo yum install -y bzip2 curl htop mtr tree unzip vim-enhanced wget \
+            yum-utils
           check $? "Application install"
-
-          # info "Installing Python applications"
-          # pip3 install ansible-lint yamllint vim-vint
-          # check $? "Python application installation"
 
           vagrantPlugins
           ;;
@@ -200,14 +192,10 @@ workstation() {
           sudo apt update
           check $? "Apt cache update"
           info "Installing applications"
-          sudo apt install -y ansible ansible-lint curl htop mtr-tiny neofetch \
-            packer python3 python3-pip shellcheck tidy tree unzip vagrant vim \
-            wget whois yamllint
+          sudo apt install -y ansible ansible-lint curl htop mtr-tiny ncdu \
+            neofetch packer shellcheck tidy tree unzip vagrant vim wget whois \
+            yamllint
           check $? "Application install"
-
-          info "Installing Python applications"
-          pip3 install vim-vint
-          check $? "Python application installation"
 
           vagrantPlugins
           ;;
@@ -264,7 +252,7 @@ workstation() {
       check $? "Brew software installation"
 
       info "Installing Python applications"
-      pip3 install ansible-lint yamllint vim-vint
+      pip3 install ansible-lint yamllint
       check $? "Python application installation"
 
       vagrantPlugins

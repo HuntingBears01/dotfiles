@@ -12,8 +12,8 @@ if [ -f /etc/os-release ]; then
       # Install prerequisites for guest additions
       apt-get -qy install build-essential dkms linux-headers-amd64
       # Install useful apps
-      apt-get -qy install curl git htop jq mtr-tiny needrestart openssl python3 \
-        python3-apt shellcheck tree unzip vim wget whois
+      apt-get -qy install curl git htop jq mtr-tiny needrestart openssl \
+        shellcheck tree unzip vim wget whois
       ;;
     ubuntu )
       export DEBIAN_FRONTEND=noninteractive
@@ -21,8 +21,8 @@ if [ -f /etc/os-release ]; then
       # Install prerequisites for guest additions
       apt-get -qy install build-essential dkms linux-headers-generic
       # Install useful apps
-      apt-get -qy install curl git htop jq mtr-tiny needrestart openssl python3 \
-        python3-apt shellcheck tree unzip vim wget whois
+      apt-get -qy install curl git htop jq mtr-tiny needrestart openssl \
+        shellcheck tree unzip vim wget whois
       ;;
     centos )
       # Get EL major version
@@ -35,7 +35,7 @@ if [ -f /etc/os-release ]; then
         # Install prerequisites for guest additions
         dnf -y install dkms gcc kernel-devel kernel-headers make perl
         # Install useful apps
-        dnf -y install bzip2 dnf-utils git htop jq mtr python3 tar tree unzip \
+        dnf -y install bzip2 dnf-utils git htop jq mtr tar tree unzip \
           vim-enhanced whois wget
       else
         # Install EPEL
@@ -43,8 +43,8 @@ if [ -f /etc/os-release ]; then
         # Install prerequisites for guest additions
         yum -y install dkms gcc kernel-devel kernel-headers make perl
         # Install useful apps
-        yum -y install bzip2 git htop jq mtr openssl python libselinux-python \
-          tree unzip vim-enhanced whois wget yum-utils
+        yum -y install bzip2 git htop jq mtr openssl tree unzip vim-enhanced \
+          whois wget yum-utils
       fi
       ;;
   esac
