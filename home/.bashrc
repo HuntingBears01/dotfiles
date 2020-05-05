@@ -31,9 +31,6 @@ shopt -s nocaseglob
 # Autocorrect typos in path names when using `cd`
 shopt -s cdspell
 
-# Set default permissions
-umask 0027
-
 # Add ~/scripts to path if it exists
 if [[ -d ~/scripts ]];then
   PATH=${PATH}:${HOME}/scripts
