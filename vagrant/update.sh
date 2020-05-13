@@ -14,7 +14,7 @@ if [ -f /etc/os-release ]; then
       apt-get -qy autoremove
       # Reboot if new kernel has been installed
       if [[ $(needrestart -kb | grep 'NEEDRESTART-KSTA' | awk -F' ' '{print $2}') -gt 1 ]]; then
-        shutdown -r 1
+        echo "Reboot required to finish installing updates" >&2
       fi
       ;;
     centos )
@@ -28,7 +28,7 @@ if [ -f /etc/os-release ]; then
         yum -y update
       fi
       if (needs-restarting -r | grep 'Reboot' | grep 'required'); then
-        shutdown -r 1
+        echo "Reboot required to finish installing updates" >&2
       fi
       ;;
   esac
