@@ -182,7 +182,7 @@ vagrantfilePublicIP() {
   cat << EOF >> Vagrantfile
     ${vmName}.vm.network "public_network", ip: "${vmIP}" , bridge: [
       "en0: Ethernet",
-      "en1: Wi-Fi (AirPort)"
+      "en1: Wi-Fi (AirPort)",
     ]
 EOF
 }
