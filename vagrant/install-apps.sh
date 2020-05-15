@@ -11,18 +11,16 @@ if [ -f /etc/os-release ]; then
       apt-get -q update
       # Install prerequisites for guest additions
       apt-get -qy install build-essential dkms linux-headers-amd64
-      # Install useful apps
-      apt-get -qy install curl dnsutils git htop jq mtr-tiny needrestart openssl \
-        shellcheck tree unzip vim wget
+      # Install prerequisites for other scripts
+      apt-get -qy install git needrestart
       ;;
     ubuntu )
       export DEBIAN_FRONTEND=noninteractive
       apt-get -q update
       # Install prerequisites for guest additions
       apt-get -qy install build-essential dkms linux-headers-generic
-      # Install useful apps
-      apt-get -qy install curl dnsutils git htop jq mtr-tiny needrestart openssl \
-        shellcheck tree unzip vim wget
+      # Install prerequisites for other scripts
+      apt-get -qy install git needrestart
       ;;
     centos )
       # Get EL major version
@@ -34,17 +32,15 @@ if [ -f /etc/os-release ]; then
         dnf -y install epel-release
         # Install prerequisites for guest additions
         dnf -y install dkms gcc kernel-devel kernel-headers make perl
-        # Install useful apps
-        dnf -y install bind-utils bzip2 dnf-utils git htop jq mtr tar tree unzip \
-          vim-enhanced wget
+        # Install prerequisites for other scripts
+        dnf -y install dnf-utils git
       else
         # Install EPEL
         yum -y install epel-release
         # Install prerequisites for guest additions
         yum -y install dkms gcc kernel-devel kernel-headers make perl
-        # Install useful apps
-        yum -y install bind-utils bzip2 git htop jq mtr openssl tree unzip vim-enhanced \
-          wget yum-utils
+        # Install prerequisites for other scripts
+        yum -y install git yum-utils
       fi
       ;;
   esac
