@@ -159,108 +159,21 @@ export LESS_TERMCAP_ue=$'\e[0m'         # reset underline
 export GROFF_NO_SGR=1                   # for konsole and gnome-terminal
 export LESS="-FgiqR"                    # see man less
 
+# Configure colours
+export LS_COLORS="di=00;34:ow=00;34:ln=00;35:ex=00;31:or=00;37;101:su=01;41;37:sg=01;41;37"
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Aliases
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if [ -f /etc/os-release ]; then
-  # Linux specific section
-  # Enable color support for ls
-  if [ -x /usr/bin/dircolors ]; then
-    alias ls='ls -v --color=auto'
-  fi
-  source /etc/os-release
-  os="${ID}"
-  case "${os}" in
-    debian | ubuntu | raspbian )
-      alias updy='sudo apt update && sudo apt upgrade -Vy'
-      ;;
-    manjaro )
-      alias updy='sudo pacman -Syu --noconfirm'
-      ;;
-    centos )
-      alias updy='sudo yum update -y'
-      ;;
-    fedora )
-      alias updy='sudo dnf update -y'
-      ;;
-    opensuse )
-      alias updy='sudo zypper refresh && sudo zypper update -y'
-      ;;
-  esac
-elif [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
-  # OS X specific section
-  alias updy='brew update && brew upgrade'
-  alias flushdns='sudo killall -HUP mDNSResponder'
-  alias sudoedit='sudo vim'
-  # Use GNU coreutils if installed
-  if [ -x /usr/local/bin/gls ]; then
-    alias date='gdate'
-    alias ls='gls -v --color=auto'
-    alias md5sum='gmd5sum'
-    alias sha1sum='gsha1sum'
-    alias sha224sum='gsha224sum'
-    alias sha256sum='gsha256sum'
-    alias sha384sum='gsha384sum'
-    alias sha512sum='gsha512sum'
-  else
-    alias ls='ls -G'
-    export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
-  fi
-  # Add /usr/local/sbin to path for Brew
-  export PATH="/usr/local/sbin:${PATH}"
-  # Add Brew auto completion
-  if [ -f /usr/local/etc/bash_completion ]; then
-    source /usr/local/etc/bash_completion
-  fi
-fi
-
-
-
-export LS_COLORS="di=00;34:ow=00;34:ln=00;35:ex=00;31:or=00;37;101:su=01;41;37:sg=01;41;37"
-alias grep='grep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'
-alias la='ls -a'
-alias ll='ls -lh'
-alias lla='ls -lha'
-alias reload='. ~/.bashrc'
-alias vi='vim'
-alias cls='clear'
-
-# Aliases for commonly edited files
-# Format: "filename relative to $HOME":alias
-for file in ".vimrc":vimrc ".bashrc":bashrc
-do
-  if [ -f "$HOME/${file%:*}" ]; then
-    # shellcheck disable=SC2139
-    alias ${file/*:}="vim $HOME/${file%:*}"
+# Source any files in ~/.config/aliases/
+for file in ~/.config/aliases/*; do
+  if [[ -f "${file}" ]]; then
+    source "${file}"
   fi
 done
-
-# Aliases for commonly edited root owned files
-# Format: "/path/to/file":alias
-for file in "/etc/hosts":hosts "/etc/fstab":fstab
-do
-  if [ -f "${file%:*}" ]; then
-    # shellcheck disable=SC2139
-    alias ${file/*:}="sudoedit ${file%:*}"
-  fi
-done
-
-# Aliases for commonly used directories
-# Format: "directory relative to $HOME":alias
-for dir in "Music":mus "Videos":vid "Desktop":dt "Pictures":pic \
-  "Downloads":dl "Documents":doc "Archive":arc \
-  ".config":cnf ".config":cfg "Projects":prj "Library/Application Support/Firefox":fox \
-  ".mozilla/firefox":fox
-do
-  if [ -d "$HOME/${dir%:*}" ]; then
-    # shellcheck disable=SC2139
-    alias ${dir/*:}="cd '$HOME/${dir%:*}' && ls"
-  fi
-done
+unset file
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

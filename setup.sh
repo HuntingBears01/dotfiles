@@ -64,6 +64,7 @@ base16() {
 }
 linkDotfiles() {
   # Link dotfiles
+  linkFiles "${progDir}/aliases" "${HOME}/.config/aliases"
   linkFiles "${progDir}/home" "${HOME}"
   linkFiles "${progDir}/scripts" "${HOME}/scripts"
   linkFiles "${progDir}/vagrant" "${HOME}/scripts/.vagrant"
