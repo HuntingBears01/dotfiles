@@ -15,7 +15,7 @@ alias cls='clear'
 
 # Aliases for commonly edited files
 # Format: "filename relative to $HOME":alias
-for file in ".vimrc":vimrc ".bashrc":bashrc
+for file in ".vimrc":vimrc ".bashrc":bashrc ".ssh/config":sshc ".ssh/known_hosts":knownh
 do
   if [ -f "$HOME/${file%:*}" ]; then
     # shellcheck disable=SC2139
