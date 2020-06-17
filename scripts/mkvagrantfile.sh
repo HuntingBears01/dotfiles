@@ -77,13 +77,13 @@ usage() {
   echo
   echo "  --centos-current          Setup a CentOS ${centosCurrVersion} box"
   echo "  --debian-current          Setup a Debian ${debianCurrVersion} box"
-  echo "  --debian-current          Setup a Ubuntu ${ubuntuCurrVersion} box"
+  echo "  --ubuntu-current          Setup a Ubuntu ${ubuntuCurrVersion} box"
   echo
   echo "  Previous releases:"
   echo
   echo "  --centos-previous         Setup a CentOS ${centosPrevVersion} box"
   echo "  --debian-previous         Setup a Debian ${debianPrevVersion} box"
-  echo "  --debian-previous         Setup a Ubuntu ${ubuntuPrevVersion} box"
+  echo "  --ubuntu-previous         Setup a Ubuntu ${ubuntuPrevVersion} box"
   echo
   echo "  --all                     Setup all releases in one file"
   echo "  --centos-all              Setup all CentOS releases in one file"
