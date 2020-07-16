@@ -72,6 +72,7 @@ let g:airline#extensions#hunks#enabled = 0
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 set background=dark                                             " dark background
+set cursorline                                                  " highlight cursor line
 set encoding=utf-8                                              " text encoding
 scriptencoding utf-8                                            " script encoding
 syntax enable                                                   " enable syntax highlighting
