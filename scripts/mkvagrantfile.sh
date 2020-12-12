@@ -33,22 +33,22 @@ fi
 # CentOS versions
 centosCurrVersion="8"
 centosPrevVersion="7"
-centosCurrRelease="bento/centos-${centosCurrVersion}"
-centosPrevRelease="bento/centos-${centosPrevVersion}"
+centosCurrRelease="centos-${centosCurrVersion}-x86_64"
+centosPrevRelease="centos-${centosPrevVersion}-x86_64"
 # Debian versions
 debianCurrVersion="10"
 debianPrevVersion="9"
-debianCurrRelease="bento/debian-${debianCurrVersion}"
-debianPrevRelease="bento/debian-${debianPrevVersion}"
+debianCurrRelease="debian-${debianCurrVersion}-amd64"
+debianPrevRelease="debian-${debianPrevVersion}-amd64"
 # Ubuntu versions
-ubuntuCurrMajorVersion="20"
-ubuntuPrevMajorVersion="18"
-ubuntuCurrMinorVersion="04"
-ubuntuPrevMinorVersion="04"
-ubuntuCurrVersion="${ubuntuCurrMajorVersion}.${ubuntuCurrMinorVersion}"
-ubuntuPrevVersion="${ubuntuPrevMajorVersion}.${ubuntuPrevMinorVersion}"
-ubuntuCurrRelease="bento/ubuntu-${ubuntuCurrVersion}"
-ubuntuPrevRelease="bento/ubuntu-${ubuntuPrevVersion}"
+ubuntuCurrVersionYear="20"
+ubuntuPrevVersionYear="18"
+ubuntuCurrVersionMonth="04"
+ubuntuPrevVersionMonth="04"
+ubuntuCurrVersion="${ubuntuCurrVersionYear}.${ubuntuCurrVersionMonth}"
+ubuntuPrevVersion="${ubuntuPrevVersionYear}.${ubuntuPrevVersionMonth}"
+ubuntuCurrRelease="ubuntu-${ubuntuCurrVersion}-amd64"
+ubuntuPrevRelease="ubuntu-${ubuntuPrevVersion}-amd64"
 # NOTE  All the *CurrVersion & *PrevVersion vars above must contain
 # only numbers. No special characters allowed.
 
