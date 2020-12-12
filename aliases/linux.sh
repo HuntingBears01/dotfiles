@@ -9,6 +9,13 @@ if [ -f /etc/os-release ]; then
   if [ -x /usr/bin/dircolors ]; then
     alias ls='ls -v --color=auto'
   fi
+
+  # Alias fd-find to fd
+  if (command -v fd-find > /dev/null 2>&1); then
+    alias fd='fd-find'
+  fi
+
+  # Setup updy alias
   source /etc/os-release
   os="${ID}"
   case "${os}" in
