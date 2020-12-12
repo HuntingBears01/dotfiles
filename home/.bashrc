@@ -31,13 +31,19 @@ shopt -s nocaseglob
 # Autocorrect typos in path names when using `cd`
 shopt -s cdspell
 
-# Add ~/scripts to path if it exists
-if [[ -d ~/scripts ]];then
-  PATH=${PATH}:${HOME}/scripts
-fi
+# Add directories to path if they exist
+for directory in "${HOME}/.local/bin" "/usr/local/opt/fzf/bin" "/usr/local/sbin"; do
+  if [[ -d ${directory} ]]; then
+    if [[ ! ${PATH} == *${directory}* ]]; then
+      PATH=${PATH}:${directory}
+    fi
+  fi
+done
+unset directory
 
 # Silence Bash warnings in MacOS
 export BASH_SILENCE_DEPRECATION_WARNING=1
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Colours

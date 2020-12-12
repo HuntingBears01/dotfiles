@@ -7,6 +7,7 @@ if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
   alias updy='brew update && brew upgrade'
   alias flushdns='sudo killall -HUP mDNSResponder'
   alias sudoedit='sudo vim'
+
   # Use GNU coreutils if installed
   if [ -x /usr/local/bin/gls ]; then
     alias date='gdate'
@@ -20,11 +21,5 @@ if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
   else
     alias ls='ls -G'
     export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
-  fi
-  # Add /usr/local/sbin to path for Brew
-  export PATH="/usr/local/sbin:${PATH}"
-  # Add Brew auto completion
-  if [ -f /usr/local/etc/bash_completion ]; then
-    source /usr/local/etc/bash_completion
   fi
 fi
