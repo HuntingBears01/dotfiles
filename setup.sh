@@ -41,7 +41,6 @@ usage() {
   echo
   echo "  --minimal           Install dotfiles only (default)"
   echo "  --git               Install dotfiles & configure git"
-  echo "  --workstation       Install dotfiles, git & applications"
   echo
   echo "  --help              Display this help"
   echo
@@ -66,8 +65,8 @@ linkDotfiles() {
   # Link dotfiles
   linkFiles "${progDir}/aliases" "${HOME}/.config/aliases"
   linkFiles "${progDir}/home" "${HOME}"
-  linkFiles "${progDir}/scripts" "${HOME}/scripts"
-  linkFiles "${progDir}/vagrant" "${HOME}/scripts/.vagrant"
+  linkFiles "${progDir}/scripts" "${HOME}/.local/bin"
+  linkFiles "${progDir}/yamllint" "${HOME}/.config/yamllint"
 }
 gitConfig() {
   # Configure Git
@@ -103,160 +102,42 @@ gitConfig() {
     check $? "Git configuration"
   fi
 }
-vagrantPlugins() {
-  info "Installing Vagrant plugins"
-  if (vagrant plugin list | grep -q vagrant-hostsupdater); then
-    vagrant plugin update vagrant-hostupdater
+gitInstall() {
+  # Install git
+  if (command -v git > /dev/null 2>&1); then
+    notify "Git installed"
   else
-    vagrant plugin install vagrant-hostsupdater
-  fi
-  if (vagrant plugin list | grep -q vagrant-vbguest); then
-    vagrant plugin update vagrant-vbguest
-  else
-    vagrant plugin install vagrant-vbguest
-  fi
-  # MacOS only
-  if [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
-    if ! [ -f /private/etc/sudoers.d/vagrant_hostsupdater ]; then
-      cat << EOF | sudo tee /private/etc/sudoers.d/vagrant_hostsupdater
-# Allow passwordless startup of Vagrant with vagrant-hostsupdater
-Cmnd_Alias VAGRANT_HOSTS_ADD = /bin/sh -c echo "*" >> /etc/hosts
-Cmnd_Alias VAGRANT_HOSTS_REMOVE = /usr/bin/sed -i -e /*/ d /etc/hosts
-%admin ALL=(root) NOPASSWD: VAGRANT_HOSTS_ADD, VAGRANT_HOSTS_REMOVE
-EOF
-    fi
-  # Linux only
-  else
-    if ! [ -f /etc/sudoers.d/vagrant_hostsupdater ]; then
-      cat << EOF | sudo tee /etc/sudoers.d/vagrant_hostsupdater
-# Allow passwordless startup of Vagrant with vagrant-hostsupdater.
-Cmnd_Alias VAGRANT_HOSTS_ADD = /bin/sh -c echo "*" >> /etc/hosts
-Cmnd_Alias VAGRANT_HOSTS_REMOVE = /bin/sed -i -e /*/ d /etc/hosts
-%sudo ALL=(root) NOPASSWD: VAGRANT_HOSTS_ADD, VAGRANT_HOSTS_REMOVE
-EOF
-    fi
-  fi
-  check $? "Vagrant plugin installation"
-}
-workstation() {
-  if isRoot; then
-    fail "This program must not be run as root"
-  else
-    # Linux only section
     if [ -f /etc/os-release ]; then
       # shellcheck disable=SC1091
       source /etc/os-release
       os="${ID}"
       case "${os}" in
-        debian | raspbian )
-          notify "Debian based distribution detected"
-          # Authenticate once
-          sudo -v
-          info "Updating apt cache"
-          sudo apt update
-          check $? "Apt cache update"
-          info "Installing applications"
-          sudo apt install -y curl htop mtr-tiny shellcheck tree unzip vim \
-            wget whois
-          check $? "Application install"
-
-          vagrantPlugins
-          ;;
-        manjaro )
-          notify "Arch based distribution detected"
+        debian | ubuntu | raspbian )
+          info "Installing git for Debian"
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get -q update
+          apt-get -qy install git
+          check "Git install for Debian"
           ;;
         centos )
-          notify "CentOS detected"
-          # Authenticate once
-          sudo -v
-          info "Installing EPEL"
-          sudo yum install -y epel-release
-          check $? "EPEL install"
-          info "Installing applications"
-          sudo yum install -y bzip2 curl htop mtr tree unzip vim-enhanced wget \
-            yum-utils
-          check $? "Application install"
+          info "Installing git for CentOS"
+          # Get EL major version
+          major_version="$(sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/redhat-release | awk -F. '{print $1}')";
 
-          vagrantPlugins
+          # Use dnf on EL 8+
+          if [ "${major_version}" -ge 8 ]; then
+            dnf -y install git
+          else
+            yum -y install git
+          fi
+          check "Git install for CentOS"
           ;;
-        fedora )
-          notify "Fedora detected"
-          ;;
-        opensuse )
-          notify "OpenSUSE detected"
-          ;;
-        ubuntu )
-          notify "Ubuntu based distribution detected"
-          # Authenticate once
-          sudo -v
-          info "Updating apt cache"
-          sudo apt update
-          check $? "Apt cache update"
-          info "Installing applications"
-          sudo apt install -y ansible ansible-lint curl htop mtr-tiny ncdu \
-            neofetch packer shellcheck tidy tree unzip vagrant vim wget whois \
-            yamllint
-          check $? "Application install"
-
-          vagrantPlugins
+        * )
+          fail "Git not installed. Install git and try again"
           ;;
       esac
-    fi
-
-    # MacOS only section
-    if [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
-      notify "MacOS detected"
-      # Authenticate once
-      sudo -v
-
-      info "Setting Hostname"
-      read -rp "Enter Hostname: " name
-      if [ -z "${name}" ]; then
-        warn "Hostname unchanged"
-      else
-        sudo scutil --set ComputerName "${name}" &&
-        sudo scutil --set HostName "${name}" &&
-        sudo scutil --set LocalHostName "${name}" &&
-        sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "${name}"
-        check $? "Hostname setup"
-      fi
-
-      if (command -v brew > /dev/null 2>&1); then
-        info "Updating Homebrew"
-        brew update && brew upgrade
-        check $? "Homebrew updating"
-      else
-        info "Installing Homebrew"
-        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        check $? "Homebrew installation"
-      fi
-
-      if [[ -f "/usr/local/bin/bash" ]]; then
-        info "GNU Bash already installed"
-      else
-        info "Installing GNU Bash"
-        brew install bash coreutils &&
-        appendOnce /usr/local/bin/bash /etc/shells
-        check $? "GNU Bash installation"
-      fi
-      if [[ "${SHELL}" == "/usr/local/bin/bash" ]]; then
-        info "GNU Bash already set as default"
-      else
-        info "Set GNU Bash as default"
-        appendOnce /usr/local/bin/bash /etc/shells &&
-        sudo chsh -s /usr/local/bin/bash "$USER"
-        check $? "Setting default shell"
-      fi
-
-      info "Installing Brew software"
-      brew bundle
-      check $? "Brew software installation"
-
-      info "Installing Python applications"
-      pip3 install ansible-lint yamllint
-      check $? "Python application installation"
-
-      vagrantPlugins
+    else
+      fail "Git not installed. Install git and try again"
     fi
   fi
 }
@@ -269,6 +150,7 @@ begin
 
 if [[ $# -eq 0 ]]; then
   notify "Minimal install"
+  gitInstall
   base16
   linkDotfiles
 fi
@@ -282,21 +164,16 @@ while [[ $# -gt 0 ]]; do
       ;;
     --minimal | -minimal | -m )
       notify "Minimal install"
+      gitInstall
       base16
       linkDotfiles
       ;;
     --git | -git | -g )
       notify "Git install"
+      gitInstall
       base16
       linkDotfiles
       gitConfig
-      ;;
-    --workstation | -workstation | -w )
-      notify "Workstation install"
-      base16
-      linkDotfiles
-      gitConfig
-      workstation
       ;;
     -*)
       fail "Unrecognized option: $1"
