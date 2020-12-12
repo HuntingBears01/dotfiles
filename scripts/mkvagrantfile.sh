@@ -62,7 +62,7 @@ declare -a selectedServerNames=()
 # Default values
 cpu="1"
 mem="1024"
-publicIP=""
+privateIP=""
 destDir="."
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -94,7 +94,7 @@ usage() {
   echo
   echo "  --mem size                Set the amount of RAM in MB"
   echo "  --cpu number              Set the number of vCPUs"
-  echo "  --ip ip_address           Set a public IP address"
+  echo "  --ip ip_address           Set a private IP address"
   echo "  --dir /path/to/dir        Set destination directory (defaults to current dir)"
   echo
   echo "  --help                    Display this help"
@@ -175,28 +175,12 @@ vagrantfileDefineVM() {
     end
 EOF
 }
-vagrantfilePublicIP() {
-  # Usage:  vagrantfilePublicIP "name" "IP"
+vagrantfilePrivateIP() {
+  # Usage:  vagrantfilePrivateIP "name" "IP"
   vmName="$1"
   vmIP="$2"
   cat << EOF >> Vagrantfile
-    ${vmName}.vm.network "public_network", ip: "${vmIP}" , bridge: [
-      "en0: Ethernet",
-      "en1: Wi-Fi (AirPort)",
-    ]
-EOF
-}
-vagrantfileProvision() {
-  # Usage:  vagrantfileProvision
-  cat << EOF >> Vagrantfile
-  config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "/tmp/id_rsa.pub"
-  config.vm.provision "shell", path: "~/scripts/.vagrant/user-ansible.sh"
-  config.vm.provision "shell", path: "~/scripts/.vagrant/ssh-keys.sh"
-  config.vm.provision "shell", path: "~/scripts/.vagrant/sudoers.sh"
-  config.vm.provision "shell", path: "~/scripts/.vagrant/install-apps.sh"
-  config.vm.provision "shell", path: "~/scripts/.vagrant/dotfiles.sh"
-  config.vm.provision "shell", path: "~/scripts/.vagrant/update.sh",
-    run: "always"
+    ${vmName}.vm.network "private_network", ip: "${vmIP}"
 EOF
 }
 vagrantfileEndVM() {
@@ -240,7 +224,7 @@ while [[ $# -gt 0 ]]; do
       selectedBoxNames=(
         "centos${centosCurrVersion}" "centos${centosPrevVersion}"
         "debian${debianCurrVersion}" "debian${debianPrevVersion}"
-        "ubuntu${ubuntuCurrMajorVersion}${ubuntuCurrMinorVersion}" "ubuntu${ubuntuPrevMajorVersion}${ubuntuPrevMinorVersion}"
+        "ubuntu${ubuntuCurrVersionYear}${ubuntuCurrVersionMonth}" "ubuntu${ubuntuPrevVersionYear}${ubuntuPrevVersionMonth}"
         )
       ;;
     --centos-current | -centos-current | -cc )
@@ -285,7 +269,7 @@ while [[ $# -gt 0 ]]; do
         "${ubuntuCurrRelease}" "${ubuntuPrevRelease}"
         )
       selectedBoxNames=(
-        "ubuntu${ubuntuCurrMajorVersion}${ubuntuCurrMinorVersion}" "ubuntu${ubuntuPrevMajorVersion}${ubuntuPrevMinorVersion}"
+        "ubuntu${ubuntuCurrVersionYear}${ubuntuCurrVersionMonth}" "ubuntu${ubuntuPrevVersionYear}${ubuntuPrevVersionMonth}"
         )
       ;;
     --cpu | -cpu )
@@ -299,7 +283,7 @@ while [[ $# -gt 0 ]]; do
     --ip | -ip )
       shift
       if ipValid "$1"; then
-        publicIP=$1
+        privateIP=$1
       else
         fail "Invalid public IP: $1"
       fi
@@ -364,14 +348,13 @@ if [[ "${box}" = "multi" ]];then
     box="${selectedBoxes[i]}"
     name="${selectedBoxNames[i]}"
     vagrantfileDefineVM "${name}" "${box}" "${mem}" "${cpu}"
-    if [ -n "${publicIP}" ]; then
-      vagrantfilePublicIP "${name}" "${publicIP}"
-      incrementIP "${publicIP}"
-      publicIP=${nextIP}
+    if [ -n "${privateIP}" ]; then
+      vagrantfilePrivateIP "${name}" "${privateIP}"
+      incrementIP "${privateIP}"
+      privateIP=${nextIP}
     fi
     vagrantfileEndVM
   done
-  vagrantfileProvision
   vagrantfileEnd
   okay "Vagrantfile setup complete"
   exit 0
@@ -382,14 +365,13 @@ else
   do
     name="${selectedServerNames[i]}"
     vagrantfileDefineVM "${name}" "${box}" "${mem}" "${cpu}"
-    if [ -n "${publicIP}" ]; then
-      vagrantfilePublicIP "${name}" "${publicIP}"
-      incrementIP "${publicIP}"
-      publicIP=${nextIP}
+    if [ -n "${privateIP}" ]; then
+      vagrantfilePrivateIP "${name}" "${privateIP}"
+      incrementIP "${privateIP}"
+      privateIP=${nextIP}
     fi
     vagrantfileEndVM
   done
-  vagrantfileProvision
   vagrantfileEnd
   okay "Vagrantfile setup complete"
   exit 0
