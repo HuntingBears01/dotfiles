@@ -188,7 +188,7 @@ linkFiles(){
   fileList=$(ls -A "${sourceDir}")
   info "Linking files in ${sourceDir} to ${destDir}"
   if [[ ! -d "${destDir}" ]]; then
-    mkdir "${destDir}"
+    mkdir -p "${destDir}"
   fi
   for item in ${fileList}; do
     if [[ "${sourceDir}/${item}" -ef "${destDir}/${item}" ]]; then

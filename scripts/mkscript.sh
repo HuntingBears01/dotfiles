@@ -50,13 +50,13 @@ trap cleanup EXIT
 # shellcheck disable=SC2034
 progDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 progName=$(basename "$0")
-logDir="${HOME}/logs"
+logDir="${HOME}/.local/logs"
 logName="${progName%.*}"
 logFile="${logDir}/${logName}.log"
 
 # Create log directory
 if [[ ! -d ${logDir} ]]; then
-  mkdir "${logDir}"
+  mkdir -p "${logDir}"
 fi
 
 # Import common functions
