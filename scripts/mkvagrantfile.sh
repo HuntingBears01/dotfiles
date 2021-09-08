@@ -30,14 +30,9 @@ else
 fi
 
 # Update the version numbers below as required
-# CentOS versions
-centosCurrVersion="8"
-centosPrevVersion="7"
-centosCurrRelease="centos-${centosCurrVersion}-x86_64"
-centosPrevRelease="centos-${centosPrevVersion}-x86_64"
 # Debian versions
-debianCurrVersion="10"
-debianPrevVersion="9"
+debianCurrVersion="11"
+debianPrevVersion="10"
 debianCurrRelease="debian-${debianCurrVersion}-amd64"
 debianPrevRelease="debian-${debianPrevVersion}-amd64"
 # Ubuntu versions
@@ -75,18 +70,15 @@ usage() {
   echo
   echo "  Current releases:"
   echo
-  echo "  --centos-current          Setup a CentOS ${centosCurrVersion} box"
   echo "  --debian-current          Setup a Debian ${debianCurrVersion} box"
   echo "  --ubuntu-current          Setup a Ubuntu ${ubuntuCurrVersion} box"
   echo
   echo "  Previous releases:"
   echo
-  echo "  --centos-previous         Setup a CentOS ${centosPrevVersion} box"
   echo "  --debian-previous         Setup a Debian ${debianPrevVersion} box"
   echo "  --ubuntu-previous         Setup a Ubuntu ${ubuntuPrevVersion} box"
   echo
   echo "  --all                     Setup all releases in one file"
-  echo "  --centos-all              Setup all CentOS releases in one file"
   echo "  --debian-all              Setup all Debian releases in one file"
   echo "  --ubuntu-all              Setup all Ubuntu releases in one file"
   echo
@@ -217,29 +209,12 @@ while [[ $# -gt 0 ]]; do
     --all | -all | -a )
       box="multi"
       selectedBoxes=(
-        "${centosCurrRelease}" "${centosPrevRelease}"
         "${debianCurrRelease}" "${debianPrevRelease}"
         "${ubuntuCurrRelease}" "${ubuntuPrevRelease}"
         )
       selectedBoxNames=(
-        "centos${centosCurrVersion}" "centos${centosPrevVersion}"
         "debian${debianCurrVersion}" "debian${debianPrevVersion}"
         "ubuntu${ubuntuCurrVersionYear}${ubuntuCurrVersionMonth}" "ubuntu${ubuntuPrevVersionYear}${ubuntuPrevVersionMonth}"
-        )
-      ;;
-    --centos-current | -centos-current | -cc )
-      box=${centosCurrRelease}
-      ;;
-    --centos-previous | -centos-previous | -cp )
-      box=${centosPrevRelease}
-      ;;
-    --centos-all | -centos-all | -ca )
-      box="multi"
-      selectedBoxes=(
-        "${centosCurrRelease}" "${centosPrevRelease}"
-        )
-      selectedBoxNames=(
-        "centos${centosCurrVersion}" "centos${centosPrevVersion}"
         )
       ;;
     --debian-current | -debian-current | -dc )
