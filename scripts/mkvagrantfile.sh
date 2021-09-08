@@ -58,6 +58,7 @@ declare -a selectedServerNames=()
 cpu="1"
 mem="1024"
 privateIP=""
+publicIP=""
 destDir="."
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -86,7 +87,8 @@ usage() {
   echo
   echo "  --mem size                Set the amount of RAM in MB"
   echo "  --cpu number              Set the number of vCPUs"
-  echo "  --ip ip_address           Set a private IP address"
+  echo "  --private ip_address      Set a private IP address"
+  echo "  --public ip_address       Set a public IP address"
   echo "  --dir /path/to/dir        Set destination directory (defaults to current dir)"
   echo
   echo "  --help                    Display this help"
@@ -175,6 +177,14 @@ vagrantfilePrivateIP() {
     ${vmName}.vm.network "private_network", ip: "${vmIP}"
 EOF
 }
+vagrantfilePublicIP() {
+  # Usage:  vagrantfilePublicIP "name" "IP"
+  vmName="$1"
+  vmIP="$2"
+  cat << EOF >> Vagrantfile
+    ${vmName}.vm.network "public_network", ip: "${vmIP}"
+EOF
+}
 vagrantfileEndVM() {
   # Usage: vagrantfileEndVM
   cat << EOF >> Vagrantfile
@@ -255,10 +265,18 @@ while [[ $# -gt 0 ]]; do
         fail "Invalid CPU value: $1"
       fi
       ;;
-    --ip | -ip )
+    --private | -private )
       shift
       if ipValid "$1"; then
         privateIP=$1
+      else
+        fail "Invalid private IP: $1"
+      fi
+      ;;
+    --public | -public )
+      shift
+      if ipValid "$1"; then
+        publicIP=$1
       else
         fail "Invalid public IP: $1"
       fi
@@ -289,8 +307,12 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-if [[ -z "${box}" ]];then
+if [[ -z "${box}" ]]; then
   fail "Release not specified"
+fi
+
+if [[ -n "${privateIP}" && -n ${publicIP} ]]; then
+  fail "Only one of public IP or private IP can be specified"
 fi
 
 # Parse folder names & server names
@@ -343,6 +365,11 @@ else
     if [ -n "${privateIP}" ]; then
       vagrantfilePrivateIP "${name}" "${privateIP}"
       incrementIP "${privateIP}"
+      privateIP=${nextIP}
+    fi
+    if [ -n "${publicIP}" ]; then
+      vagrantfilePublicIP "${name}" "${publicIP}"
+      incrementIP "${publicIP}"
       privateIP=${nextIP}
     fi
     vagrantfileEndVM
