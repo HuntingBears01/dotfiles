@@ -4,7 +4,7 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 
 # If not running interactively, don't do anything
-[ -z "${PS1}" ] && return
+[[ -z "${PS1}" ]] && return
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -61,7 +61,7 @@ if [[ -d ${HOME}/.config/base16-shell/hooks ]]; then
 fi
 
 # Setup colours
-if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+if [[ -x /usr/bin/tput ]] && tput setaf 1 >&/dev/null; then
   tput sgr0 # reset colors
 
   reset=$(tput sgr0)
@@ -81,8 +81,8 @@ esac
 # enable coloured prompt
 force_color_prompt=yes
 
-if [ -n "${force_color_prompt}" ]; then
-  if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+if [[ -n "${force_color_prompt}" ]]; then
+  if [[ -x /usr/bin/tput ]] && tput setaf 1 >&/dev/null; then
     # We have color support, assume it is compliant with Ecma-48
     # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
     # a case would tend to support setf rather than setaf.)
@@ -92,7 +92,7 @@ if [ -n "${force_color_prompt}" ]; then
   fi
 fi
 
-if [ "${color_prompt}" = yes ]; then
+if [[ "${color_prompt}" = yes ]]; then
   # Highlight the user name when logged in as root
   if [[ "${UID}" -eq "0" ]]; then
     userStyle="${red}"
@@ -126,12 +126,12 @@ esac
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Add tab completion for SSH hostnames based on ~/.ssh/config, ignoring wildcards
-if [ -e "${HOME}/.ssh/config" ]; then
+if [[ -e "${HOME}/.ssh/config" ]]; then
   complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh
 fi
 
 # enable programmable completion features
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
   source /etc/bash_completion
 fi
 
@@ -169,7 +169,7 @@ export LESS="-giR"                      # see man less
 export LS_COLORS="di=00;34:ow=00;34:ln=00;35:ex=00;31:or=00;37;101:su=01;41;37:sg=01;41;37"
 
 # Add Brew auto completion
-if [ -f /usr/local/etc/bash_completion ]; then
+if [[ -f /usr/local/etc/bash_completion ]]; then
   source /usr/local/etc/bash_completion
 fi
 
@@ -227,10 +227,10 @@ up() {
   # Usage: up {number}
   TIMES=$1
 
-  if [ -z "${TIMES}" ]; then
+  if [[ -z "${TIMES}" ]]; then
     TIMES=1
   fi
-  while [ ${TIMES} -gt 0 ]; do
+  while [[ ${TIMES} -gt 0 ]]; do
     cd ..
     TIMES=$((TIMES - 1))
   done
