@@ -9,7 +9,6 @@ alias egrep='egrep --color=auto'
 alias la='ls -a'
 alias ll='ls -lh'
 alias lla='ls -lha'
-alias reload='. ~/.bashrc'
 alias vi='vim'
 alias cls='clear'
 
@@ -35,10 +34,10 @@ done
 
 # Aliases for commonly used directories
 # Format: "directory relative to $HOME":alias
-for dir in "Music":mus "Videos":vid "Desktop":dt "Pictures":pic \
-  "Downloads":dl "Documents":doc "Archive":arc \
-  ".config":cnf ".config":cfg "Projects":prj "Library/Application Support/Firefox":fox \
-  ".mozilla/firefox":fox
+for dir in "Desktop":dt "Downloads":dl "Documents":doc \
+  "Nextcloud":nc "Nextcloud/Projects":prj \
+  ".config":cnf ".config":cfg \
+  "Library/Application Support/Firefox":fox ".mozilla/firefox":fox
 do
   if [ -d "$HOME/${dir%:*}" ]; then
     # shellcheck disable=SC2139
@@ -46,3 +45,7 @@ do
     alias ${dir/*:}="cd '$HOME/${dir%:*}' && ls"
   fi
 done
+
+# Aliases for Ansible
+alias ap='ansible-playbook'
+alias ag='ansible-galaxy'

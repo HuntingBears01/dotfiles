@@ -18,20 +18,27 @@ if [ -f /etc/os-release ]; then
   # Setup updy alias
   source /etc/os-release
   os="${ID}"
+  os_family="${ID_LIKE}"
   case "${os}" in
-    debian | ubuntu | raspbian )
+    debian | ubuntu | raspbian | pop )
       alias updy='sudo apt update && sudo apt upgrade -Vy'
       ;;
-    manjaro )
+  esac
+  case "${os_family}" in
+    *debian* | *ubuntu* )
+      alias updy='sudo apt update && sudo apt upgrade -Vy'
+      ;;
+    *arch* )
       alias updy='sudo pacman -Syu --noconfirm'
       ;;
-    centos )
-      alias updy='sudo yum update -y'
+    *rhel* | *fedora* )
+      if (command -v dnf > /dev/null 2>&1); then
+        alias updy='sudo dnf update -y'
+      else
+        alias updy='sudo yum update -y'
+      fi
       ;;
-    fedora )
-      alias updy='sudo dnf update -y'
-      ;;
-    opensuse )
+    *opensuse* | *suse* )
       alias updy='sudo zypper refresh && sudo zypper update -y'
       ;;
   esac
