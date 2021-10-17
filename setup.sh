@@ -19,7 +19,7 @@ progName=$(basename "$0")
 isInteractive(){
   # Purpose:  Check if running from an interactive shell
   # Usage:    isInteractive
-  if [[ -t 0 ]]; then
+  if [ -t 0 ]; then
     return 0
   else
     return 1
@@ -29,7 +29,7 @@ isInteractive(){
 isRoot(){
   # Purpose:  Check if running as root
   # Usage:    isRoot
-  if [[ ${EUID} -eq 0 ]]; then
+  if [ "$(id -u)" -eq 0 ]; then
     return 0
   else
     return 1
@@ -45,7 +45,7 @@ appendOnce() {
   file=$2
   if ! [ -f "${file}" ]; then
     echo "${string}" | sudo tee "${file}"
-  elif [[ $(grep -c "${string}" < "${file}") -eq 0 ]]; then
+  elif [ "$(grep -c "${string}" < "${file}")" -eq 0 ]; then
     echo "${string}" | sudo tee -a "${file}"
   fi
 }
@@ -56,12 +56,12 @@ cloneGitRepo(){
   destDir=$2
   repoName=$(basename -s .git "${repoURL}")
   info "Cloning ${repoName}"
-  if [[ -L "${destDir}/${repoName}" ]]; then
+  if [ -L "${destDir}/${repoName}" ]; then
     info "Deleting existing symlink ${destDir}"
     rm "${destDir}"
     git clone -q "${repoURL}" "${destDir}"
     check $? "${repoName} cloning"
-  elif [[ -d "${destDir}" ]]; then
+  elif [ -d "${destDir}" ]; then
     warn "${repoName} directory already exists, skipping"
   else
     git clone -q "${repoURL}" "${destDir}"
@@ -76,20 +76,20 @@ linkFiles(){
   destDir="$2"
   fileList=$(ls -A "${sourceDir}")
   info "Linking files in ${sourceDir} to ${destDir}"
-  if [[ ! -d "${destDir}" ]]; then
+  if [ ! -d "${destDir}" ]; then
     mkdir -p "${destDir}"
   fi
   for item in ${fileList}; do
-    if [[ "${sourceDir}/${item}" -ef "${destDir}/${item}" ]]; then
+    if [ "${sourceDir}/${item}" -ef "${destDir}/${item}" ]; then
       # Skip if file is already linked
       info "Skipping, ${item} already linked to ${sourceDir}"
-    elif [[ -L "${destDir}/${item}" ]]; then
+    elif [ -L "${destDir}/${item}" ]; then
       # Delete broken links & create new ones
       info "Deleting broken link for ${item}"
       rm "${destDir}/${item}"
       info "Linking ${item} to ${sourceDir}"
       ln -s "${sourceDir}/${item}" "${destDir}/${item}"
-    elif [[ -e "${destDir}/${item}" ]]; then
+    elif [ -e "${destDir}/${item}" ]; then
       # Backup existing files and create new links
       info "Backing up ${destDir}/${item} to ${destDir}/${item}.bak"
       mv "${destDir}/${item}" "${destDir}/${item}.bak"
@@ -109,7 +109,7 @@ linkFiles(){
 check() {
   # Purpose:  Checks the return code and displays an appropriate message
   # Usage:    check $? "Task description"
-  if [[ $1 -eq 0 ]]; then
+  if [ "$1" -eq 0 ]; then
     shift
     okay "$* complete"
   else
@@ -247,43 +247,12 @@ gitConfig() {
   fi
 }
 
-gitInstall() {
+gitCheck() {
   # Install git
   if (command -v git > /dev/null 2>&1); then
-    notify "Git already installed"
+    notify "Git installed"
   else
-    if [ -f /etc/os-release ]; then
-      # shellcheck disable=SC1091
-      . /etc/os-release
-      os="${ID}"
-      case "${os}" in
-        debian | ubuntu | raspbian )
-          info "Installing git for Debian"
-          export DEBIAN_FRONTEND=noninteractive
-          apt-get -q update
-          apt-get -qy install git
-          check "Git install for Debian"
-          ;;
-        centos )
-          info "Installing git for CentOS"
-          # Get EL major version
-          major_version="$(sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/redhat-release | awk -F. '{print $1}')";
-
-          # Use dnf on EL 8+
-          if [ "${major_version}" -ge 8 ]; then
-            dnf -y install git
-          else
-            yum -y install git
-          fi
-          check "Git install for CentOS"
-          ;;
-        * )
-          fail "Git not installed. Install git and try again"
-          ;;
-      esac
-    else
-      fail "Git not installed. Install git and try again"
-    fi
+    fail "Git not installed. Install git and try again"
   fi
 }
 
@@ -295,35 +264,23 @@ installFonts() {
     else
       info "Installing Hack Nerd Font for MacOS"
       brew install homebrew/cask-fonts/font-hack
-      check "Hack Nerd Font install for MacOS"
+      check $? "Hack Nerd Font install for MacOS"
     fi
   elif [ -f /etc/os-release ]; then
     # shellcheck disable=SC1091
     . /etc/os-release
     os="${ID}"
     case "${os}" in
-      debian | ubuntu | raspbian )
-        info "Installing Hack Nerd Font for Debian"
-        export DEBIAN_FRONTEND=noninteractive
-        apt-get -q update
-        apt-get -qy install fonts-hack-ttf
-        check "Hack Nerd Font install for Debian"
-        ;;
-      centos )
-        info "Installing Hack Nerd Font for CentOS"
-        # Get EL major version
-        major_version="$(sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/redhat-release | awk -F. '{print $1}')";
-
-        # Use dnf on EL 8+
-        if [ "${major_version}" -ge 8 ]; then
-          dnf -y install dnf-plugins-core :: heliocastro/hack-fonts :: hack-fonts
+      debian | ubuntu | raspbian | pop )
+        if [ -f "/usr/share/fonts/truetype/hack/Hack-Regular.ttf" ]; then
+          notify "Hack Nerd Font already installed"
         else
-          yum -y install dnf-plugins-core :: heliocastro/hack-fonts :: hack-fonts
+          info "Installing Hack Nerd Font for Debian"
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get -q update
+          sudo apt-get -qy install fonts-hack-ttf
+          check $? "Hack Nerd Font install for Debian"
         fi
-        check "Hack Nerd Font install for CentOS"
-        ;;
-      * )
-        warn "Hack Nerd Font not installed. Install Hack Nerd Font manually"
         ;;
     esac
   fi
@@ -354,20 +311,23 @@ installMinimal() {
 installTheme() {
   notify "Install dotfiles & theme"
   linkDotfiles
-  gitInstall
+  gitCheck
   base16
-  installFonts
   powerlevel10k
 }
 
 installFull() {
   notify "Install everything"
-  linkDotfiles
-  gitInstall
-  base16
-  installFonts
-  powerlevel10k
-  gitConfig
+  if isInteractive; then
+    linkDotfiles
+    gitCheck
+    base16
+    installFonts
+    powerlevel10k
+    gitConfig
+  else
+    fail "Full install can only be ran interactively"
+  fi
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
