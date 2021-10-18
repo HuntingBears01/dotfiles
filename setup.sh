@@ -256,36 +256,6 @@ gitCheck() {
   fi
 }
 
-installFonts() {
-  # Install Nerd Fonts
-  if  [ "$( uname -s )" = "Darwin" ] > /dev/null 2>&1; then
-    if [ -f "$HOME/Library/Fonts/Hack-Regular.ttf" ]; then
-      notify "Hack Nerd Font already installed"
-    else
-      info "Installing Hack Nerd Font for MacOS"
-      brew install homebrew/cask-fonts/font-hack
-      check $? "Hack Nerd Font install for MacOS"
-    fi
-  elif [ -f /etc/os-release ]; then
-    # shellcheck disable=SC1091
-    . /etc/os-release
-    os="${ID}"
-    case "${os}" in
-      debian | ubuntu | raspbian | pop )
-        if [ -f "/usr/share/fonts/truetype/hack/Hack-Regular.ttf" ]; then
-          notify "Hack Nerd Font already installed"
-        else
-          info "Installing Hack Nerd Font for Debian"
-          export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get -q update
-          sudo apt-get -qy install fonts-hack-ttf
-          check $? "Hack Nerd Font install for Debian"
-        fi
-        ;;
-    esac
-  fi
-}
-
 powerlevel10k() {
   # Install powerlevel10k
   powerlevel10k_dir="${HOME}/.config/powerlevel10k"
@@ -322,7 +292,6 @@ installFull() {
     linkDotfiles
     gitCheck
     base16
-    installFonts
     powerlevel10k
     gitConfig
   else
