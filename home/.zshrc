@@ -82,19 +82,16 @@ else
   # Basic prompt
   if [[ "${UID}" -eq "0" ]]; then
     # Root prompt
-    PS1='%F{red}%n%f@%F{yellow}%m%f %F{blue}%~%f %# '
+    PS1='%F{red}%n%f@%F{yellow}%m%f %F{blue}%~%f %(?.%F{green}>.%F{red}>)%f '
   else
     if [[ ${SSH_TTY} ]]; then
       # User prompt over SSH
-      PS1='%F{green}%n%f@%F{yellow}%m%f %F{blue}%~%f %# '
+      PS1='%F{green}%n%f@%F{yellow}%m%f %F{blue}%~%f %(?.%F{green}>.%F{red}>)%f '
     else
       # Local user prompt
-      PS1='%F{green}%n%f %F{blue}%~%f %# '
+      PS1='%F{blue}%~%f %(?.%F{green}>.%F{red}>)%f '
     fi
   fi
-
-  # Right hand side prompt
-  RPROMPT='%* %(?.%F{green}✓.%F{red}✗)%f'
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -91,7 +91,7 @@ else
     PS1='\[$green\]\u\[$grey\]@\[$yellow\]\h\[$grey\]:\[$blue\]\w \[$white\]\$\[$reset\] '
   else
     # Local user prompt
-    PS1='\[$green\]\u\[$grey\]:\[$blue\]\w \[$white\]\$\[$reset\] '
+    PS1='\[$blue\]\w \[$white\]\$\[$reset\] '
   fi
 fi
 
