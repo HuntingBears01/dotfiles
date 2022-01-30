@@ -47,5 +47,9 @@ do
 done
 
 # Aliases for Ansible
-alias ap='ansible-playbook'
-alias ag='ansible-galaxy'
+if command -v ansible >/dev/null 2>&1; then
+  alias ap='ansible-playbook'
+  alias ag='ansible-galaxy'
+  alias avc='ansible-vault create'
+  alias ave='ansible-vault edit'
+fi
