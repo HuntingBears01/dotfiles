@@ -35,7 +35,7 @@ done
 # Aliases for commonly used directories
 # Format: "directory relative to $HOME":alias
 for dir in "Desktop":dt "Downloads":dl "Documents":doc \
-  "Nextcloud":nc "Nextcloud/Projects":prj \
+  "Nextcloud":nc "Projects":prj \
   ".config":cnf ".config":cfg \
   "Library/Application Support/Firefox":fox ".mozilla/firefox":fox
 do
