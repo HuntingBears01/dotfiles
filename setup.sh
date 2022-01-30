@@ -191,6 +191,7 @@ usage() {
 base16() {
   # Install base16-shell
   base16_shell_dir="${HOME}/.config/base16-shell"
+  base16_default_theme="eighties"
   if [ -d "${base16_shell_dir}" ]; then
     info "Updating base16-shell"
     cd "${base16_shell_dir}" &&
@@ -202,6 +203,13 @@ base16() {
     info "Installing base16-shell"
     git clone -q https://github.com/chriskempson/base16-shell.git "${base16_shell_dir}"
     check $? "base16-shell install"
+  fi
+  if [ -L "${HOME}/.base16_theme" ]; then
+    notify "Default Base16 theme already set"
+  else
+    info "Setting default base16 theme"
+    ln -s "${base16_shell_dir}/scripts/base16-${base16_default_theme}.sh" "${HOME}/.base16_theme"
+    check $? "Setting default theme"
   fi
 }
 
