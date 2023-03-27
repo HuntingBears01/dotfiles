@@ -12,7 +12,6 @@ endif
 " Install plugins
 call plug#begin('~/.vim/bundle')
 Plug 'airblade/vim-gitgutter'
-Plug 'chriskempson/base16-vim'
 Plug 'godlygeek/tabular'
 Plug 'scrooloose/nerdcommenter'
 Plug 'sheerun/vim-polyglot'
@@ -23,8 +22,9 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'w0rp/ale'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+Plug 'catppuccin/vim', { 'as': 'catppuccin' }
+Plug 'itchyny/lightline.vim'
+Plug 'jeffkreeftmeijer/vim-dim'
 call plug#end()
 
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -34,12 +34,6 @@ call plug#end()
 " airblade/vim-gitgutter
 set updatetime=250
 let g:gitgutter_max_signs = 500
-
-" Theme
-if filereadable(expand("~/.vimrc_background"))
-  let base16colorspace=256
-  source ~/.vimrc_background
-endif
 
 " scrooloose/nerdcommenter
 let g:nerdspacedelims = 1
@@ -55,17 +49,12 @@ let g:ale_sign_warning = '--'
 let g:airline#extensions#ale#enabled = 1
 let g:ale_open_list = 1
 
-" vim-airline/vim-airline
-if !exists('g:airline_symbols')
-  let g:airline_symbols = {}
-endif
-" Comment below line if Powerline fonts are not installed
-let g:airline_powerline_fonts = 1
-" Uncomment 2 lines below if Powerline fonts are not installed
-" let g:airline_left_sep = ''
-" let g:airline_right_sep = ''
-let g:airline#extensions#hunks#enabled = 0
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+"  Vim theme
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+let g:lightline = {'colorscheme': 'catppuccin_mocha'}
+colorscheme dim
 
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 "  Vim Config
