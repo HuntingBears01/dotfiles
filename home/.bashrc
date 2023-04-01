@@ -183,28 +183,24 @@ rmrecursive() {
 #  Fuzzy finder - fzf
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Homebrew managed fzf
-if command -v brew >/dev/null 2>&1; then
-  fzf_path="$(brew --prefix)/opt/fzf"
-  if [[ -f "$fzf_path/shell/completion.bash" ]]; then
-    [[ $- == *i* ]] && source "$fzf_path/shell/completion.bash" 2> /dev/null
-  fi
-  if [[ -f "$fzf_path/shell/key-bindings.bash" ]]; then
-    source "$fzf_path/shell/key-bindings.bash"
-  fi
-fi
-
-# Git managed fzf
+# Determine fzf path
 if [[ -f "${HOME}/.local/bin/fzf/bin/fzf" ]]; then
   fzf_path="${HOME}/.local/bin/fzf"
-  if [[ -f "$fzf_path/shell/completion.bash" ]]; then
-    [[ $- == *i* ]] && source "$fzf_path/shell/completion.bash" 2> /dev/null
-  fi
-  if [[ -f "$fzf_path/shell/key-bindings.bash" ]]; then
-    source "$fzf_path/shell/key-bindings.bash"
-  fi
+elif command -v brew >/dev/null 2>&1; then
+  fzf_path="$(brew --prefix)/opt/fzf"
 fi
 
+# Completion config
+if [[ -f "$fzf_path/shell/completion.bash" ]]; then
+  [[ $- == *i* ]] && source "$fzf_path/shell/completion.bash" 2> /dev/null
+fi
+
+# Key binding config
+if [[ -f "$fzf_path/shell/key-bindings.bash" ]]; then
+  source "$fzf_path/shell/key-bindings.bash"
+fi
+
+# fzf config
 if command -v fzf >/dev/null 2>&1; then
   # Default options
   export FZF_DEFAULT_OPTS="
