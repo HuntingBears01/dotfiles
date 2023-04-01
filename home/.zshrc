@@ -171,14 +171,18 @@ rmrecursive() {
 #  Fuzzy finder - fzf
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if [[ -f "/usr/local/opt/fzf/shell/completion.zsh" ]]; then
-  # Auto-completion
-  [[ $- == *i* ]] && source "/usr/local/opt/fzf/shell/completion.zsh" 2> /dev/null
+# Homebrew managed fzf
+if command -v brew >/dev/null 2>&1; then
+  fzf_path="$(brew --prefix)/opt/fzf"
+  if [[ -f "$fzf_path/shell/completion.zsh" ]]; then
+    [[ $- == *i* ]] && source "$fzf_path/shell/completion.zsh" 2> /dev/null
+  fi
+  if [[ -f "$fzf_path/shell/key-bindings.zsh" ]]; then
+    source "$fzf_path/shell/key-bindings.zsh"
+  fi
+fi
 
-  # Key bindings
-  source "/usr/local/opt/fzf/shell/key-bindings.zsh"
-  bindkey "ç" fzf-cd-widget # Make ALT-C work on MacOS
-
+if command -v fzf >/dev/null 2>&1; then
   # Default options
   export FZF_DEFAULT_OPTS="
   --layout=reverse

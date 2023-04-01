@@ -183,13 +183,18 @@ rmrecursive() {
 #  Fuzzy finder - fzf
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if [[ -f "/usr/local/opt/fzf/shell/completion.bash" ]]; then
-  # Auto-completion
-  [[ $- == *i* ]] && source "/usr/local/opt/fzf/shell/completion.bash" 2> /dev/null
+# Homebrew managed fzf
+if command -v brew >/dev/null 2>&1; then
+  fzf_path="$(brew --prefix)/opt/fzf"
+  if [[ -f "$fzf_path/shell/completion.bash" ]]; then
+    [[ $- == *i* ]] && source "$fzf_path/shell/completion.bash" 2> /dev/null
+  fi
+  if [[ -f "$fzf_path/shell/key-bindings.bash" ]]; then
+    source "$fzf_path/shell/key-bindings.bash"
+  fi
+fi
 
-  # Key bindings
-  source "/usr/local/opt/fzf/shell/key-bindings.bash"
-
+if command -v fzf >/dev/null 2>&1; then
   # Default options
   export FZF_DEFAULT_OPTS="
   --layout=reverse
@@ -199,8 +204,12 @@ if [[ -f "/usr/local/opt/fzf/shell/completion.bash" ]]; then
   --preview '([[ -f {} ]] && (bat --style=numbers --color=always {} || cat {})) || ([[ -d {} ]] && (tree -C {} | less)) || echo {} 2> /dev/null | head -200'
   --color=16
   --bind '?:toggle-preview'
+  --bind 'ctrl-a:select-all'
   --bind 'ctrl-s:execute(subl {+})'
   "
+
+  # Completion trigger
+  # export FZF_COMPLETION_TRIGGER='**'
 
   # fzf's command
   export FZF_DEFAULT_COMMAND="fd --hidden --exclude '.Trash' --exclude '.git'"
