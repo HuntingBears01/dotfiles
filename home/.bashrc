@@ -137,11 +137,12 @@ done
 unset file
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#  Brew auto completion
+#  Brew config
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if [[ -f /usr/local/etc/bash_completion ]]; then
-  source /usr/local/etc/bash_completion
+if command -v brew >/dev/null 2>&1; then
+  # Disable google analytics
+  export HOMEBREW_NO_GOOGLE_ANALYTICS=1
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
