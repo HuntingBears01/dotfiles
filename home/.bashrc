@@ -194,6 +194,17 @@ if command -v brew >/dev/null 2>&1; then
   fi
 fi
 
+# Git managed fzf
+if [[ -f "${HOME}/.local/bin/fzf/bin/fzf" ]]; then
+  fzf_path="${HOME}/.local/bin/fzf"
+  if [[ -f "$fzf_path/shell/completion.bash" ]]; then
+    [[ $- == *i* ]] && source "$fzf_path/shell/completion.bash" 2> /dev/null
+  fi
+  if [[ -f "$fzf_path/shell/key-bindings.bash" ]]; then
+    source "$fzf_path/shell/key-bindings.bash"
+  fi
+fi
+
 if command -v fzf >/dev/null 2>&1; then
   # Default options
   export FZF_DEFAULT_OPTS="
