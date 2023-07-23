@@ -125,15 +125,6 @@ done
 unset file
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#  Brew config
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-if command -v brew >/dev/null 2>&1; then
-  # Disable google analytics
-  export HOMEBREW_NO_GOOGLE_ANALYTICS=1
-fi
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Editor
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
