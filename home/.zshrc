@@ -1,7 +1,7 @@
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+if [[ -e "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
@@ -15,12 +15,22 @@ unset LSCOLORS
 export CLICOLOR=1
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   brew
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Set brewPrefix variable if brew is installed
+# Use ${brewPrefix} instead of $(brew --prefix) when needed
+if command -v brew >/dev/null 2>&1; then
+  brewPrefix="$(brew --prefix)"
+fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #   Command completion
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Enable completions from brew installed apps
 if command -v brew >/dev/null 2>&1; then
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+  FPATH="${brewPrefix}/share/zsh/site-functions:${FPATH}"
 fi
 
 autoload -Uz compinit
@@ -114,7 +124,7 @@ esac
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Reload config
-alias reload='. ~/.zshrc'
+alias reload='source ~/.zshrc'
 
 # Source alias files from ~/.config/aliases/
 for file in ~/.config/aliases/*; do
@@ -166,7 +176,7 @@ rmrecursive() {
 if [[ -f "${HOME}/.local/bin/fzf/bin/fzf" ]]; then
   fzf_path="${HOME}/.local/bin/fzf"
 elif command -v brew >/dev/null 2>&1; then
-  fzf_path="$(brew --prefix)/opt/fzf"
+  fzf_path="${brewPrefix}/opt/fzf"
 fi
 
 # Completion config
