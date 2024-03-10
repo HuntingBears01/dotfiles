@@ -44,15 +44,27 @@ zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}
 #   History
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-HISTSIZE=1000
-SAVEHIST=1000
+HISTSIZE=50000
+SAVEHIST=50000
 HISTFILE=~/.zsh_history
-setopt APPEND_HISTORY
+# Immediately append to history file:
 setopt INC_APPEND_HISTORY
+# Record timestamp in history:
+setopt EXTENDED_HISTORY
+# Expire duplicate entries first when trimming history:
+setopt HIST_EXPIRE_DUPS_FIRST
+# Dont record an entry that was just recorded again:
 setopt HIST_IGNORE_DUPS
+# Delete old recorded entry if new entry is a duplicate:
+setopt HIST_IGNORE_ALL_DUPS
+# Do not display a line previously found:
+setopt HIST_FIND_NO_DUPS
+# Dont record an entry starting with a space:
 setopt HIST_IGNORE_SPACE
-setopt HIST_NO_STORE
-setopt HIST_VERIFY
+# Dont write duplicate entries in the history file:
+setopt HIST_SAVE_NO_DUPS
+# Share history between all sessions:
+setopt SHARE_HISTORY
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #   Options
