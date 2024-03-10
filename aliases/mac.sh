@@ -4,7 +4,6 @@
 # shellcheck disable=SC1091
 
 if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
-  alias updy='brew update && brew upgrade'
   alias flushdns='sudo killall -HUP mDNSResponder'
   alias sudoedit='sudo vim'
 

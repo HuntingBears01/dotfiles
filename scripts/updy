@@ -1,0 +1,144 @@
+#! /usr/bin/env bash
+
+# Update script
+# Author: Conor Martin
+
+isInteractive(){
+  # Purpose:  Check if running from an interactive shell
+  # Usage:    isInteractive
+  if [ -t 0 ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+isRoot(){
+  # Purpose:  Check if running as root
+  # Usage:    isRoot
+  if [ "$(id -u)" -eq 0 ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+check() {
+  # Purpose:  Checks the return code and displays an appropriate message
+  # Usage:    check $? "Task description"
+  if [ "$1" -eq 0 ]; then
+    shift
+    okay "$* complete"
+  else
+    shift
+    fail "$* failed"
+  fi
+}
+
+fail() {
+  # Purpose:  Display a task failed message then exit
+  # Usage:    fail "Message to display"
+  echo
+  ${red}; printf " ✗  "; ${reset}; echo "$*" >&2
+  echo
+  exit 1
+}
+
+info() {
+  # Purpose:  Display an informational message
+  # Usage:    info "Message to display"
+  ${cyan}; printf " ℹ︎  "; ${reset}; echo "$*"
+}
+
+notify() {
+  # Purpose:  Display a notification
+  # Usage:    notify "Message to display"
+  ${green}; printf " ℹ︎  "; ${reset}; echo "$*"
+  echo
+}
+
+okay() {
+  # Purpose:  Display a task successful message
+  # Usage:    okay "Message to display"
+  ${green}; printf " ✓  "; ${reset}; echo "$*"
+  echo
+}
+
+warn() {
+  # Purpose:  Display a warning message
+  # Usage:    warn "Message to display"
+  ${yellow}; printf " !  "; ${reset}; echo "$*" >&2
+}
+
+# Set text colours
+if isInteractive; then
+  red='tput setaf 1'
+  green='tput setaf 2'
+  yellow='tput setaf 3'
+  cyan='tput setaf 6'
+  reset='tput sgr0'
+else
+  red=''
+  green=''
+  yellow=''
+  cyan=''
+  reset=''
+fi
+
+
+
+if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
+  info "Updating brew"
+  brew update
+  check $? "brew update"
+  info "Updating brew apps"
+  brew upgrade
+  check $? "brew app updates"
+  info "Updating brew Mac apps"
+  brew upgrade --greedy
+  check $? "brew Mac app updates"
+  info "Cleaning up brew apps"
+  brew cleanup -s
+  check $? "brew cleanup"
+  info "Installing missing dependencies"
+  brew missing
+  check $? "brew dependencies"
+  info "Removing unneeded apps"
+  brew autoremove
+  check $? "brew cleanup"
+  info "Checking brew"
+  brew doctor
+  check $? "brew check"
+fi
+
+if [ -f /etc/os-release ]; then
+  source /etc/os-release
+  # os="${ID}"
+  os_family="${ID_LIKE}"
+  # case "${os}" in
+  #   debian | ubuntu | raspbian | pop )
+  #     alias updy='sudo apt update && sudo apt upgrade'
+  #     ;;
+  # esac
+
+  case "${os_family}" in
+    *debian* | *ubuntu* )
+      sudo apt update
+      sudo apt upgrade
+      ;;
+    *arch* )
+      sudo pacman -Syu
+      ;;
+    *rhel* | *fedora* )
+      if (command -v dnf > /dev/null 2>&1); then
+        sudo dnf update
+      else
+        sudo yum update
+      fi
+      ;;
+    *opensuse* | *suse* )
+      sudo zypper refresh
+      sudo zypper update
+      ;;
+  esac
+fi

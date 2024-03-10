@@ -192,6 +192,7 @@ linkDotfiles() {
   # Link dotfiles
   linkFiles "${progDir}/aliases" "${HOME}/.config/aliases"
   linkFiles "${progDir}/home" "${HOME}"
+  linkFiles "${progDir}/scripts" "${HOME}/.local/bin"
   linkFiles "${progDir}/yamllint" "${HOME}/.config/yamllint"
 }
 
