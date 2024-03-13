@@ -32,13 +32,18 @@ fi
 
 if [ -f /etc/os-release ]; then
   source /etc/os-release
-  # os="${ID}"
+  os="${ID}"
   os_family="${ID_LIKE}"
-  # case "${os}" in
-  #   debian | ubuntu | raspbian | pop )
-  #     alias updy='sudo apt update && sudo apt upgrade'
-  #     ;;
-  # esac
+  case "${os}" in
+    debian | ubuntu | raspbian | pop )
+      info "Updating apt cache"
+      sudo apt update
+      info "Installing updates"
+      sudo apt upgrade
+      info "Removing unneeded apps"
+      sudo apt autoremove
+      ;;
+  esac
 
   case "${os_family}" in
     *debian* | *ubuntu* )
