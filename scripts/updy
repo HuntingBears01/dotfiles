@@ -38,8 +38,10 @@ if [ -f /etc/os-release ]; then
     debian | ubuntu | raspbian | pop )
       info "Updating apt cache"
       sudo apt update
+      echo ""
       info "Installing updates"
       sudo apt upgrade
+      echo ""
       info "Removing unneeded apps"
       sudo apt autoremove
       ;;
@@ -49,8 +51,10 @@ if [ -f /etc/os-release ]; then
     *debian* | *ubuntu* )
       info "Updating apt cache"
       sudo apt update
+      echo ""
       info "Installing updates"
       sudo apt upgrade
+      echo ""
       info "Removing unneeded apps"
       sudo apt autoremove
       ;;
