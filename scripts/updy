@@ -4,7 +4,7 @@
 # Author: Ciara Martin
 
 info() {
-  tput setaf 5; printf "==> "; tput sgr0; echo "$*"
+  tput setaf 5; tput bold; printf "==> "; tput sgr0; printf "%s\n\n" "$*"
 }
 
 if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
