@@ -23,9 +23,6 @@ if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
   info "Installing missing dependencies"
   brew missing
   echo ""
-  info "Removing unneeded apps"
-  brew autoremove
-  echo ""
   info "Checking brew"
   brew doctor
 fi
