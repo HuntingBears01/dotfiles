@@ -196,41 +196,6 @@ linkDotfiles() {
   linkFiles "${progDir}/yamllint" "${HOME}/.config/yamllint"
 }
 
-gitConfig() {
-  # Configure Git
-  if isRoot; then
-    fail "This program must not be run as root"
-  else
-    info "Git configuration"
-    if isInteractive; then
-      read -rp "Enter Git name: " gitName
-      if [ -n "${gitName}" ]; then
-        git config --global user.name "${gitName}"
-        read -rp "Enter Git email: " gitEmail
-        if [ -n "${gitEmail}" ]; then
-          git config --global user.email "${gitEmail}"
-          if [ ! -f ~/.ssh/id_rsa ]; then
-            ssh-keygen -t rsa -C "${gitEmail}" -f ~/.ssh/id_rsa
-          fi
-        fi
-      fi
-    fi &&
-    git config --global color.ui auto &&
-    git config --global core.editor "$(command -v vim)" &&
-    git config --global core.autocrlf input &&
-    git config --global core.excludesfile "${HOME}/.gitignore" &&
-    git config --global push.default current &&
-    git config --global alias.unstage 'reset HEAD --' &&
-    git config --global alias.last 'log -1 HEAD' &&
-    git config --global alias.co checkout &&
-    git config --global alias.br branch &&
-    git config --global alias.ci commit &&
-    git config --global alias.s status &&
-    git config --global alias.logp 'log --pretty=oneline --graph'
-    check $? "Git configuration"
-  fi
-}
-
 gitCheck() {
   # Install git
   if (command -v git > /dev/null 2>&1); then
@@ -275,7 +240,6 @@ installFull() {
     linkDotfiles
     gitCheck
     powerlevel10k
-    gitConfig
   else
     fail "Full install can only be ran interactively"
   fi

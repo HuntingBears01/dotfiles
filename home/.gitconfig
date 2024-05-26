@@ -1,0 +1,19 @@
+[user]
+  name = C Martin
+  email = cmartin@ronoc.com
+[color]
+  ui = auto
+[core]
+  editor = /usr/bin/vim
+  autocrlf = input
+  excludesfile = /Users/cmartin/.gitignore
+[push]
+  default = current
+[alias]
+  unstage = reset HEAD --
+  last = log -1 HEAD
+  co = checkout
+  br = branch
+  ci = commit
+  s = status
+  logp = log --pretty=oneline --graph
