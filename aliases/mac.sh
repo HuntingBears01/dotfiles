@@ -8,9 +8,9 @@ if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
   alias sudoedit='sudo vim'
 
   # Use GNU coreutils if installed
-  if [ -x /usr/local/bin/gls ]; then
+  if command -v gls >/dev/null 2>&1; then
     alias date='gdate'
-    alias ls='gls -v --color=auto'
+    alias ls='gls -v --color=auto --hyperlink'
     alias md5sum='gmd5sum'
     alias sha1sum='gsha1sum'
     alias sha224sum='gsha224sum'
