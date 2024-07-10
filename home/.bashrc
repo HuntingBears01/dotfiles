@@ -29,6 +29,16 @@ fi
 export LS_COLORS="di=00;34:ow=00;34:ln=00;35:ex=00;31:or=00;37;101:su=01;41;37:sg=01;41;37"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   brew
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Set brewPrefix variable if brew is installed
+# Use ${brewPrefix} instead of $(brew --prefix) when needed
+if command -v brew >/dev/null 2>&1; then
+  brewPrefix="$(brew --prefix)"
+fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #   Command completion
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -40,12 +50,11 @@ shopt -s nocaseglob
 
 # Enable completions from brew installed apps
 if command -v brew >/dev/null 2>&1; then
-  HOMEBREW_PREFIX="$(brew --prefix)"
-  if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]
+  if [[ -r "${brewPrefix}/etc/profile.d/bash_completion.sh" ]]
   then
-    source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
+    source "${brewPrefix}/etc/profile.d/bash_completion.sh"
   else
-    for COMPLETION in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*
+    for COMPLETION in "${brewPrefix}/etc/bash_completion.d/"*
     do
       [[ -r "${COMPLETION}" ]] && source "${COMPLETION}"
     done
@@ -178,7 +187,7 @@ rmrecursive() {
 if [[ -f "${HOME}/.local/bin/fzf/bin/fzf" ]]; then
   fzf_path="${HOME}/.local/bin/fzf"
 elif command -v brew >/dev/null 2>&1; then
-  fzf_path="$(brew --prefix)/opt/fzf"
+  fzf_path="${brewPrefix}/opt/fzf"
 fi
 
 # Completion config
