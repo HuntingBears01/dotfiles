@@ -18,10 +18,18 @@ export CLICOLOR=1
 #   brew
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Set brewPrefix variable if brew is installed
+# Add brew bins to path if installed
 # Use ${brewPrefix} instead of $(brew --prefix) when needed
 if command -v brew >/dev/null 2>&1; then
   brewPrefix="$(brew --prefix)"
+  for directory in "${brewPrefix}/sbin" "${brewPrefix}/bin"; do
+    if [[ -d ${directory} ]]; then
+      if [[ ! ${PATH} == *${directory}* ]]; then
+        PATH=${PATH}:${directory}
+      fi
+    fi
+  done
+  unset directory
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -32,10 +32,18 @@ export LS_COLORS="di=00;34:ow=00;34:ln=00;35:ex=00;31:or=00;37;101:su=01;41;37:s
 #   brew
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Set brewPrefix variable if brew is installed
+# Add brew bins to path if installed
 # Use ${brewPrefix} instead of $(brew --prefix) when needed
 if command -v brew >/dev/null 2>&1; then
   brewPrefix="$(brew --prefix)"
+  for directory in "${brewPrefix}/sbin" "${brewPrefix}/bin"; do
+    if [[ -d ${directory} ]]; then
+      if [[ ! ${PATH} == *${directory}* ]]; then
+        PATH=${PATH}:${directory}
+      fi
+    fi
+  done
+  unset directory
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
