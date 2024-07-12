@@ -18,14 +18,25 @@ export CLICOLOR=1
 #   brew
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Add brew bins to path if installed
+# Check wher brew is installed & set ${brewPrefix}
 # Use ${brewPrefix} instead of $(brew --prefix) when needed
-if command -v brew >/dev/null 2>&1; then
-  brewPrefix="$(brew --prefix)"
+if [ -x /opt/homebrew/bin/brew ]; then
+  # Apple Silicon
+  brewPrefix=/opt/homebrew
+elif [ -x /usr/local/bin/brew ]; then
+  # Apple Intel
+  brewPrefix=/usr/local
+elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  # Linux
+  brewPrefix=/home/linuxbrew/.linuxbrew
+fi
+
+# Add brew bins to path if installed
+if command -v ${brewPrefix}/bin/brew >/dev/null 2>&1; then
   for directory in "${brewPrefix}/sbin" "${brewPrefix}/bin"; do
     if [[ -d ${directory} ]]; then
       if [[ ! ${PATH} == *${directory}* ]]; then
-        PATH=${PATH}:${directory}
+        PATH=${directory}:${PATH}
       fi
     fi
   done

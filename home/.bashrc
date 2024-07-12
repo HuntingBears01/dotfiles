@@ -32,14 +32,25 @@ export LS_COLORS="di=00;34:ow=00;34:ln=00;35:ex=00;31:or=00;37;101:su=01;41;37:s
 #   brew
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Add brew bins to path if installed
+# Check wher brew is installed & set ${brewPrefix}
 # Use ${brewPrefix} instead of $(brew --prefix) when needed
-if command -v brew >/dev/null 2>&1; then
-  brewPrefix="$(brew --prefix)"
+if [ -x /opt/homebrew/bin/brew ]; then
+  # Apple Silicon
+  brewPrefix=/opt/homebrew
+elif [ -x /usr/local/bin/brew ]; then
+  # Apple Intel
+  brewPrefix=/usr/local
+elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  # Linux
+  brewPrefix=/home/linuxbrew/.linuxbrew
+fi
+
+# Add brew bins to beginning of path if installed
+if command -v "${brewPrefix}"/bin/brew >/dev/null 2>&1; then
   for directory in "${brewPrefix}/sbin" "${brewPrefix}/bin"; do
     if [[ -d ${directory} ]]; then
       if [[ ! ${PATH} == *${directory}* ]]; then
-        PATH=${PATH}:${directory}
+        PATH=${directory}:${PATH}
       fi
     fi
   done
