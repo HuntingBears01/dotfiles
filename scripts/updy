@@ -3,28 +3,55 @@
 # Update script
 # Author: Ciara Martin
 
-info() {
-  tput setaf 5; tput bold; printf "\n==> "; tput sgr0; printf "%s\n\n" "$*"
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   Define functions
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+check() {
+  # Purpose:  Display task status, log result & exit on error
+  # Usage:    check $? "Task name"
+  if [ "$1" -eq 0 ]; then
+    printf "\n🟢  %s successful\n\n" "$2"
+  else
+    printf "\n🔴  %s failed\n\n" "$2"
+    exit 1
+  fi
 }
+
+info() {
+  # Purpose:  Displays an info message & outputs to logfile
+  # Usage:    info "Message"
+  printf "\n🔵  %s\n\n" "$1"
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   Main
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
   info "Updating brew"
   brew update
+  check $? "Brew update"
 
-  info "Updating brew apps"
-  brew upgrade
+  info "Upgrading brew apps"
+  brew upgrade --formula
+  check $? "Brew app upgrade"
 
-  info "Updating brew Mac apps"
-  brew upgrade --greedy
+  info "Upgrading brew Mac apps"
+  brew upgrade --cask --greedy
+  check $? "Brew Mac app upgrade"
 
-  info "Cleaning up brew apps"
+  info "Cleaning up brew"
   brew cleanup -s
+  check $? "Brew cleanup"
 
   info "Installing missing dependencies"
   brew missing
+  check $? "Missing dependency install"
 
   info "Checking brew"
   brew doctor
+  check $? "Brew check"
 fi
 
 if [ -f /etc/os-release ]; then
@@ -35,12 +62,15 @@ if [ -f /etc/os-release ]; then
     debian | ubuntu | raspbian | pop )
       info "Updating apt cache"
       sudo apt update
+      check $? "apt update"
 
-      info "Installing updates"
+      info "Upgrading apt apps"
       sudo apt upgrade
+      check $? "apt upgrade"
 
-      info "Removing unneeded apps"
+      info "Autoremove apt apps"
       sudo apt autoremove
+      check $? "apt autoremove"
       ;;
   esac
 
@@ -48,26 +78,40 @@ if [ -f /etc/os-release ]; then
     *debian* | *ubuntu* )
       info "Updating apt cache"
       sudo apt update
+      check $? "apt update"
 
-      info "Installing updates"
+      info "Upgrading apt apps"
       sudo apt upgrade
+      check $? "apt upgrade"
 
-      info "Removing unneeded apps"
+      info "Autoremove apt apps"
       sudo apt autoremove
+      check $? "apt autoremove"
       ;;
     *arch* )
+      info "Updating pacman apps"
       sudo pacman -Syu
+      check $? "pacman update"
       ;;
     *rhel* | *fedora* )
       if (command -v dnf > /dev/null 2>&1); then
+        info "Updating dnf apps"
         sudo dnf update
+        check $? "dnf update"
       else
+        info "Updating yum apps"
         sudo yum update
+        check $? "yum update"
       fi
       ;;
     *opensuse* | *suse* )
+      info "Refreshing zypper cache"
       sudo zypper refresh
+      check $? "zypper refresh"
+
+      info "Updating zypper apps"
       sudo zypper update
+      check $? "zypper update"
       ;;
   esac
 fi
