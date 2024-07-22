@@ -195,6 +195,7 @@ linkDotfiles() {
   linkFiles "${progDir}/scripts" "${HOME}/.local/bin"
   linkFiles "${progDir}/yamllint" "${HOME}/.config/yamllint"
   linkFiles "${progDir}/kitty" "${HOME}/.config/kitty"
+  linkFiles "${progDir}/yt-dlp" "${HOME}/.yt-dlp"
 }
 
 gitCheck() {
