@@ -33,25 +33,34 @@ if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
   brew update
   check $? "Brew update"
 
-  info "Upgrading brew apps"
-  brew upgrade --formula
-  check $? "Brew app upgrade"
 
-  info "Upgrading brew Mac apps"
-  brew upgrade --cask --greedy
-  check $? "Brew Mac app upgrade"
+  if [[ -z "$(brew outdated --formula --quiet)" ]] > /dev/null 2>&1; then
+    info "Brew apps up to date"
+  else
+    info "Upgrading brew apps"
+    brew upgrade --formula
+    check $? "Brew upgrade"
+  fi
 
-  info "Cleaning up brew"
-  brew cleanup -s
-  check $? "Brew cleanup"
+  if [[ -z "$(brew outdated --cask --quiet)" ]] > /dev/null 2>&1; then
+    info "Brew cask apps up to date"
+  else
+    info "Upgrading brew cask apps"
+    brew upgrade --cask
+    check $? "Brew cask upgrade"
+  fi
 
-  info "Installing missing dependencies"
-  brew missing
-  check $? "Missing dependency install"
+  # info "Cleaning up brew"
+  # brew cleanup -s
+  # check $? "Brew cleanup"
 
-  info "Checking brew"
-  brew doctor
-  check $? "Brew check"
+  # info "Installing missing dependencies"
+  # brew missing
+  # check $? "Missing dependency install"
+
+  # info "Checking brew"
+  # brew doctor
+  # check $? "Brew check"
 fi
 
 if [ -f /etc/os-release ]; then
