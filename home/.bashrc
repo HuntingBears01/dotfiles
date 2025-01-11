@@ -32,7 +32,7 @@ export LS_COLORS="di=00;34:ow=00;34:ln=00;35:ex=00;31:or=00;37;101:su=01;41;37:s
 #   brew
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Check wher brew is installed & set ${brewPrefix}
+# Check where brew is installed & set ${brewPrefix}
 # Use ${brewPrefix} instead of $(brew --prefix) when needed
 if [ -x /opt/homebrew/bin/brew ]; then
   # Apple Silicon
@@ -202,21 +202,26 @@ rmrecursive() {
 #  Fuzzy finder - fzf
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Determine fzf path
-if [[ -f "${HOME}/.local/bin/fzf/bin/fzf" ]]; then
-  fzf_path="${HOME}/.local/bin/fzf"
+# Determine fzf config path
+if [[ -d "${HOME}/.local/bin/fzf/shell" ]]; then
+  # Git
+  fzf_config_path="${HOME}/.local/bin/fzf/shell"
+elif [[ -d "/usr/share/doc/fzf/examples" ]]; then
+  # Debian (apt)
+  fzf_config_path="/usr/share/doc/fzf/examples"
 elif command -v brew >/dev/null 2>&1; then
-  fzf_path="${brewPrefix}/opt/fzf"
+  # Mac (brew)
+  fzf_config_path="${brewPrefix}/opt/fzf/shell"
 fi
 
 # Completion config
-if [[ -f "$fzf_path/shell/completion.bash" ]]; then
-  [[ $- == *i* ]] && source "$fzf_path/shell/completion.bash" 2> /dev/null
+if [[ -f "$fzf_config_path/completion.bash" ]]; then
+  [[ $- == *i* ]] && source "$fzf_config_path/completion.bash" 2> /dev/null
 fi
 
 # Key binding config
-if [[ -f "$fzf_path/shell/key-bindings.bash" ]]; then
-  source "$fzf_path/shell/key-bindings.bash"
+if [[ -f "$fzf_config_path/key-bindings.bash" ]]; then
+  source "$fzf_config_path/key-bindings.bash"
 fi
 
 # fzf config
