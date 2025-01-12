@@ -4,6 +4,18 @@
 # Author: Ciara Martin
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   Define variables
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Text formatting
+green=$(tput setaf 2)
+grey=$(tput setaf 7)
+italic=$(tput sitm)
+red=$(tput setaf 1)
+reset=$(tput sgr0)
+yellow=$(tput setaf 3)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #   Define functions
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -11,9 +23,13 @@ check() {
   # Purpose:  Display task status, log result & exit on error
   # Usage:    check $? "Task name"
   if [ "$1" -eq 0 ]; then
-    printf "\n🟢  %s successful\n\n" "$2"
+    echo
+    echo "${green}${italic}==> ${grey}$2 successful${reset}"
+    echo
   else
-    printf "\n🔴  %s failed\n\n" "$2"
+    echo
+    echo "${red}${italic}==> ${grey}$2 failed${reset}"
+    echo
     exit 1
   fi
 }
@@ -21,7 +37,9 @@ check() {
 info() {
   # Purpose:  Displays an info message & outputs to logfile
   # Usage:    info "Message"
-  printf "\n🔵  %s\n\n" "$1"
+  echo
+  echo "${yellow}${italic}==> ${grey}$1${reset}"
+  echo
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -49,18 +67,6 @@ if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
     brew upgrade --cask
     check $? "Brew cask upgrade"
   fi
-
-  # info "Cleaning up brew"
-  # brew cleanup -s
-  # check $? "Brew cleanup"
-
-  # info "Installing missing dependencies"
-  # brew missing
-  # check $? "Missing dependency install"
-
-  # info "Checking brew"
-  # brew doctor
-  # check $? "Brew check"
 fi
 
 if [ -f /etc/os-release ]; then
