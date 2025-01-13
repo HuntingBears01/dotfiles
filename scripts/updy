@@ -42,12 +42,26 @@ info() {
   echo
 }
 
+pushd () {
+  # Purpose:  Hide output from pushd when successful
+  # Usage:    pushd /path/to/dir
+  # shellcheck disable=SC2164
+  command pushd "$@" > /dev/null
+}
+
+popd () {
+  # Purpose:  Hide output from popd when successful
+  # Usage:    popd
+  # shellcheck disable=SC2164
+  command popd > /dev/null
+}
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #   Update dotfiles
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if [ -d "${HOME}"/.config/dotfiles ]; then
-  pushd -q "${HOME}"/.config/dotfiles || exit
+  pushd "${HOME}"/.config/dotfiles || exit
   if [[ -z "$(git fetch --dry-run)" ]] > /dev/null 2>&1; then
     info "dotfiles up to date"
   else
@@ -63,7 +77,7 @@ if [ -d "${HOME}"/.config/dotfiles ]; then
       git stash pop
     fi
   fi
-  popd -q || exit
+  popd || exit
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -71,7 +85,7 @@ fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if [ -d "${HOME}"/.local/bin/fzf ]; then
-  pushd -q "${HOME}"/.local/bin/fzf || exit
+  pushd "${HOME}"/.local/bin/fzf || exit
   if [[ -z "$(git fetch --dry-run)" ]] > /dev/null 2>&1; then
     info "fzf is up to date"
   else
@@ -87,7 +101,7 @@ if [ -d "${HOME}"/.local/bin/fzf ]; then
       git stash pop
     fi
   fi
-  popd -q || exit
+  popd || exit
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
