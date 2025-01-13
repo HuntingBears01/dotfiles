@@ -47,7 +47,7 @@ info() {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if [ -d "${HOME}"/.config/dotfiles ]; then
-  pushd "${HOME}"/.config/dotfiles || exit
+  pushd -q "${HOME}"/.config/dotfiles || exit
   if [[ -z "$(git fetch --dry-run)" ]] > /dev/null 2>&1; then
     info "dotfiles up to date"
   else
@@ -63,7 +63,7 @@ if [ -d "${HOME}"/.config/dotfiles ]; then
       git stash pop
     fi
   fi
-  popd || exit
+  popd -q || exit
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -71,7 +71,7 @@ fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if [ -d "${HOME}"/.local/bin/fzf ]; then
-  pushd "${HOME}"/.local/bin/fzf || exit
+  pushd -q "${HOME}"/.local/bin/fzf || exit
   if [[ -z "$(git fetch --dry-run)" ]] > /dev/null 2>&1; then
     info "fzf is up to date"
   else
@@ -87,7 +87,7 @@ if [ -d "${HOME}"/.local/bin/fzf ]; then
       git stash pop
     fi
   fi
-  popd || exit
+  popd -q || exit
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
