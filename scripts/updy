@@ -43,14 +43,61 @@ info() {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#   Main
+#   Update dotfiles
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if [ -d "${HOME}"/.config/dotfiles ]; then
+  pushd "${HOME}"/.config/dotfiles || exit
+  if [[ -z "$(git fetch --dry-run)" ]] > /dev/null 2>&1; then
+    info "dotfiles up to date"
+  else
+    if  [[ "$(git stash push)" = "No local changes to save" ]] > /dev/null 2>&1; then
+      info "Local changes stashed"
+      stashed=true
+    fi
+    info "Updating dotfiles"
+    git pull
+    check $? "dotfiles update"
+    if [ "${stashed}" = true ]; then
+      info "Restoring local changes"
+      git stash pop
+    fi
+  fi
+  popd || exit
+fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   Update fzf (git version)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if [ -d "${HOME}"/.local/bin/fzf ]; then
+  pushd "${HOME}"/.local/bin/fzf || exit
+  if [[ -z "$(git fetch --dry-run)" ]] > /dev/null 2>&1; then
+    info "fzf is up to date"
+  else
+    if  [[ "$(git stash push)" = "No local changes to save" ]] > /dev/null 2>&1; then
+      info "Local changes stashed"
+      stashed=true
+    fi
+    info "Updating fzf"
+    git pull && ./install --bin
+    check $? "fzf update"
+    if [ "${stashed}" = true ]; then
+      info "Restoring local changes"
+      git stash pop
+    fi
+  fi
+  popd || exit
+fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   Update Mac using brew
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
   info "Updating brew"
   brew update
   check $? "Brew update"
-
 
   if [[ -z "$(brew outdated --formula --quiet)" ]] > /dev/null 2>&1; then
     info "Brew apps up to date"
@@ -68,6 +115,10 @@ if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
     check $? "Brew cask upgrade"
   fi
 fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   Update Linux using default package manager
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if [ -f /etc/os-release ]; then
   source /etc/os-release
