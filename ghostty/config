@@ -1,0 +1,5 @@
+font-family = "IosevkaTerm Nerd Font"
+font-size = 14
+theme = catppuccin-mocha
+window-height = 60
+window-width = 180

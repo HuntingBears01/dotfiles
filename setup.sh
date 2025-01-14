@@ -192,9 +192,10 @@ linkDotfiles() {
   # Link dotfiles
   linkFiles "${progDir}/aliases" "${HOME}/.config/aliases"
   linkFiles "${progDir}/home" "${HOME}"
+  linkFiles "${progDir}/kitty" "${HOME}/.config/kitty"
+  linkFiles "${progDir}/ghostty" "${HOME}/.config/ghostty"
   linkFiles "${progDir}/scripts" "${HOME}/.local/bin"
   linkFiles "${progDir}/yamllint" "${HOME}/.config/yamllint"
-  linkFiles "${progDir}/kitty" "${HOME}/.config/kitty"
   linkFiles "${progDir}/yt-dlp" "${HOME}/.yt-dlp"
 }
 
