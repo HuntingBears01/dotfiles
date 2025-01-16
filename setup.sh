@@ -213,12 +213,7 @@ powerlevel10k() {
   # Install powerlevel10k
   powerlevel10k_dir="${HOME}/.config/powerlevel10k"
   if [ -d "${powerlevel10k_dir}" ]; then
-    info "Updating powerlevel10k"
-    cd "${powerlevel10k_dir}" &&
-    git pull -q
-    check $? "powerlevel10k update"
-    # shellcheck disable=SC2164
-    cd "${progDir}"
+    info "powerlevel10k already installed"
   else
     info "Installing powerlevel10k"
     git clone --depth=1 -q https://github.com/romkatv/powerlevel10k.git "${powerlevel10k_dir}"
