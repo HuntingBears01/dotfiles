@@ -263,3 +263,8 @@ export LESS_TERMCAP_se=$'\e[0m'         # reset reverse video
 export LESS_TERMCAP_ue=$'\e[0m'         # reset underline
 export GROFF_NO_SGR=1                   # for konsole and gnome-terminal
 export LESS="-giR"                      # see man less
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   direnv
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+eval "$(direnv hook bash)"

@@ -2,9 +2,9 @@
 
 [GitHub](https://github.com/romkatv/powerlevel10k?tab=readme-ov-file)
 
-## Useful commands
+## Tips
 
-Run configuration wizard
+### Run configuration wizard
 
 ```
 p10k configure

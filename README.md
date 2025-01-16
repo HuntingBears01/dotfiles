@@ -2,6 +2,7 @@
 
 ## Prerequisites
 
+- direnv
 - fzf
 - git
 - vim
@@ -46,4 +47,11 @@ source ~/.zshrc
 ## Terminal customisation
 
 - Theme: [Catppuccin](https://catppuccin.com/)
-- Font: [Iosevka Term](https://typeof.net/Iosevka/)
+- Font: [Iosevka Term](https://typeof.net/Iosevka/) or [IosevkaTerm Nerd Font](https://www.nerdfonts.com/font-downloads)
+
+## More information
+
+- [fzf](docs/fzf.md)
+- [LS_COLORS](docs/LS_COLORS.md)
+- [Powerlevel10k](docs/Powerlevel10k.md)
+- [Vim](docs/Vim.md)

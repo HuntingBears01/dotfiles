@@ -191,6 +191,7 @@ usage() {
 linkDotfiles() {
   # Link dotfiles
   linkFiles "${progDir}/aliases" "${HOME}/.config/aliases"
+  linkFiles "${progDir}/direnv" "${HOME}/.config/direnv"
   linkFiles "${progDir}/home" "${HOME}"
   linkFiles "${progDir}/kitty" "${HOME}/.config/kitty"
   linkFiles "${progDir}/ghostty" "${HOME}/.config/ghostty"
