@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+set -euo pipefail
+
 # Update script
 # Author: Ciara Martin
 
@@ -174,30 +176,22 @@ if [ -f /etc/os-release ]; then
       sudo apt update
       check $? "apt update"
 
-      info "Upgrading apt apps"
-      sudo apt upgrade
-      check $? "apt upgrade"
+      updatesAvailable=$(apt-get --dry-run upgrade | grep -c ^Inst || test $? = 1) > /dev/null 2>&1
+      if ${updatesAvailable} -gt 0; then
+        info "${updatesAvailable} updates available"
+        sudo apt upgrade
+        check $? "apt upgrade"
 
-      info "Autoremove apt apps"
-      sudo apt autoremove
-      check $? "apt autoremove"
+        info "Autoremove apt apps"
+        sudo apt autoremove
+        check $? "apt autoremove"
+      else
+        info "No updates available"
+      fi
       ;;
   esac
 
   case "${os_family}" in
-    *debian* | *ubuntu* )
-      info "Updating apt cache"
-      sudo apt update
-      check $? "apt update"
-
-      info "Upgrading apt apps"
-      sudo apt upgrade
-      check $? "apt upgrade"
-
-      info "Autoremove apt apps"
-      sudo apt autoremove
-      check $? "apt autoremove"
-      ;;
     *arch* )
       info "Updating pacman apps"
       sudo pacman -Syu
