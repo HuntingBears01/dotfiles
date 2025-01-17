@@ -169,7 +169,7 @@ fi
 if [ -f /etc/os-release ]; then
   source /etc/os-release
   os="${ID}"
-  os_family="${ID_LIKE}"
+  os_family="${ID_LIKE}" || true
   case "${os}" in
     debian | ubuntu | raspbian | pop )
       info "Updating apt cache"
@@ -177,7 +177,7 @@ if [ -f /etc/os-release ]; then
       check $? "apt update"
 
       updatesAvailable=$(apt-get --dry-run upgrade | grep -c ^Inst || test $? = 1) > /dev/null 2>&1
-      if ${updatesAvailable} -gt 0; then
+      if [[ ${updatesAvailable} -gt 0 ]]; then
         info "${updatesAvailable} updates available"
         sudo apt upgrade
         check $? "apt upgrade"
