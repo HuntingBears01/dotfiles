@@ -168,8 +168,8 @@ fi
 
 if [ -f /etc/os-release ]; then
   source /etc/os-release
-  os="${ID}"
-  os_family="${ID_LIKE}" || true
+  os="${ID:=unknown}"
+  os_family="${ID_LIKE:=unknown}"
   case "${os}" in
     debian | ubuntu | raspbian | pop )
       info "Updating apt cache"
