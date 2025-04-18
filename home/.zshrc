@@ -7,6 +7,24 @@ fi
 
 # ~/.zshrc - ZSH configuration
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   PATH manipulation functions
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+pathAppend (){
+  pathRemove "$1"
+  export PATH="$PATH:$1"
+}
+
+pathPrepend (){
+  pathRemove "$1"
+  export PATH="$1:$PATH"
+}
+
+pathRemove (){
+  PATH=$(echo -n $PATH | awk -v RS=: -v ORS=: '$0 != "'$1'"' | sed 's/:$//')
+  export PATH
+}
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #   Colours
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -31,13 +49,11 @@ elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
   brewPrefix=/home/linuxbrew/.linuxbrew
 fi
 
-# Add brew bins to path if installed
-if command -v ${brewPrefix}/bin/brew >/dev/null 2>&1; then
+# Add brew bins to beginning of path if installed
+if command -v "${brewPrefix}/bin/brew" >/dev/null 2>&1; then
   for directory in "${brewPrefix}/sbin" "${brewPrefix}/bin"; do
-    if [[ -d ${directory} ]]; then
-      if [[ ! ${PATH} == *${directory}* ]]; then
-        PATH=${directory}:${PATH}
-      fi
+    if [[ -d "${directory}" ]]; then
+      pathPrepend "${directory}"
     fi
   done
   unset directory
@@ -95,14 +111,12 @@ setopt AUTO_CD
 setopt CORRECT
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#   Path
+#   Add directories to PATH
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 for directory in "${HOME}/.local/bin" "/usr/local/sbin" "${HOME}/.local/bin/fzf/bin"; do
-  if [[ -d ${directory} ]]; then
-    if [[ ! ${PATH} == *${directory}* ]]; then
-      PATH=${PATH}:${directory}
-    fi
+  if [[ -d "${directory}" ]]; then
+    pathAppend "${directory}"
   fi
 done
 unset directory
@@ -164,6 +178,14 @@ for file in ~/.config/aliases/*; do
   fi
 done
 unset file
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   direnv
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  Editor
@@ -264,11 +286,3 @@ export LESS_TERMCAP_se=$'\e[0m'         # reset reverse video
 export LESS_TERMCAP_ue=$'\e[0m'         # reset underline
 export GROFF_NO_SGR=1                   # for konsole and gnome-terminal
 export LESS="-giR"                      # see man less
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#   direnv
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-if command -v direnv >/dev/null 2>&1; then
-  eval "$(direnv hook zsh)"
-fi
