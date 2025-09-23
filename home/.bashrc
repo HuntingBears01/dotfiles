@@ -50,14 +50,18 @@ export LS_COLORS="di=00;34:ow=00;34:ln=00;35:ex=00;31:or=00;37;101:su=01;41;37:s
 #   brew
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Check where brew is installed & set ${brewPrefix}
+# Check where brew is installed & set ${brewPrefix} and brew options
 # Use ${brewPrefix} instead of $(brew --prefix) when needed
 if [ -x /opt/homebrew/bin/brew ]; then
   # Apple Silicon
   brewPrefix=/opt/homebrew
+  # Fuck apple gatekeeper
+  export HOMEBREW_CASK_OPTS="--no-quarantine"
 elif [ -x /usr/local/bin/brew ]; then
   # Apple Intel
   brewPrefix=/usr/local
+  # Fuck apple gatekeeper
+  export HOMEBREW_CASK_OPTS="--no-quarantine"
 elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
   # Linux
   brewPrefix=/home/linuxbrew/.linuxbrew
