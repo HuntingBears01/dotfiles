@@ -10,10 +10,8 @@ set -euo pipefail
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Text formatting
-green=$(tput setaf 2)
 grey=$(tput setaf 7)
 italic=$(tput sitm)
-red=$(tput setaf 1)
 reset=$(tput sgr0)
 yellow=$(tput setaf 3)
 
@@ -21,23 +19,8 @@ yellow=$(tput setaf 3)
 #   Define functions
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-check() {
-  # Purpose:  Display task status, log result & exit on error
-  # Usage:    check $? "Task name"
-  if [ "$1" -eq 0 ]; then
-    echo
-    echo "${green}${italic}==> ${grey}$2 successful${reset}"
-    echo
-  else
-    echo
-    echo "${red}${italic}==> ${grey}$2 failed${reset}"
-    echo
-    exit 1
-  fi
-}
-
 info() {
-  # Purpose:  Displays an info message & outputs to logfile
+  # Purpose:  Displays an info message
   # Usage:    info "Message"
   echo
   echo "${yellow}${italic}==> ${grey}$1${reset}"
@@ -75,7 +58,6 @@ if [[ -d "${HOME}"/.config/dotfiles ]]; then
     fi
     info "Updating dotfiles"
     git pull && ./setup.sh
-    check $? "dotfiles update"
     if [ "${stashed}" = true ]; then
       info "Restoring local changes"
       git stash pop
@@ -101,7 +83,6 @@ if [[ -d "${HOME}"/.local/bin/fzf ]]; then
     fi
     info "Updating fzf"
     git pull && ./install --bin
-    check $? "fzf update"
     if [ "${stashed}" = true ]; then
       info "Restoring local changes"
       git stash pop
@@ -127,7 +108,6 @@ if [[ -d "${HOME}"/.config/powerlevel10k ]]; then
     fi
     info "Updating powerlevel10k"
     git pull
-    check $? "powerlevel10k update"
     if [ "${stashed}" = true ]; then
       info "Restoring local changes"
       git stash pop
@@ -141,24 +121,12 @@ fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if  [[ "$( uname -s )" = "Darwin" ]] > /dev/null 2>&1; then
-  info "Updating brew"
-  brew update
-  check $? "Brew update"
+  brew update-if-needed
 
-  if [[ -z "$(brew outdated --formula --quiet)" ]] > /dev/null 2>&1; then
-    info "Brew apps up to date"
+  if [[ -z "$(brew outdated --quiet)" ]] > /dev/null 2>&1; then
+    info "Homebrew apps are up to date"
   else
-    info "Upgrading brew apps"
-    brew upgrade --formula
-    check $? "Brew upgrade"
-  fi
-
-  if [[ -z "$(brew outdated --cask --quiet)" ]] > /dev/null 2>&1; then
-    info "Brew cask apps up to date"
-  else
-    info "Upgrading brew cask apps"
-    brew upgrade --cask
-    check $? "Brew cask upgrade"
+    brew upgrade
   fi
 fi
 
@@ -172,19 +140,12 @@ if [ -f /etc/os-release ]; then
   os_family="${ID_LIKE:=unknown}"
   case "${os}" in
     debian | ubuntu | raspbian | pop )
-      info "Updating apt cache"
       sudo apt update
-      check $? "apt update"
 
       updatesAvailable=$(apt-get --dry-run upgrade | grep -c ^Inst || test $? = 1) > /dev/null 2>&1
       if [[ ${updatesAvailable} -gt 0 ]]; then
-        info "${updatesAvailable} updates available"
         sudo apt upgrade
-        check $? "apt upgrade"
-
-        info "Autoremove apt apps"
         sudo apt autoremove
-        check $? "apt autoremove"
       else
         info "No updates available"
       fi
@@ -193,29 +154,18 @@ if [ -f /etc/os-release ]; then
 
   case "${os_family}" in
     *arch* )
-      info "Updating pacman apps"
       sudo pacman -Syu
-      check $? "pacman update"
       ;;
     *rhel* | *fedora* )
       if (command -v dnf > /dev/null 2>&1); then
-        info "Updating dnf apps"
         sudo dnf update
-        check $? "dnf update"
       else
-        info "Updating yum apps"
         sudo yum update
-        check $? "yum update"
       fi
       ;;
     *opensuse* | *suse* )
-      info "Refreshing zypper cache"
       sudo zypper refresh
-      check $? "zypper refresh"
-
-      info "Updating zypper apps"
       sudo zypper update
-      check $? "zypper update"
       ;;
   esac
 fi

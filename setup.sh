@@ -26,48 +26,7 @@ isInteractive(){
   fi
 }
 
-isRoot(){
-  # Purpose:  Check if running as root
-  # Usage:    isRoot
-  if [ "$(id -u)" -eq 0 ]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-appendOnce() {
-  # Purpose:  Append string to a file if it doesn't already exist
-  # Usage:    appendOnce "string" "/path/to/file"
-  string=$1
-  file=$2
-  if ! [ -f "${file}" ]; then
-    echo "${string}" | sudo tee "${file}"
-  elif [ "$(grep -c "${string}" < "${file}")" -eq 0 ]; then
-    echo "${string}" | sudo tee -a "${file}"
-  fi
-}
-cloneGitRepo(){
-  # Purpose:  Clone git repository from URL
-  # Usage:    cloneGitRepo "repo URL" "/path/to/destination/dir"
-  repoURL=$1
-  destDir=$2
-  repoName=$(basename -s .git "${repoURL}")
-  info "Cloning ${repoName}"
-  if [ -L "${destDir}/${repoName}" ]; then
-    info "Deleting existing symlink ${destDir}"
-    rm "${destDir}"
-    git clone -q "${repoURL}" "${destDir}"
-    check $? "${repoName} cloning"
-  elif [ -d "${destDir}" ]; then
-    warn "${repoName} directory already exists, skipping"
-  else
-    git clone -q "${repoURL}" "${destDir}"
-    check $? "${repoName} cloning"
-  fi
-}
 
 linkFiles(){
   # Purpose:  Link all files in source directory to destination directory
@@ -180,9 +139,8 @@ usage() {
   echo
   echo "  Options:"
   echo
+  echo "  --full              Install everything (default)"
   echo "  --minimal           Install dotfiles only"
-  echo "  --theme             Install dotfiles & theme (default)"
-  echo "  --full              Install everything (interactive)"
   echo
   echo "  --help              Display this help"
   echo
@@ -221,26 +179,14 @@ powerlevel10k() {
   fi
 }
 
-installMinimal() {
-  notify "Install dotfiles only"
-  linkDotfiles
-}
-
-installTheme() {
-  notify "Install dotfiles & theme"
-  linkDotfiles
-  gitCheck
-  powerlevel10k
-}
-
-installFull() {
-  notify "Install everything"
-  if isInteractive; then
-    linkDotfiles
-    gitCheck
-    powerlevel10k
+sshConfig() {
+  # Create a minimal SSH config if it doesn't already exist
+  if [[ ! -e "${HOME}/.ssh/config" ]]; then
+    copy "${progDir}/ssh/config" "${HOME}/.ssh/config"
+    chmod 600 "${HOME}/.ssh/config"
+    check $? "Minimal SSH config install"
   else
-    fail "Full install can only be ran interactively"
+    info "SSH config already installed"
   fi
 }
 
@@ -250,7 +196,11 @@ installFull() {
 
 # Default option
 if [ $# -eq 0 ]; then
-  installTheme
+  notify "Install everything"
+  linkDotfiles
+  gitCheck
+  powerlevel10k
+  sshConfig
 fi
 
 # Parse options
@@ -261,13 +211,15 @@ while [ $# -gt 0 ]; do
       exit 0
       ;;
     --minimal | -minimal | -m )
-      installMinimal
-      ;;
-    --theme | -theme | -t )
-      installTheme
+      notify "Install dotfiles only"
+      linkDotfiles
       ;;
     --full | -full | -f )
-      installFull
+      notify "Install everything"
+      linkDotfiles
+      gitCheck
+      powerlevel10k
+      sshConfig
       ;;
     -*)
       fail "Unrecognized option: $1"
