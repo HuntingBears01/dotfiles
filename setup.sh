@@ -182,7 +182,7 @@ powerlevel10k() {
 sshConfig() {
   # Create a minimal SSH config if it doesn't already exist
   if [[ ! -e "${HOME}/.ssh/config" ]]; then
-    copy "${progDir}/ssh/config" "${HOME}/.ssh/config"
+    cp "${progDir}/ssh/config" "${HOME}/.ssh/config"
     chmod 600 "${HOME}/.ssh/config"
     check $? "Minimal SSH config install"
   else
